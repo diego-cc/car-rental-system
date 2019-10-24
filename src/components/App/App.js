@@ -1,14 +1,15 @@
 import React from 'react';
 import {VehicleStarter} from "../../VehicleStarter";
+import {Navigation} from "../Navigation/Navigation";
+import {Header} from "../Header/Header";
 
 export class App extends React.Component {
     render() {
         return (
-            <div>
-                <h1>Welcome to the Car Rental System</h1>
-                <p>Car details:</p>
-                { VehicleStarter() }
-            </div>
+            <>
+                <Navigation />
+                <Header headerText="Welcome to the Car Rental System" />
+            </>
         )
     }
 }
