@@ -1,0 +1,17 @@
+{
+  "vehicles": [
+    {
+      "manufacturer": "Ford",
+      "model": "T812",
+      "makeYear": 2014,
+      "registrationNumber": "",
+      "odometerReading": "",
+      "tankCapacity": "",
+      "fuelPurchase": {
+        "fuelEconomy": "",
+        "litres": 0,
+        "cost": 0
+      }
+    }
+  ]
+}

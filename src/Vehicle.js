@@ -5,7 +5,7 @@ import {FuelPurchase} from "./FuelPurchase";
  */
 export class Vehicle {
     /**
-     *
+     * @
      */
     _manufacturer;
     _model;
@@ -73,7 +73,8 @@ export class Vehicle {
             makeYear: this.getMakeYear(),
             model: this.getModel(),
             registrationNumber: this.getRegistrationNumber(),
-            tankCapacity: this.getTankCapacity()
+            tankCapacity: this.getTankCapacity(),
+            fuelPurchase: this.getFuelPurchase()
         })
     }
 
