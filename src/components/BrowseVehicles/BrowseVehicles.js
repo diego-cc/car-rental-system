@@ -1,5 +1,5 @@
 import React from 'react';
-import { FirebaseContext } from '../../Firebase';
+import {firebase} from "../../Firebase/Firebase";
 
 export class BrowseVehicles extends React.Component {
     constructor(props) {
@@ -10,7 +10,14 @@ export class BrowseVehicles extends React.Component {
     };
 
     componentDidMount() {
-        
+        const db = firebase.firestore();
+        db
+            .collection('vehicles')
+            .get()
+            .then(querySnapshot => {
+                const data = querySnapshot.docs.map(doc => doc.data());
+                console.dir(data);
+            })
     }
 
     render() {

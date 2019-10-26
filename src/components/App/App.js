@@ -1,7 +1,7 @@
 import React from 'react';
-import {VehicleStarter} from "../../VehicleStarter";
 import {Navigation} from "../Navigation/Navigation";
 import {Header} from "../Header/Header";
+import {BrowseVehicles} from "../BrowseVehicles/BrowseVehicles";
 
 export class App extends React.Component {
     render() {
@@ -9,6 +9,7 @@ export class App extends React.Component {
             <>
                 <Navigation />
                 <Header headerText="Welcome to the Car Rental System" />
+                <BrowseVehicles />
             </>
         )
     }
