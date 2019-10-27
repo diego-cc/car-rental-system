@@ -2,12 +2,17 @@ import React from 'react';
 import {Container, Form, Row, Col, Button} from "react-bootstrap";
 import {firebase} from "../../Firebase/Firebase";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
+import {Notification} from "../Notification/Notification";
 
 export class AddVehicle extends React.Component {
     constructor(props) {
         super(props);
         this.initialState = {
             loading: true,
+            notification: {
+                display: false,
+                message: ''
+            },
             fields: {
                 manufacturer: '',
                 model: '',
@@ -39,15 +44,43 @@ export class AddVehicle extends React.Component {
                 .set(this.state.fields)
                 .then(() => {
                     this.setState({
+                        notification: {
+                            display: true,
+                            message: 'The vehicle has been successfully added to the system'
+                        },
                         loading: false
+                    }, () => {
+                        setTimeout(() => {
+                            this.setState({
+                                notification: {
+                                    display: false,
+                                    message: ''
+                                }
+                            });
+                        }, 3500)
                     })
                 })
                 .catch(e => {
                     this.setState({
-                        loading: false
-                    }, () => console.dir(e))
+                        loading: false,
+                        notification: {
+                            display: true,
+                            message: 'The vehicle could not be added to the system. Please try again.'
+                        }
+                    }, () => {
+                        console.dir(e);
+                        setTimeout(() => {
+                            this.setState({
+                                notification: {
+                                    display: false,
+                                    message: ''
+                                }
+                            });
+                        }, 3500)
+                    })
                 });
         })
+        // TODO: Validate fields before submission
         /*Object.values(this.state).some(value => value.trim() && value.)
         let emptyField = false;
         for(let field in this.state) {
@@ -58,6 +91,8 @@ export class AddVehicle extends React.Component {
     componentDidMount() {
         this.setState({
             loading: false
+        }, () => {
+
         })
     }
 
@@ -91,9 +126,21 @@ export class AddVehicle extends React.Component {
     render() {
         return (
             <Container>
-                <Row>
+                <Row className="my-3">
                     <Col>
-                        <h2 className="text-center my-5">Add a new vehicle</h2>
+                        {
+                            this.state.notification.display ?
+                                (
+                                    <Notification
+                                        display={this.state.notification.display}
+                                        message={this.state.notification.message}/>
+                                ) : ''
+                        }
+                    </Col>
+                </Row>
+                <Row className="mb-5">
+                    <Col>
+                        <h2 className="text-center">Add a new vehicle</h2>
                     </Col>
                 </Row>
                 {
