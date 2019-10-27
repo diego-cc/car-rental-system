@@ -62,7 +62,7 @@ export class AddVehicle extends React.Component {
     }
 
     handleClear = () => {
-        const state = {...this.initialState};
+        const state = {...this.initialState, loading: false};
         this.setState(state, () => this.manufacturerInput.current.focus());
     };
 
@@ -112,6 +112,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Control
                                             ref={this.manufacturerInput}
                                             onChange={this.handleChange}
+                                            value={this.state.fields.manufacturer}
                                             type="text"
                                             placeholder="Manufacturer..."/>
                                     </Form.Group>
@@ -119,6 +120,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Label>Model:</Form.Label>
                                         <Form.Control
                                             onChange={this.handleChange}
+                                            value={this.state.fields.model}
                                             type="text"
                                             placeholder="Model..."/>
                                     </Form.Group>
@@ -126,6 +128,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Label>Year:</Form.Label>
                                         <Form.Control
                                             onChange={this.handleChange}
+                                            value={this.state.fields.year}
                                             type="number"
                                             placeholder="Year..."/>
                                     </Form.Group>
@@ -135,6 +138,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Label>Registration Number:</Form.Label>
                                         <Form.Control
                                             onChange={this.handleChange}
+                                            value={this.state.fields.registrationNumber}
                                             type="text"
                                             placeholder="Registration Number..."/>
                                     </Form.Group>
@@ -144,6 +148,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Label>Odometer Reading (in kilometres):</Form.Label>
                                         <Form.Control
                                             onChange={this.handleChange}
+                                            value={this.state.fields.odometerReading}
                                             type="number"
                                             placeholder="Odometer Reading (km)..."/>
                                     </Form.Group>
@@ -153,6 +158,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Label>Tank Capacity (in litres):</Form.Label>
                                         <Form.Control
                                             onChange={this.handleChange}
+                                            value={this.state.fields.tankCapacity}
                                             type="number"
                                             placeholder="Tank Capacity (L)..."/>
                                     </Form.Group>
@@ -160,6 +166,7 @@ export class AddVehicle extends React.Component {
                                         <Form.Label>Fuel Economy:</Form.Label>
                                         <Form.Control
                                             onChange={this.handleChange}
+                                            value={this.state.fields.fuelPurchase.fuelEconomy}
                                             type="number"
                                             placeholder="Fuel Economy..."/>
                                     </Form.Group>

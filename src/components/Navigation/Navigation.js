@@ -19,7 +19,7 @@ export class Navigation extends React.Component {
                 <Navbar.Brand as={Link} to="/" className="mr-lg-5">Car Rental System</Navbar.Brand>
                 <Navbar.Toggle aria-controls="navbar-collapse"/>
                 <Navbar.Collapse id="navbar-collapse">
-                    <Nav>
+                    <Nav className="mr-auto">
                         <NavItem>
                             <Nav.Link as={Link} to="/" className="mr-lg-3">Home</Nav.Link>
                         </NavItem>
@@ -29,19 +29,19 @@ export class Navigation extends React.Component {
                             <NavDropdown.Item as={Link} to="/edit">Edit an existing vehicle</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/delete">Delete a vehicle from the system</NavDropdown.Item>
                         </NavDropdown>
-                        <NavDropdown title="Record an incident" id="record-incident" className="mr-lg-5">
+                        <NavDropdown title="Record an incident" id="record-incident">
                             <NavDropdown.Item as={Link} to="/safety-incident">Safety incident</NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/maintenance-incident">Maintenance incident</NavDropdown.Item>
                         </NavDropdown>
-                        <Form inline>
-                            <FormControl
-                                onChange={this.handleSearch}
-                                type="text"
-                                placeholder="Search for a vehicle..."
-                                className="mr-sm-2 mr-lg-3"/>
-                            <Button variant="outline-info">Search</Button>
-                        </Form>
                     </Nav>
+                    <Form inline className="mr-lg-3">
+                        <FormControl
+                            onChange={this.handleSearch}
+                            type="text"
+                            placeholder="Search for a vehicle..."
+                            className="mr-sm-3 mr-lg-3"/>
+                        <Button variant="outline-info">Search</Button>
+                    </Form>
                 </Navbar.Collapse>
             </Navbar>
         )
