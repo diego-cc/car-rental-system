@@ -41,7 +41,10 @@ export class AddVehicle extends React.Component {
             db
                 .collection('vehicles')
                 .doc(`${this.state.fields.manufacturer}_${this.state.fields.model}_${this.state.fields.year}_${this.state.fields.registrationNumber}`)
-                .set(this.state.fields)
+                .set({
+                    id: require('uuid/v4')(),
+                    data: this.state.fields
+                })
                 .then(() => {
                     this.setState({
                         notification: {
@@ -91,8 +94,6 @@ export class AddVehicle extends React.Component {
     componentDidMount() {
         this.setState({
             loading: false
-        }, () => {
-
         })
     }
 
