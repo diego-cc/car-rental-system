@@ -11,23 +11,82 @@ export class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.addVehicle = (e, vehicle) => {
-            e.preventDefault();
-
-            const {vehicles} = this.state;
-            vehicles.push({
-                id: require('uuid/v4')(),
-                data: vehicle
-            });
+        this.addVehicle = vehicle => {
             this.setState({
-                vehicles
+                loading: true
+            }, () => {
+                // TODO: Validate fields before submission
+                /*Object.values(vehicle).some(value => value.trim() && ...)
+                let emptyField = false;
+                for(let field in this.state) {
+                    ...
+                }*/
+                const {vehicles} = this.state;
+                const vehicleId = require('uuid/v4')();
+                vehicles.push({
+                    id: vehicleId,
+                    data: vehicle
+                });
+                this.setState({
+                    vehicles
+                }, () => {
+                    const db = firebase.firestore();
+                    db
+                        .collection('vehicles')
+                        .doc(`${vehicle.manufacturer}_${vehicle.model}_${vehicle.year}_${vehicle.registrationNumber}`)
+                        .set({
+                            id: vehicleId,
+                            data: vehicle
+                        })
+                        .then(() => {
+                            this.setState({
+                                notification: {
+                                    display: true,
+                                    message: 'The vehicle has been successfully added to the system'
+                                },
+                                loading: false
+                            }, () => {
+                                setTimeout(() => {
+                                    this.setState({
+                                        notification: {
+                                            display: false,
+                                            message: ''
+                                        }
+                                    });
+                                }, 3500)
+                            })
+                        })
+                        .catch(e => {
+                            this.setState({
+                                loading: false,
+                                notification: {
+                                    display: true,
+                                    message: 'The vehicle could not be added to the system. Please try again.'
+                                }
+                            }, () => {
+                                console.dir(e);
+                                setTimeout(() => {
+                                    this.setState({
+                                        notification: {
+                                            display: false,
+                                            message: ''
+                                        }
+                                    });
+                                }, 3500)
+                            })
+                        });
+                })
             })
         };
 
         this.state = {
             loading: true,
             vehicles: [],
-            addVehicle: this.addVehicle
+            addVehicle: this.addVehicle,
+            notification: {
+                display: false,
+                message: ''
+            }
         };
     }
 

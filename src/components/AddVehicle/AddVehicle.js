@@ -1,19 +1,13 @@
 import React from 'react';
 import {Container, Form, Row, Col, Button} from "react-bootstrap";
-import {firebase} from "../../Firebase/Firebase";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {Notification} from "../Notification/Notification";
-import {AppConsumer} from "../../AppContext/AppContext";
+import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 
 export class AddVehicle extends React.Component {
     constructor(props) {
         super(props);
         this.initialState = {
-            loading: true,
-            notification: {
-                display: false,
-                message: ''
-            },
             fields: {
                 manufacturer: '',
                 model: '',
@@ -32,74 +26,17 @@ export class AddVehicle extends React.Component {
         this.manufacturerInput = React.createRef();
     }
 
-    handleSubmit = e => {
+    handleSubmit = (e, vehicle) => {
         e.preventDefault();
 
-        this.setState({
-            loading: true
-        }, () => {
-            const db = firebase.firestore();
-            db
-                .collection('vehicles')
-                .doc(`${this.state.fields.manufacturer}_${this.state.fields.model}_${this.state.fields.year}_${this.state.fields.registrationNumber}`)
-                .set({
-                    id: require('uuid/v4')(),
-                    data: this.state.fields
-                })
-                .then(() => {
-                    this.setState({
-                        notification: {
-                            display: true,
-                            message: 'The vehicle has been successfully added to the system'
-                        },
-                        loading: false
-                    }, () => {
-                        setTimeout(() => {
-                            this.setState({
-                                notification: {
-                                    display: false,
-                                    message: ''
-                                }
-                            });
-                        }, 3500)
-                    })
-                })
-                .catch(e => {
-                    this.setState({
-                        loading: false,
-                        notification: {
-                            display: true,
-                            message: 'The vehicle could not be added to the system. Please try again.'
-                        }
-                    }, () => {
-                        console.dir(e);
-                        setTimeout(() => {
-                            this.setState({
-                                notification: {
-                                    display: false,
-                                    message: ''
-                                }
-                            });
-                        }, 3500)
-                    })
-                });
+        this.setState({...this.initialState}, () => {
+            const {addVehicle} = this.context;
+            addVehicle(vehicle);
         })
-        // TODO: Validate fields before submission
-        /*Object.values(this.state).some(value => value.trim() && value.)
-        let emptyField = false;
-        for(let field in this.state) {
-
-        }*/
     };
 
-    componentDidMount() {
-        this.setState({
-            loading: false
-        })
-    }
-
     handleClear = () => {
-        const state = {...this.initialState, loading: false};
+        const state = {...this.initialState};
         this.setState(state, () => this.manufacturerInput.current.focus());
     };
 
@@ -129,16 +66,16 @@ export class AddVehicle extends React.Component {
         return (
             <AppConsumer>
                 {
-                    ({addVehicle}) => (
+                    ({loading, notification}) => (
                         <Container>
                             <Row className="my-3">
                                 <Col>
                                     {
-                                        this.state.notification.display ?
+                                        notification.display ?
                                             (
                                                 <Notification
-                                                    display={this.state.notification.display}
-                                                    message={this.state.notification.message}/>
+                                                    display={notification.display}
+                                                    message={notification.message}/>
                                             ) : ''
                                     }
                                 </Col>
@@ -149,7 +86,7 @@ export class AddVehicle extends React.Component {
                                 </Col>
                             </Row>
                             {
-                                this.state.loading ?
+                                loading ?
                                     (
                                         <Row className="justify-content-center mt-5">
                                             <LoadingSpinner/>
@@ -158,7 +95,7 @@ export class AddVehicle extends React.Component {
                                     :
                                     (
                                         <Form
-                                            onSubmit={e => addVehicle(e, this.state.fields)}
+                                            onSubmit={e => this.handleSubmit(e, this.state.fields)}
                                         >
                                             <Form.Row className="mb-lg-3">
                                                 <Form.Group as={Col} controlId="manufacturer" lg="4" md="12">
@@ -252,3 +189,5 @@ export class AddVehicle extends React.Component {
         )
     }
 }
+
+AddVehicle.contextType = AppContext;

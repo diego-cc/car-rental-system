@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row, Col, Accordion, Card, Button, ListGroup} from 'react-bootstrap'
+import {Row, Col, Accordion, Card, Button, ListGroup, Container} from 'react-bootstrap'
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {AppConsumer} from "../../AppContext/AppContext";
 
@@ -8,7 +8,7 @@ export const BrowseVehicles = props => {
         <AppConsumer>
             {
                 ({loading, vehicles}) => (
-                    <>
+                    <Container>
                         <Row>
                             <Col>
                                 <h2 className="text-center my-5">Browse vehicles</h2>
@@ -65,7 +65,7 @@ export const BrowseVehicles = props => {
                                     </Accordion>
                                 )
                         }
-                    </>
+                    </Container>
                 )
             }
         </AppConsumer>
