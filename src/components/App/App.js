@@ -6,6 +6,7 @@ import {Switch, Route} from 'react-router-dom';
 import {AddVehicle} from "../AddVehicle/AddVehicle";
 import {firebase} from "../../Firebase/Firebase";
 import {AppProvider} from "../../AppContext/AppContext";
+import {EditVehicle} from "../EditVehicle/EditVehicle";
 
 export class App extends React.Component {
     constructor(props) {
@@ -79,6 +80,15 @@ export class App extends React.Component {
             })
         };
 
+        this.editVehicle = vehicle => {
+            this.setState({
+                loading: true
+            }, () => {
+                const { vehicles } = this.state;
+
+            })
+        };
+
         this.state = {
             loading: true,
             vehicles: [],
@@ -125,6 +135,7 @@ export class App extends React.Component {
                     <Route path="/add">
                         <AddVehicle/>
                     </Route>
+                    <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />} />
                 </Switch>
             </AppProvider>
         )

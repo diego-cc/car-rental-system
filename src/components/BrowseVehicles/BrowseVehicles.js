@@ -1,7 +1,10 @@
 import React from 'react';
-import {Row, Col, Accordion, Card, Button, ListGroup, Container} from 'react-bootstrap'
+import {Row, Col, Accordion, Card, Button, ListGroup, Container, ButtonGroup} from 'react-bootstrap'
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {AppConsumer} from "../../AppContext/AppContext";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {Link} from 'react-router-dom';
 
 export const BrowseVehicles = props => {
     return (
@@ -26,11 +29,31 @@ export const BrowseVehicles = props => {
                                         {
                                             vehicles.map((vehicle, index) => (
                                                 <Card key={vehicle.id}>
-                                                    <Accordion.Toggle as={Card.Header} eventKey={index}>
-                                                        <Button variant="link">
+                                                    <Card.Header>
+                                                        <Accordion.Toggle
+                                                            className="mr-auto"
+                                                            as={Button}
+                                                            variant="link"
+                                                            eventKey={index}>
                                                             {`${vehicle.data.manufacturer} ${vehicle.data.model} (${vehicle.data.year})`}
-                                                        </Button>
-                                                    </Accordion.Toggle>
+                                                        </Accordion.Toggle>
+                                                        <ButtonGroup aria-label="Options">
+                                                            <Link
+                                                                to={`/edit/${vehicle.id}`}
+                                                                className="mr-3"
+                                                            >
+                                                                <Button
+                                                                    variant="outline-warning"
+                                                                >
+                                                                    <FontAwesomeIcon icon={faEdit}/>
+                                                                </Button>
+                                                            </Link>
+                                                            <Button
+                                                                variant="outline-danger">
+                                                                <FontAwesomeIcon icon={faTrash}/>
+                                                            </Button>
+                                                        </ButtonGroup>
+                                                    </Card.Header>
                                                     <Accordion.Collapse eventKey={index}>
                                                         <Card.Body>
                                                             <ListGroup>
