@@ -71,29 +71,20 @@ export const BrowseVehicles = props => {
                                                                     <FontAwesomeIcon icon={faCog}/>
                                                                 </Dropdown.Toggle>
                                                                 <Dropdown.Menu>
-                                                                    <Dropdown.Item>
-                                                                        <Link
-                                                                            style={{textDecoration: 'none', color: 'inherit'}}
-                                                                            to={`/addService/${vehicle.id}`}
-                                                                        >
-                                                                            Add service
-                                                                        </Link>
+                                                                    <Dropdown.Item
+                                                                        as={Link}
+                                                                        to={`/addService/${vehicle.id}`}>
+                                                                        Add service
                                                                     </Dropdown.Item>
-                                                                    <Dropdown.Item>
-                                                                        <Link
-                                                                            style={{textDecoration: 'none', color: 'inherit'}}
-                                                                            to={`/addRental/${vehicle.id}`}
-                                                                        >
-                                                                            Add rental
-                                                                        </Link>
+                                                                    <Dropdown.Item
+                                                                        as={Link}
+                                                                        to={`/addRental/${vehicle.id}`}>
+                                                                        Add rental
                                                                     </Dropdown.Item>
-                                                                    <Dropdown.Item>
-                                                                        <Link
-                                                                            style={{textDecoration: 'none', color: 'inherit'}}
-                                                                            to={`/addFuelPurchase/${vehicle.id}`}
-                                                                        >
-                                                                            Add fuel purchase
-                                                                        </Link>
+                                                                    <Dropdown.Item
+                                                                    as={Link}
+                                                                    to={`/addFuelPurchase/${vehicle.id}`}>
+                                                                        Add fuel purchase
                                                                     </Dropdown.Item>
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
