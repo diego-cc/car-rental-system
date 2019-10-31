@@ -47,6 +47,7 @@ export class EditVehicle extends React.Component {
         const {id, value} = e.target;
         if (id === 'fuelEconomy') {
             this.setState(prevState => ({
+                id: prevState.id,
                 data: {
                     ...prevState.data,
                     fuelPurchase: {
@@ -57,6 +58,7 @@ export class EditVehicle extends React.Component {
             }));
         } else {
             this.setState(prevState => ({
+                id: prevState.id,
                 data: {
                     ...prevState.data,
                     [id]: value

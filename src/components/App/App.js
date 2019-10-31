@@ -34,7 +34,7 @@ export class App extends React.Component {
                     const db = firebase.firestore();
                     db
                         .collection('vehicles')
-                        .doc(`${vehicle.manufacturer}_${vehicle.model}_${vehicle.year}_${vehicle.registrationNumber}`)
+                        .doc(vehicleId)
                         .set({
                             id: vehicleId,
                             data: vehicle
@@ -81,8 +81,6 @@ export class App extends React.Component {
         };
 
         this.editVehicle = vehicle => {
-            const oldVehicle = this.state.vehicles.find(v => v.id === vehicle.id);
-
             this.setState({
                 loading: true
             }, () => {
@@ -97,10 +95,12 @@ export class App extends React.Component {
                     })
                 }, () => {
                     const db = firebase.firestore();
+
                     return db
                         .collection('vehicles')
-                        .doc(`${oldVehicle.data.manufacturer}_${oldVehicle.data.model}_${oldVehicle.data.year}_${oldVehicle.data.registrationNumber}`)
+                        .doc(vehicle.id)
                         .update({
+                            id: vehicle.id,
                             data: vehicle.data
                         })
                         .then(() => {

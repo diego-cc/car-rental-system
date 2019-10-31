@@ -3,8 +3,6 @@ import {Button, Modal} from "react-bootstrap";
 import {AppConsumer, AppContext} from '../../AppContext/AppContext';
 
 export const DeleteVehicle = props => {
-    const context = useContext(AppContext);
-    console.dir(context);
     return (
         <AppConsumer>
             {
