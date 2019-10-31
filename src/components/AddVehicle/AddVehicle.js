@@ -62,6 +62,10 @@ export class AddVehicle extends React.Component {
         }
     };
 
+    handleCancel = () => {
+        this.props.history.push("/browse");
+    };
+
     render() {
         return (
             <AppConsumer>
@@ -174,9 +178,17 @@ export class AddVehicle extends React.Component {
                                                 <Button
                                                     variant="warning"
                                                     size="lg"
+                                                    className="mr-5"
                                                     onClick={this.handleClear}
                                                 >
                                                     Clear
+                                                </Button>
+                                                <Button
+                                                    variant="danger"
+                                                    size="lg"
+                                                    onClick={this.handleCancel}
+                                                >
+                                                    Cancel
                                                 </Button>
                                             </Row>
                                         </Form>

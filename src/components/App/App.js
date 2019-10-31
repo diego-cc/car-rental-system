@@ -259,9 +259,7 @@ export class App extends React.Component {
                     <Route path="/browse">
                         <BrowseVehicles/>
                     </Route>
-                    <Route path="/add">
-                        <AddVehicle/>
-                    </Route>
+                    <Route path="/add" render={(props) => <AddVehicle {...props} />} />
                     <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
                 </Switch>
             </AppProvider>

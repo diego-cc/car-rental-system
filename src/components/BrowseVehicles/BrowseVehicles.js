@@ -6,13 +6,22 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {Link} from 'react-router-dom';
 import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
+import {Notification} from "../Notification/Notification";
 
 export const BrowseVehicles = props => {
     return (
         <AppConsumer>
             {
-                ({loading, vehicles, deleteVehicle}) => (
+                ({loading, vehicles, deleteVehicle, notification}) => (
                     <Container>
+                        {
+                            notification.display ?
+                                (
+                                    <Notification
+                                        display={notification.display}
+                                        message={notification.message}/>
+                                ) : ''
+                        }
                         <Row>
                             <Col>
                                 <h2 className="text-center my-5">Browse vehicles</h2>

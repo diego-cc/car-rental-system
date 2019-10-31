@@ -1,8 +1,13 @@
 import React, {useContext} from 'react';
-import {Button, Modal} from "react-bootstrap";
+import {Button, ListGroup, Modal} from "react-bootstrap";
 import {AppConsumer, AppContext} from '../../AppContext/AppContext';
 
 export const DeleteVehicle = props => {
+    let vehicleToBeDeleted;
+    const {deleteVehicle, vehicles} = useContext(AppContext);
+    if (deleteVehicle.selectedVehicleId) {
+        vehicleToBeDeleted = vehicles.find(vehicle => vehicle.id === deleteVehicle.selectedVehicleId);
+    }
     return (
         <AppConsumer>
             {
@@ -20,8 +25,17 @@ export const DeleteVehicle = props => {
                             </Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <h3>Are you sure that you want to delete this vehicle from the system?</h3>
-                            <p>Vehicle ID: {deleteVehicle.selectedVehicleId ? deleteVehicle.selectedVehicleId : ''}</p>
+                            <h3 className="mb-4">Are you sure that you want to delete this vehicle from the system?</h3>
+                            <h4>Vehicle information:</h4>
+                            <ListGroup>
+                                <ListGroup.Item>Manufacturer: {vehicleToBeDeleted ? vehicleToBeDeleted.data.manufacturer : ''}</ListGroup.Item>
+                                <ListGroup.Item>Model: {vehicleToBeDeleted ? vehicleToBeDeleted.data.model : ''}</ListGroup.Item>
+                                <ListGroup.Item>Year: {vehicleToBeDeleted ? vehicleToBeDeleted.data.year : ''}</ListGroup.Item>
+                                <ListGroup.Item>Registration number: {vehicleToBeDeleted ? vehicleToBeDeleted.data.registrationNumber : ''}</ListGroup.Item>
+                                <ListGroup.Item>Odometer reading: {vehicleToBeDeleted ? vehicleToBeDeleted.data.odometerReading : ''}</ListGroup.Item>
+                                <ListGroup.Item>Tank capacity: {vehicleToBeDeleted ? vehicleToBeDeleted.data.tankCapacity : ''}</ListGroup.Item>
+                                <ListGroup.Item>Fuel economy: {vehicleToBeDeleted ? vehicleToBeDeleted.data.fuelPurchase.fuelEconomy : ''}</ListGroup.Item>
+                            </ListGroup>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button
