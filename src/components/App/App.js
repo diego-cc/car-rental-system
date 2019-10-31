@@ -139,7 +139,64 @@ export class App extends React.Component {
         };
 
         this.confirmDeleteVehicle = vehicleId => {
-            console.dir(vehicleId);
+            this.setState({
+                loading: true
+            }, () => {
+                const filteredVehicles = this.state.vehicles.filter(vehicle => vehicle.id !== vehicleId);
+                this.setState({
+                    vehicles: filteredVehicles
+                }, () => {
+                    const db = firebase.firestore();
+                    return db
+                        .collection('vehicles')
+                        .doc(vehicleId)
+                        .delete()
+                        .then(() => {
+                            this.setState(prevState => ({
+                                loading: false,
+                                deleteVehicle: {
+                                    ...prevState.deleteVehicle,
+                                    showDeleteModal: false
+                                },
+                                notification: {
+                                    display: true,
+                                    message: 'The vehicle has been successfully deleted from the system'
+                                }
+                            }), () => {
+                                setTimeout(() => {
+                                    this.setState({
+                                        notification: {
+                                            display: false,
+                                            message: ''
+                                        }
+                                    })
+                                }, 3500)
+                            })
+                        })
+                        .catch(err => {
+                            this.setState(prevState => ({
+                                notification: {
+                                    loading: false,
+                                    deleteVehicle: {
+                                        ...prevState.deleteVehicle,
+                                        showDeleteModal: false
+                                    },
+                                    display: true,
+                                    message: `The vehicle could not be deleted. Error: ${err}`
+                                }
+                            }), () => {
+                                setTimeout(() => {
+                                    this.setState({
+                                        notification: {
+                                            display: false,
+                                            message: ''
+                                        }
+                                    })
+                                }, 3500)
+                            })
+                        })
+                })
+            })
         };
 
         this.setDeleteModalShow = vehicleId => {
