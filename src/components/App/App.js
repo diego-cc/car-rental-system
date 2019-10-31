@@ -7,6 +7,7 @@ import {AddVehicle} from "../AddVehicle/AddVehicle";
 import {firebase} from "../../Firebase/Firebase";
 import {AppProvider} from "../../AppContext/AppContext";
 import {EditVehicle} from "../EditVehicle/EditVehicle";
+import {AddRental} from "../AddRental/AddRental";
 
 export class App extends React.Component {
     constructor(props) {
@@ -209,6 +210,10 @@ export class App extends React.Component {
             }));
         };
 
+        this.addRental = rental => {
+            console.dir(rental);
+        };
+
         this.state = {
             loading: true,
             vehicles: [],
@@ -223,6 +228,7 @@ export class App extends React.Component {
                 showDeleteModal: false,
                 setDeleteModalShow: this.setDeleteModalShow
             },
+            addRental: this.addRental,
             notification: {
                 display: false,
                 message: ''
@@ -277,6 +283,7 @@ export class App extends React.Component {
                     </Route>
                     <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
                     <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
+                    <Route path="/addRental/:vehicleID" render={(props) => <AddRental {...props} />} />
                 </Switch>
             </AppProvider>
         )

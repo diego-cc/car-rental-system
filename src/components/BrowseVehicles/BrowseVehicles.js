@@ -71,9 +71,30 @@ export const BrowseVehicles = props => {
                                                                     <FontAwesomeIcon icon={faCog}/>
                                                                 </Dropdown.Toggle>
                                                                 <Dropdown.Menu>
-                                                                    <Dropdown.Item>Add service</Dropdown.Item>
-                                                                    <Dropdown.Item>Add rental</Dropdown.Item>
-                                                                    <Dropdown.Item>Add fuel purchase</Dropdown.Item>
+                                                                    <Dropdown.Item>
+                                                                        <Link
+                                                                            style={{textDecoration: 'none', color: 'inherit'}}
+                                                                            to={`/addService/${vehicle.id}`}
+                                                                        >
+                                                                            Add service
+                                                                        </Link>
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Item>
+                                                                        <Link
+                                                                            style={{textDecoration: 'none', color: 'inherit'}}
+                                                                            to={`/addRental/${vehicle.id}`}
+                                                                        >
+                                                                            Add rental
+                                                                        </Link>
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Item>
+                                                                        <Link
+                                                                            style={{textDecoration: 'none', color: 'inherit'}}
+                                                                            to={`/addFuelPurchase/${vehicle.id}`}
+                                                                        >
+                                                                            Add fuel purchase
+                                                                        </Link>
+                                                                    </Dropdown.Item>
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
                                                         </ButtonGroup>
@@ -116,14 +137,17 @@ export const BrowseVehicles = props => {
                                                                                                 Service History
                                                                                             </Accordion.Toggle>
                                                                                         </Card.Header>
-                                                                                        <Accordion.Collapse eventKey={index}>
+                                                                                        <Accordion.Collapse
+                                                                                            eventKey={index}>
                                                                                             <Card.Body>
                                                                                                 <ListGroup>
                                                                                                     <ListGroup.Item>
-                                                                                                        Vehicle ID: {service.vehicleID}
+                                                                                                        Vehicle
+                                                                                                        ID: {service.vehicleID}
                                                                                                     </ListGroup.Item>
                                                                                                     <ListGroup.Item>
-                                                                                                        Service odometer: {service.serviceOdometer}
+                                                                                                        Service
+                                                                                                        odometer: {service.serviceOdometer}
                                                                                                     </ListGroup.Item>
                                                                                                 </ListGroup>
                                                                                             </Card.Body>
