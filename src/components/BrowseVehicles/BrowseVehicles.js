@@ -46,7 +46,7 @@ export const BrowseVehicles = props => {
                                                             as={Button}
                                                             variant="link"
                                                             eventKey={index}>
-                                                            {`${vehicle.data.manufacturer} ${vehicle.data.model} (${vehicle.data.year})`}
+                                                            {`${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})`}
                                                         </Accordion.Toggle>
                                                         <ButtonGroup aria-label="Options">
                                                             <Link
@@ -70,26 +70,37 @@ export const BrowseVehicles = props => {
                                                         <Card.Body>
                                                             <ListGroup>
                                                                 <ListGroup.Item>
-                                                                    Manufacturer: {vehicle.data.manufacturer}
+                                                                    Manufacturer: {vehicle.manufacturer}
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
-                                                                    Model: {vehicle.data.model}
+                                                                    Model: {vehicle.model}
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
-                                                                    Year: {vehicle.data.year}
+                                                                    Year: {vehicle.year}
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
                                                                     Registration
-                                                                    Number: {vehicle.data.registrationNumber}
+                                                                    Number: {vehicle.registrationNumber}
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
-                                                                    Odometer Reading: {vehicle.data.odometerReading} km
+                                                                    Odometer Reading: {vehicle.odometerReading} km
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
-                                                                    Tank Capacity: {vehicle.data.tankCapacity} L
+                                                                    Tank Capacity: {vehicle.tankCapacity} L
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
-                                                                    Fuel Economy: {vehicle.data.fuelEconomy}
+                                                                    Fuel Economy: {vehicle.fuelEconomy}
+                                                                </ListGroup.Item>
+                                                                <ListGroup.Item>
+                                                                    <Accordion>
+                                                                        {
+
+                                                                        }
+                                                                    </Accordion>
+                                                                </ListGroup.Item>
+                                                                <ListGroup.Item>
+                                                                    <Link to="/service-history/:id">Service
+                                                                        History</Link>
                                                                 </ListGroup.Item>
                                                             </ListGroup>
                                                         </Card.Body>

@@ -28,13 +28,12 @@ export const DeleteVehicle = props => {
                             <h3 className="mb-4">Are you sure that you want to delete this vehicle from the system?</h3>
                             <h4>Vehicle information:</h4>
                             <ListGroup>
-                                <ListGroup.Item>Manufacturer: {vehicleToBeDeleted ? vehicleToBeDeleted.data.manufacturer : ''}</ListGroup.Item>
-                                <ListGroup.Item>Model: {vehicleToBeDeleted ? vehicleToBeDeleted.data.model : ''}</ListGroup.Item>
-                                <ListGroup.Item>Year: {vehicleToBeDeleted ? vehicleToBeDeleted.data.year : ''}</ListGroup.Item>
-                                <ListGroup.Item>Registration number: {vehicleToBeDeleted ? vehicleToBeDeleted.data.registrationNumber : ''}</ListGroup.Item>
-                                <ListGroup.Item>Odometer reading: {vehicleToBeDeleted ? vehicleToBeDeleted.data.odometerReading : ''}</ListGroup.Item>
-                                <ListGroup.Item>Tank capacity: {vehicleToBeDeleted ? vehicleToBeDeleted.data.tankCapacity : ''}</ListGroup.Item>
-                                <ListGroup.Item>Fuel economy: {vehicleToBeDeleted ? vehicleToBeDeleted.data.fuelPurchase.fuelEconomy : ''}</ListGroup.Item>
+                                <ListGroup.Item>Manufacturer: {vehicleToBeDeleted ? vehicleToBeDeleted.manufacturer : ''}</ListGroup.Item>
+                                <ListGroup.Item>Model: {vehicleToBeDeleted ? vehicleToBeDeleted.model : ''}</ListGroup.Item>
+                                <ListGroup.Item>Year: {vehicleToBeDeleted ? vehicleToBeDeleted.year : ''}</ListGroup.Item>
+                                <ListGroup.Item>Registration number: {vehicleToBeDeleted ? vehicleToBeDeleted.registrationNumber : ''}</ListGroup.Item>
+                                <ListGroup.Item>Odometer reading: {vehicleToBeDeleted ? vehicleToBeDeleted.odometerReading : ''}</ListGroup.Item>
+                                <ListGroup.Item>Tank capacity: {vehicleToBeDeleted ? vehicleToBeDeleted.tankCapacity : ''}</ListGroup.Item>
                             </ListGroup>
                         </Modal.Body>
                         <Modal.Footer>

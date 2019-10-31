@@ -9,19 +9,12 @@ export class EditVehicle extends React.Component {
         super(props);
         this.initialState = {
             id: '',
-            data: {
-                manufacturer: '',
-                model: '',
-                year: '',
-                registrationNumber: '',
-                odometerReading: '',
-                tankCapacity: '',
-                fuelPurchase: {
-                    fuelEconomy: '',
-                    litres: 0,
-                    cost: 0
-                }
-            }
+            manufacturer: '',
+            model: '',
+            year: '',
+            registrationNumber: '',
+            odometerReading: '',
+            tankCapacity: ''
         };
         this.state = {...this.initialState};
         this.manufacturerInput = React.createRef();
@@ -36,8 +29,7 @@ export class EditVehicle extends React.Component {
                 .find(vehicle => vehicle.id === vehicleId);
 
         this.initialState = {
-            id: vehicleId,
-            data: {...vehicle.data}
+            ...vehicle
         };
 
         this.setState({...this.initialState});
@@ -45,26 +37,10 @@ export class EditVehicle extends React.Component {
 
     handleChange = e => {
         const {id, value} = e.target;
-        if (id === 'fuelEconomy') {
-            this.setState(prevState => ({
-                id: prevState.id,
-                data: {
-                    ...prevState.data,
-                    fuelPurchase: {
-                        ...prevState.data.fuelPurchase,
-                        [id]: value
-                    }
-                }
-            }));
-        } else {
-            this.setState(prevState => ({
-                id: prevState.id,
-                data: {
-                    ...prevState.data,
-                    [id]: value
-                }
-            }));
-        }
+        this.setState(prevState => ({
+            ...prevState,
+            [id]: value
+        }));
     };
 
     handleEdit = (e, vehicle) => {
@@ -76,7 +52,7 @@ export class EditVehicle extends React.Component {
 
     handleRestore = () => {
         this.setState({
-            data: {...this.initialState.data}
+            ...this.initialState
         }, () => {
             this.manufacturerInput.current.focus();
         })
@@ -127,7 +103,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Control
                                                         ref={this.manufacturerInput}
                                                         onChange={this.handleChange}
-                                                        value={this.state.data.manufacturer}
+                                                        value={this.state.manufacturer}
                                                         type="text"
                                                         placeholder="Manufacturer..."/>
                                                 </Form.Group>
@@ -135,7 +111,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Model:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.data.model}
+                                                        value={this.state.model}
                                                         type="text"
                                                         placeholder="Model..."/>
                                                 </Form.Group>
@@ -143,7 +119,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Year:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.data.year}
+                                                        value={this.state.year}
                                                         type="number"
                                                         placeholder="Year..."/>
                                                 </Form.Group>
@@ -153,7 +129,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Registration Number:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.data.registrationNumber}
+                                                        value={this.state.registrationNumber}
                                                         type="text"
                                                         placeholder="Registration Number..."/>
                                                 </Form.Group>
@@ -163,7 +139,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Odometer Reading (in kilometres):</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.data.odometerReading}
+                                                        value={this.state.odometerReading}
                                                         type="number"
                                                         placeholder="Odometer Reading (km)..."/>
                                                 </Form.Group>
@@ -173,17 +149,9 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Tank Capacity (in litres):</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.data.tankCapacity}
+                                                        value={this.state.tankCapacity}
                                                         type="number"
                                                         placeholder="Tank Capacity (L)..."/>
-                                                </Form.Group>
-                                                <Form.Group as={Col} controlId="fuelEconomy" lg="6" md="12">
-                                                    <Form.Label>Fuel Economy:</Form.Label>
-                                                    <Form.Control
-                                                        onChange={this.handleChange}
-                                                        value={this.state.data.fuelPurchase.fuelEconomy}
-                                                        type="number"
-                                                        placeholder="Fuel Economy..."/>
                                                 </Form.Group>
                                             </Form.Row>
                                             <Row className="justify-content-center">

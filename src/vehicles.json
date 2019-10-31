@@ -1,16 +1,27 @@
 {
   "vehicles": [
     {
-      "manufacturer": "Ford",
-      "model": "T812",
-      "makeYear": 2014,
-      "registrationNumber": "",
-      "odometerReading": "",
-      "tankCapacity": "",
-      "fuelPurchase": {
-        "fuelEconomy": "",
-        "litres": 0,
-        "cost": 0
+      "id": "blablabla",
+      "data": {
+        "manufacturer": "Ford",
+        "model": "T812",
+        "makeYear": 2014,
+        "registrationNumber": "",
+        "odometerReading": "",
+        "tankCapacity": "",
+        "fuelPurchase": {
+          "fuelEconomy": "",
+          "litres": 0,
+          "cost": 0
+        },
+        "rentalHistory": {
+          "id": "223894789abc",
+          "startDate": "31/10/2019",
+          "endDate": "02/11/2019",
+          "startOdometer": 555,
+          "endOdometer": 888,
+          "rentalType": "D"
+        }
       }
     }
   ]

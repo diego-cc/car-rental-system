@@ -26,7 +26,7 @@ export class App extends React.Component {
                 const vehicleId = require('uuid/v4')();
                 vehicles.push({
                     id: vehicleId,
-                    data: vehicle
+                    ...vehicle
                 });
                 this.setState({
                     vehicles
@@ -37,7 +37,7 @@ export class App extends React.Component {
                         .doc(vehicleId)
                         .set({
                             id: vehicleId,
-                            data: vehicle
+                            ...vehicle
                         })
                         .then(() => {
                             this.setState({
@@ -101,7 +101,7 @@ export class App extends React.Component {
                         .doc(vehicle.id)
                         .update({
                             id: vehicle.id,
-                            data: vehicle.data
+                            ...vehicle
                         })
                         .then(() => {
                             this.setState({
@@ -212,6 +212,9 @@ export class App extends React.Component {
         this.state = {
             loading: true,
             vehicles: [],
+            services: [],
+            rentals: [],
+            fuelPurchases: [],
             addVehicle: this.addVehicle,
             editVehicle: this.editVehicle,
             deleteVehicle: {
@@ -228,17 +231,30 @@ export class App extends React.Component {
     }
 
     componentDidMount() {
+        this.fetchCollection('vehicles', () => {
+            this.fetchCollection('services', () => {
+                this.fetchCollection('rentals', () => {
+                    this.fetchCollection('fuelPurchases', () => {
+                        console.dir(this.state);
+                    });
+                });
+            });
+        });
+    }
+
+    fetchCollection = (collection, callback) => {
         const db = firebase.firestore();
         db
-            .collection('vehicles')
+            .collection(collection)
             .get()
             .then(querySnapshot => {
                 const data = querySnapshot.docs.map(doc => doc.data());
                 this.setState({
                     loading: false,
-                    vehicles: [...data]
+                    [collection]: [...data]
                 })
             })
+            .then(callback)
             .catch(e => {
                 this.setState({
                     loading: false
@@ -246,7 +262,7 @@ export class App extends React.Component {
                     console.dir(e);
                 })
             })
-    }
+    };
 
     render() {
         return (
@@ -259,7 +275,7 @@ export class App extends React.Component {
                     <Route path="/browse">
                         <BrowseVehicles/>
                     </Route>
-                    <Route path="/add" render={(props) => <AddVehicle {...props} />} />
+                    <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
                     <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
                 </Switch>
             </AppProvider>

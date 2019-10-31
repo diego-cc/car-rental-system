@@ -14,12 +14,7 @@ export class AddVehicle extends React.Component {
                 year: '',
                 registrationNumber: '',
                 odometerReading: '',
-                tankCapacity: '',
-                fuelPurchase: {
-                    fuelEconomy: '',
-                    litres: 0,
-                    cost: 0
-                }
+                tankCapacity: ''
             }
         };
         this.state = {...this.initialState};
@@ -42,24 +37,12 @@ export class AddVehicle extends React.Component {
 
     handleChange = e => {
         const {id, value} = e.target;
-        if (id === 'fuelEconomy') {
-            this.setState(prevState => ({
-                fields: {
-                    ...prevState.fields,
-                    fuelPurchase: {
-                        ...prevState.fields.fuelPurchase,
-                        [id]: value
-                    }
-                }
-            }));
-        } else {
-            this.setState(prevState => ({
-                fields: {
-                    ...prevState.fields,
-                    [id]: value
-                }
-            }));
-        }
+        this.setState(prevState => ({
+            fields: {
+                ...prevState.fields,
+                [id]: value
+            }
+        }));
     };
 
     handleCancel = () => {
@@ -156,14 +139,6 @@ export class AddVehicle extends React.Component {
                                                         value={this.state.fields.tankCapacity}
                                                         type="number"
                                                         placeholder="Tank Capacity (L)..."/>
-                                                </Form.Group>
-                                                <Form.Group as={Col} controlId="fuelEconomy" lg="6" md="12">
-                                                    <Form.Label>Fuel Economy:</Form.Label>
-                                                    <Form.Control
-                                                        onChange={this.handleChange}
-                                                        value={this.state.fields.fuelPurchase.fuelEconomy}
-                                                        type="number"
-                                                        placeholder="Fuel Economy..."/>
                                                 </Form.Group>
                                             </Form.Row>
                                             <Row className="justify-content-center">
