@@ -81,10 +81,59 @@ export class App extends React.Component {
         };
 
         this.editVehicle = vehicle => {
+            const oldVehicle = this.state.vehicles.find(v => v.id === vehicle.id);
+
             this.setState({
                 loading: true
             }, () => {
-                const { vehicles } = this.state;
+                this.setState(prevState => {
+                    const {vehicles} = {...prevState};
+                    const oldVehicleIndex = vehicles.findIndex(v => v.id === vehicle.id);
+                    vehicles[oldVehicleIndex] = vehicle;
+
+                    return ({
+                        ...prevState,
+                        vehicles
+                    })
+                }, () => {
+                    const db = firebase.firestore();
+                    return db
+                        .collection('vehicles')
+                        .doc(`${oldVehicle.data.manufacturer}_${oldVehicle.data.model}_${oldVehicle.data.year}_${oldVehicle.data.registrationNumber}`)
+                        .update({
+                            data: vehicle.data
+                        })
+                        .then(() => {
+                            this.setState({
+                                loading: false,
+                                notification: {
+                                    display: true,
+                                    message: `The vehicle has been successfully updated`
+                                }
+                            }, () => {
+                                setTimeout(() => {
+                                    this.setState({
+                                        notification: {
+                                            display: false,
+                                            message: ''
+                                        }
+                                    })
+                                }, 3500)
+                            })
+                        })
+                        .catch(err => {
+                            this.setState({
+                                loading: false,
+                                notification: {
+                                    display: true,
+                                    message: `Could not edit vehicle: ${err}`
+                                }
+                            }, () => {
+                                console.dir(err);
+                            })
+                        })
+                });
+
 
             })
         };
@@ -93,6 +142,7 @@ export class App extends React.Component {
             loading: true,
             vehicles: [],
             addVehicle: this.addVehicle,
+            editVehicle: this.editVehicle,
             notification: {
                 display: false,
                 message: ''
@@ -135,7 +185,7 @@ export class App extends React.Component {
                     <Route path="/add">
                         <AddVehicle/>
                     </Route>
-                    <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />} />
+                    <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
                 </Switch>
             </AppProvider>
         )

@@ -8,7 +8,8 @@ export class EditVehicle extends React.Component {
     constructor(props) {
         super(props);
         this.initialState = {
-            fields: {
+            id: '',
+            data: {
                 manufacturer: '',
                 model: '',
                 year: '',
@@ -35,30 +36,29 @@ export class EditVehicle extends React.Component {
                 .find(vehicle => vehicle.id === vehicleId);
 
         this.initialState = {
-            fields: {...vehicle.data}
+            id: vehicleId,
+            data: {...vehicle.data}
         };
 
-        this.setState({
-            fields: {...this.initialState.fields}
-        })
+        this.setState({...this.initialState});
     }
 
     handleChange = e => {
         const {id, value} = e.target;
         if (id === 'fuelEconomy') {
             this.setState(prevState => ({
-                fields: {
-                    ...prevState.fields,
+                data: {
+                    ...prevState.data,
                     fuelPurchase: {
-                        ...prevState.fields.fuelPurchase,
+                        ...prevState.data.fuelPurchase,
                         [id]: value
                     }
                 }
             }));
         } else {
             this.setState(prevState => ({
-                fields: {
-                    ...prevState.fields,
+                data: {
+                    ...prevState.data,
                     [id]: value
                 }
             }));
@@ -66,16 +66,22 @@ export class EditVehicle extends React.Component {
     };
 
     handleEdit = (e, vehicle) => {
+        e.preventDefault();
 
+        const {editVehicle} = this.context;
+        editVehicle(vehicle);
     };
 
     handleRestore = () => {
-        // console.dir(this.initialState.fields);
         this.setState({
-            fields: {...this.initialState.fields}
+            data: {...this.initialState.data}
         }, () => {
             this.manufacturerInput.current.focus();
         })
+    };
+
+    handleCancel = () => {
+        this.props.history.push("/browse");
     };
 
     render() {
@@ -111,7 +117,7 @@ export class EditVehicle extends React.Component {
                                     :
                                     (
                                         <Form
-                                            onSubmit={e => this.handleEdit(e, this.state.fields)}
+                                            onSubmit={e => this.handleEdit(e, this.state)}
                                         >
                                             <Form.Row className="mb-lg-3">
                                                 <Form.Group as={Col} controlId="manufacturer" lg="4" md="12">
@@ -119,7 +125,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Control
                                                         ref={this.manufacturerInput}
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.manufacturer}
+                                                        value={this.state.data.manufacturer}
                                                         type="text"
                                                         placeholder="Manufacturer..."/>
                                                 </Form.Group>
@@ -127,7 +133,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Model:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.model}
+                                                        value={this.state.data.model}
                                                         type="text"
                                                         placeholder="Model..."/>
                                                 </Form.Group>
@@ -135,7 +141,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Year:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.year}
+                                                        value={this.state.data.year}
                                                         type="number"
                                                         placeholder="Year..."/>
                                                 </Form.Group>
@@ -145,7 +151,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Registration Number:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.registrationNumber}
+                                                        value={this.state.data.registrationNumber}
                                                         type="text"
                                                         placeholder="Registration Number..."/>
                                                 </Form.Group>
@@ -155,7 +161,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Odometer Reading (in kilometres):</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.odometerReading}
+                                                        value={this.state.data.odometerReading}
                                                         type="number"
                                                         placeholder="Odometer Reading (km)..."/>
                                                 </Form.Group>
@@ -165,7 +171,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Tank Capacity (in litres):</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.tankCapacity}
+                                                        value={this.state.data.tankCapacity}
                                                         type="number"
                                                         placeholder="Tank Capacity (L)..."/>
                                                 </Form.Group>
@@ -173,7 +179,7 @@ export class EditVehicle extends React.Component {
                                                     <Form.Label>Fuel Economy:</Form.Label>
                                                     <Form.Control
                                                         onChange={this.handleChange}
-                                                        value={this.state.fields.fuelPurchase.fuelEconomy}
+                                                        value={this.state.data.fuelPurchase.fuelEconomy}
                                                         type="number"
                                                         placeholder="Fuel Economy..."/>
                                                 </Form.Group>
@@ -190,9 +196,17 @@ export class EditVehicle extends React.Component {
                                                 <Button
                                                     variant="warning"
                                                     size="lg"
+                                                    className="mr-5"
                                                     onClick={this.handleRestore}
                                                 >
                                                     Restore
+                                                </Button>
+                                                <Button
+                                                    variant="danger"
+                                                    size="lg"
+                                                    onClick={this.handleCancel}
+                                                >
+                                                    Cancel
                                                 </Button>
                                             </Row>
                                         </Form>
