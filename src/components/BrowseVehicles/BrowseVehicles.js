@@ -3,16 +3,17 @@ import {Row, Col, Accordion, Card, Button, ListGroup, Container, ButtonGroup} fr
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {AppConsumer} from "../../AppContext/AppContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faCog, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {Link} from 'react-router-dom';
 import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 import {Notification} from "../Notification/Notification";
+import Dropdown from "react-bootstrap/Dropdown";
 
 export const BrowseVehicles = props => {
     return (
         <AppConsumer>
             {
-                ({loading, vehicles, deleteVehicle, notification}) => (
+                ({loading, vehicles, services, rentals, fuelPurchases, deleteVehicle, notification}) => (
                     <Container>
                         {
                             notification.display ?
@@ -39,7 +40,7 @@ export const BrowseVehicles = props => {
                                     <Accordion>
                                         {
                                             vehicles.map((vehicle, index) => (
-                                                <Card key={vehicle.id}>
+                                                <Card key={vehicle.id} style={{overflow: 'visible'}}>
                                                     <Card.Header>
                                                         <Accordion.Toggle
                                                             className="mr-auto"
@@ -61,9 +62,20 @@ export const BrowseVehicles = props => {
                                                             </Link>
                                                             <Button
                                                                 onClick={() => deleteVehicle.setDeleteModalShow(vehicle.id)}
+                                                                className="mr-3"
                                                                 variant="outline-danger">
                                                                 <FontAwesomeIcon icon={faTrash}/>
                                                             </Button>
+                                                            <Dropdown drop="right">
+                                                                <Dropdown.Toggle variant="outline-secondary">
+                                                                    <FontAwesomeIcon icon={faCog}/>
+                                                                </Dropdown.Toggle>
+                                                                <Dropdown.Menu>
+                                                                    <Dropdown.Item>Add service</Dropdown.Item>
+                                                                    <Dropdown.Item>Add rental</Dropdown.Item>
+                                                                    <Dropdown.Item>Add fuel purchase</Dropdown.Item>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
                                                         </ButtonGroup>
                                                     </Card.Header>
                                                     <Accordion.Collapse eventKey={index}>
@@ -89,19 +101,42 @@ export const BrowseVehicles = props => {
                                                                     Tank Capacity: {vehicle.tankCapacity} L
                                                                 </ListGroup.Item>
                                                                 <ListGroup.Item>
-                                                                    Fuel Economy: {vehicle.fuelEconomy}
-                                                                </ListGroup.Item>
-                                                                <ListGroup.Item>
                                                                     <Accordion>
                                                                         {
-
+                                                                            services
+                                                                                .filter(service => service.vehicleID === vehicle.id)
+                                                                                .map((service, index) => (
+                                                                                    <Card key={service.id}>
+                                                                                        <Card.Header>
+                                                                                            <Accordion.Toggle
+                                                                                                className="mr-auto"
+                                                                                                as={Button}
+                                                                                                variant="link"
+                                                                                                eventKey={index}>
+                                                                                                Service History
+                                                                                            </Accordion.Toggle>
+                                                                                        </Card.Header>
+                                                                                        <Accordion.Collapse eventKey={index}>
+                                                                                            <Card.Body>
+                                                                                                <ListGroup>
+                                                                                                    <ListGroup.Item>
+                                                                                                        Vehicle ID: {service.vehicleID}
+                                                                                                    </ListGroup.Item>
+                                                                                                    <ListGroup.Item>
+                                                                                                        Service odometer: {service.serviceOdometer}
+                                                                                                    </ListGroup.Item>
+                                                                                                </ListGroup>
+                                                                                            </Card.Body>
+                                                                                        </Accordion.Collapse>
+                                                                                    </Card>
+                                                                                ))
                                                                         }
                                                                     </Accordion>
                                                                 </ListGroup.Item>
-                                                                <ListGroup.Item>
+                                                                {/*<ListGroup.Item>
                                                                     <Link to="/service-history/:id">Service
                                                                         History</Link>
-                                                                </ListGroup.Item>
+                                                                </ListGroup.Item>*/}
                                                             </ListGroup>
                                                         </Card.Body>
                                                     </Accordion.Collapse>
