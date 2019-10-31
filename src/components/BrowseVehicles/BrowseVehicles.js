@@ -5,18 +5,20 @@ import {AppConsumer} from "../../AppContext/AppContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {Link} from 'react-router-dom';
+import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 
 export const BrowseVehicles = props => {
     return (
         <AppConsumer>
             {
-                ({loading, vehicles}) => (
+                ({loading, vehicles, deleteVehicle}) => (
                     <Container>
                         <Row>
                             <Col>
                                 <h2 className="text-center my-5">Browse vehicles</h2>
                             </Col>
                         </Row>
+                        <DeleteVehicle/>
                         {
                             loading ?
                                 (
@@ -49,6 +51,7 @@ export const BrowseVehicles = props => {
                                                                 </Button>
                                                             </Link>
                                                             <Button
+                                                                onClick={() => deleteVehicle.setDeleteModalShow(vehicle.id)}
                                                                 variant="outline-danger">
                                                                 <FontAwesomeIcon icon={faTrash}/>
                                                             </Button>

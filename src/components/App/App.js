@@ -138,11 +138,31 @@ export class App extends React.Component {
             })
         };
 
+        this.confirmDeleteVehicle = vehicleId => {
+            console.dir(vehicleId);
+        };
+
+        this.setDeleteModalShow = vehicleId => {
+            this.setState(prevState => ({
+                deleteVehicle: {
+                    ...prevState.deleteVehicle,
+                    selectedVehicleId: vehicleId ? vehicleId : null,
+                    showDeleteModal: !prevState.deleteVehicle.showDeleteModal
+                }
+            }));
+        };
+
         this.state = {
             loading: true,
             vehicles: [],
             addVehicle: this.addVehicle,
             editVehicle: this.editVehicle,
+            deleteVehicle: {
+                selectedVehicleId: null,
+                confirmDeleteVehicle: this.confirmDeleteVehicle,
+                showDeleteModal: false,
+                setDeleteModalShow: this.setDeleteModalShow
+            },
             notification: {
                 display: false,
                 message: ''
