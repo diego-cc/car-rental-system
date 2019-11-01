@@ -32,8 +32,8 @@ export const DeleteVehicle = props => {
 				<ListGroup.Item>Model: {vehicleToBeDeleted ? vehicleToBeDeleted.model : ''}</ListGroup.Item>
 				<ListGroup.Item>Year: {vehicleToBeDeleted ? vehicleToBeDeleted.year : ''}</ListGroup.Item>
 				<ListGroup.Item>Registration number: {vehicleToBeDeleted ? vehicleToBeDeleted.registrationNumber : ''}</ListGroup.Item>
-				<ListGroup.Item>Odometer reading: {vehicleToBeDeleted ? vehicleToBeDeleted.odometerReading : ''}</ListGroup.Item>
-				<ListGroup.Item>Tank capacity: {vehicleToBeDeleted ? vehicleToBeDeleted.tankCapacity : ''}</ListGroup.Item>
+				<ListGroup.Item>Odometer reading: {vehicleToBeDeleted ? vehicleToBeDeleted.odometerReading : 0} km</ListGroup.Item>
+				<ListGroup.Item>Tank capacity: {vehicleToBeDeleted ? vehicleToBeDeleted.tankCapacity : 0} L</ListGroup.Item>
 			  </ListGroup>
 			</Modal.Body>
 			<Modal.Footer>
