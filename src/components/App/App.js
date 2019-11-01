@@ -8,6 +8,7 @@ import {firebase} from "../../Firebase/Firebase";
 import {AppProvider} from "../../AppContext/AppContext";
 import {EditVehicle} from "../EditVehicle/EditVehicle";
 import {AddRental} from "../AddRental/AddRental";
+import {AddService} from "../AddService/AddService";
 
 export class App extends React.Component {
     constructor(props) {
@@ -269,6 +270,64 @@ export class App extends React.Component {
             })
         };
 
+        this.addService = service => {
+            const serviceID = require('uuid/v4')();
+            const updatedService = {
+                ...service,
+                id: serviceID
+            };
+            this.setState(prevState => {
+                const {rentals} = prevState;
+                rentals.push(updatedService);
+                return ({
+                    loading: true,
+                    rentals
+                })
+            }, () => {
+                const db = firebase.firestore();
+                db
+                    .collection('rentals')
+                    .doc(serviceID)
+                    .set(updatedService)
+                    .then(() => {
+                        this.setState({
+                            loading: false,
+                            notification: {
+                                display: true,
+                                message: `The new service has been successfully registered in the system`
+                            }
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    notification: {
+                                        display: false,
+                                        message: ''
+                                    }
+                                })
+                            }, 3500)
+                        })
+                    })
+                    .catch(err => {
+                        this.setState({
+                            loading: false,
+                            notification: {
+                                display: true,
+                                message: `Could not register new service. Error: ${err}`
+                            }
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    notification: {
+                                        display: false,
+                                        message: ''
+                                    }
+                                })
+                            }, 3500)
+                        })
+                    })
+            })
+        };
+
         this.state = {
             loading: true,
             vehicles: [],
@@ -284,6 +343,7 @@ export class App extends React.Component {
                 setDeleteModalShow: this.setDeleteModalShow
             },
             addRental: this.addRental,
+            addService: this.addService,
             notification: {
                 display: false,
                 message: ''
@@ -339,6 +399,7 @@ export class App extends React.Component {
                     <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
                     <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
                     <Route path="/addRental/:vehicleID" render={(props) => <AddRental {...props} />}/>
+                    <Route path="/addService/:vehicleID" render={(props) => <AddService {...props} />}/>
                 </Switch>
             </AppProvider>
         )
