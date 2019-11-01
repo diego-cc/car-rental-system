@@ -212,6 +212,61 @@ export class App extends React.Component {
 
         this.addRental = rental => {
             console.dir(rental);
+            const rentalID = require('uuid/v4')();
+            const updatedRental = {
+                ...rental,
+                id: rentalID
+            };
+            this.setState(prevState => {
+                const {rentals} = prevState;
+                rentals.push(updatedRental);
+                return ({
+                    loading: true,
+                    rentals
+                })
+            }, () => {
+                const db = firebase.firestore();
+                db
+                    .collection('rentals')
+                    .doc(rentalID)
+                    .set(updatedRental)
+                    .then(() => {
+                        this.setState({
+                            loading: false,
+                            notification: {
+                                display: true,
+                                message: `The new rental has been successfully registered in the system`
+                            }
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    notification: {
+                                        display: false,
+                                        message: ''
+                                    }
+                                })
+                            }, 3500)
+                        })
+                    })
+                    .catch(err => {
+                        this.setState({
+                            loading: false,
+                            notification: {
+                                display: true,
+                                message: `Could not register new rental. Error: ${err}`
+                            }
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    notification: {
+                                        display: false,
+                                        message: ''
+                                    }
+                                })
+                            }, 3500)
+                        })
+                    })
+            })
         };
 
         this.state = {
@@ -283,7 +338,7 @@ export class App extends React.Component {
                     </Route>
                     <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
                     <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
-                    <Route path="/addRental/:vehicleID" render={(props) => <AddRental {...props} />} />
+                    <Route path="/addRental/:vehicleID" render={(props) => <AddRental {...props} />}/>
                 </Switch>
             </AppProvider>
         )
