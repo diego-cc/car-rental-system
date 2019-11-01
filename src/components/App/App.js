@@ -135,8 +135,6 @@ export class App extends React.Component {
 			  })
 			})
 		});
-
-
 	  })
 	};
 
@@ -286,7 +284,7 @@ export class App extends React.Component {
 	  }, () => {
 		const db = firebase.firestore();
 		db
-		  .collection('rentals')
+		  .collection('services')
 		  .doc(serviceID)
 		  .set(updatedService)
 		  .then(() => {

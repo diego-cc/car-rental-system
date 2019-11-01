@@ -114,44 +114,123 @@ export const BrowseVehicles = props => {
 								</ListGroup.Item>
 								<ListGroup.Item>
 								  <Accordion>
-									{
-									  services
-										.filter(service => service.vehicleID === vehicle.id)
-										.map((service, index) => (
-										  <Card key={service.id}>
-											<Card.Header>
-											  <Accordion.Toggle
-												className="mr-auto"
-												as={Button}
-												variant="link"
-												eventKey={index}>
-												Service History
-											  </Accordion.Toggle>
-											</Card.Header>
-											<Accordion.Collapse
-											  eventKey={index}>
-											  <Card.Body>
-												<ListGroup>
-												  <ListGroup.Item>
-													Vehicle
-													ID: {service.vehicleID}
-												  </ListGroup.Item>
-												  <ListGroup.Item>
-													Service
-													odometer: {service.serviceOdometer}
-												  </ListGroup.Item>
-												</ListGroup>
-											  </Card.Body>
-											</Accordion.Collapse>
-										  </Card>
-										))
-									}
+									<Card>
+									  <Card.Header>
+										<Accordion.Toggle
+										  className="mr-auto"
+										  as={Button}
+										  variant="link"
+										  eventKey={index}>
+										  Service History
+										</Accordion.Toggle>
+									  </Card.Header>
+									  <Accordion.Collapse
+										eventKey={index}>
+										<Card.Body>
+										  {
+											services
+											  .filter(service => service.vehicleID === vehicle.id)
+											  .map((service, index) => (
+												<Accordion>
+												  <Card key={service.id}>
+													<Card.Header>
+													  <Accordion.Toggle
+														className="mr-auto"
+														as={Button}
+														variant="link"
+														eventKey={index}>
+														{new Date(service.servicedAt).toLocaleDateString("en-AU")}
+													  </Accordion.Toggle>
+													</Card.Header>
+													<Accordion.Collapse
+													  eventKey={index}>
+													  <Card.Body>
+														<ListGroup>
+														  <ListGroup.Item>
+															Serviced
+															at: {new Date(service.servicedAt).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Service
+															odometer: {service.serviceOdometer} km
+														  </ListGroup.Item>
+														</ListGroup>
+													  </Card.Body>
+													</Accordion.Collapse>
+												  </Card>
+												</Accordion>
+											  ))
+										  }
+										</Card.Body>
+									  </Accordion.Collapse>
+									</Card>
 								  </Accordion>
 								</ListGroup.Item>
-								{/*<ListGroup.Item>
-                                                                    <Link to="/service-history/:id">Service
-                                                                        History</Link>
-                                                                </ListGroup.Item>*/}
+								<ListGroup.Item>
+								  <Accordion>
+									<Card>
+									  <Card.Header>
+										<Accordion.Toggle
+										  className="mr-auto"
+										  as={Button}
+										  variant="link"
+										  eventKey={index}>
+										  Rental History
+										</Accordion.Toggle>
+									  </Card.Header>
+									  <Accordion.Collapse
+										eventKey={index}>
+										<Card.Body>
+										  {
+											rentals
+											  .filter(rental => rental.vehicleID === vehicle.id)
+											  .map((rental, index) => (
+												<Accordion key={index}>
+												  <Card>
+													<Card.Header>
+													  <Accordion.Toggle
+														className="mr-auto"
+														as={Button}
+														variant="link"
+														eventKey={index}>
+														{new Date(rental.startDate).toLocaleDateString("en-AU")}
+													  </Accordion.Toggle>
+													</Card.Header>
+													<Accordion.Collapse eventKey={index}>
+													  <Card.Body>
+														<ListGroup key={rental.id}>
+														  <ListGroup.Item>
+															Start
+															Date: {new Date(rental.startDate).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															End
+															Date: {new Date(rental.endDate).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Start
+															Odometer: {rental.startOdometer} km
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															End
+															Odometer: {rental.endOdometer} km
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Rental
+															Type: {rental.rentalType === 'D' ? 'Per day' : 'Per kilometer'}
+														  </ListGroup.Item>
+														</ListGroup>
+													  </Card.Body>
+													</Accordion.Collapse>
+												  </Card>
+												</Accordion>
+											  ))
+										  }
+										</Card.Body>
+									  </Accordion.Collapse>
+									</Card>
+								  </Accordion>
+								</ListGroup.Item>
 							  </ListGroup>
 							</Card.Body>
 						  </Accordion.Collapse>
