@@ -14,7 +14,9 @@ export class AddVehicle extends React.Component {
 		year: '',
 		registrationNumber: '',
 		odometerReading: '',
-		tankCapacity: ''
+		tankCapacity: '',
+        createdAt: '',
+        updatedAt: null
 	  }
 	};
 	this.state = {...this.initialState};
@@ -24,9 +26,14 @@ export class AddVehicle extends React.Component {
   handleSubmit = (e, vehicle) => {
 	e.preventDefault();
 
+	const updatedVehicle = {
+	    ...vehicle,
+        createdAt: new Date().toLocaleString('en-AU'),
+        updatedAt: null
+    };
 	this.setState({...this.initialState}, () => {
 	  const {addVehicle} = this.context;
-	  addVehicle(vehicle);
+	  addVehicle(updatedVehicle);
 	})
   };
 

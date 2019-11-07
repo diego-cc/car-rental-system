@@ -10,9 +10,12 @@ export class AddService extends React.Component {
 	this.initialState = {
 	  selectedVehicle: null,
 	  fields: {
+		id: '',
 		vehicleID: '',
 		serviceOdometer: '',
-		servicedAt: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() < 10 ? `0${new Date().getDate()}` : new Date().getDate()}`
+		servicedAt: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() < 10 ? `0${new Date().getDate()}` : new Date().getDate()}`,
+		createdAt: '',
+		updatedAt: null
 	  }
 	};
 
@@ -40,7 +43,13 @@ export class AddService extends React.Component {
 	e.preventDefault();
 	const {addService} = this.context;
 
-	addService(service);
+	const updatedService = {
+		...service,
+		createdAt: new Date().toLocaleString('en-AU'),
+		updatedAt: null
+	};
+
+	addService(updatedService);
   };
 
   handleChange = e => {

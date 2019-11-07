@@ -4,18 +4,20 @@ import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 
-export class AddRental extends React.Component {
+export class AddBooking extends React.Component {
   constructor(props) {
 	super(props);
 	this.initialState = {
 	  selectedVehicle: null,
 	  fields: {
+		id: '',
 		vehicleID: '',
 		startDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() < 10 ? `0${new Date().getDate()}` : new Date().getDate()}`,
 		endDate: '',
 		startOdometer: '',
-		endOdometer: '',
-		rentalType: 'D'
+		bookingType: 'D',
+		createdAt: '',
+		updatedAt: null
 	  }
 	};
 
@@ -39,11 +41,17 @@ export class AddRental extends React.Component {
 	this.setState({...this.initialState});
   }
 
-  handleSubmit = (e, rental) => {
+  handleSubmit = (e, booking) => {
 	e.preventDefault();
-	const {addRental} = this.context;
+	const {addBooking} = this.context;
 
-	addRental(rental);
+	const updatedBooking = {
+		...booking,
+		createdAt: new Date().toLocaleString('en-AU'),
+		updatedAt: null
+	};
+
+	addBooking(updatedBooking);
   };
 
   handleChange = e => {
@@ -58,13 +66,13 @@ export class AddRental extends React.Component {
 	}))
   };
 
-  handleRentalTypeChange = e => {
+  handleBookingTypeChange = e => {
 	const {value} = e.target;
 	this.setState(prevState => ({
 	  ...prevState,
 	  fields: {
 		...prevState.fields,
-		rentalType: value === 'perDay' ? 'D' : 'K'
+		bookingType: value === 'perDay' ? 'D' : 'K'
 	  }
 	}))
   };
@@ -95,7 +103,7 @@ export class AddRental extends React.Component {
 			  }
 			  <Row>
 				<Col>
-				  <h2 className="text-center my-5">Register new rental
+				  <h2 className="text-center my-5">Register new booking
 					for {this.state.selectedVehicle ? `${this.state.selectedVehicle.manufacturer} ${this.state.selectedVehicle.model} (${this.state.selectedVehicle.year})` : ''}</h2>
 				</Col>
 			  </Row>
@@ -110,13 +118,13 @@ export class AddRental extends React.Component {
 					<Form
 					  onSubmit={e => this.handleSubmit(e, this.state.fields)}
 					>
-					  <Form.Group as={Row} controlId="rentalType">
-						<Form.Label column="true" sm="2">Rental Type:</Form.Label>
+					  <Form.Group as={Row} controlId="bookingType">
+						<Form.Label column="true" sm="2">Booking Type:</Form.Label>
 						<Col sm="10">
 						  <Form.Control
 							as="select"
-							value={this.state.fields.rentalType.trim().toUpperCase() === 'D' ? 'perDay' : 'perKm'}
-							onChange={this.handleRentalTypeChange}>
+							value={this.state.fields.bookingType.trim().toUpperCase() === 'D' ? 'perDay' : 'perKm'}
+							onChange={this.handleBookingTypeChange}>
 							<option
 							  value="perDay">
 							  Per day
@@ -139,16 +147,16 @@ export class AddRental extends React.Component {
 							placeholder="Start Date..."/>
 						</Col>
 					  </Form.Group>
-					  <Form.Group as={Row} controlId="endDate">
-						<Form.Label column="true" sm="2">End Date:</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							onChange={this.handleChange}
-							value={this.state.fields.endDate}
-							type="date"
-							placeholder="End Date..."/>
-						</Col>
-					  </Form.Group>
+						<Form.Group as={Row} controlId="endDate">
+							<Form.Label column="true" sm="2">End Date:</Form.Label>
+							<Col sm="10">
+								<Form.Control
+									onChange={this.handleChange}
+									value={this.state.fields.endDate}
+									type="date"
+									placeholder="End Date..."/>
+							</Col>
+						</Form.Group>
 					  <Form.Group as={Row} controlId="startOdometer">
 						<Form.Label column="true" sm="2">Start Odometer:</Form.Label>
 						<Col sm="10">
@@ -159,16 +167,6 @@ export class AddRental extends React.Component {
 							placeholder="Start Odometer..."/>
 						</Col>
 					  </Form.Group>
-					  <Form.Group as={Row} controlId="endOdometer" className="mb-5">
-						<Form.Label column="true" sm="2">End Odometer:</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							onChange={this.handleChange}
-							value={this.state.fields.endOdometer}
-							type="number"
-							placeholder="End Odometer..."/>
-						</Col>
-					  </Form.Group>
 					  <Row className="justify-content-center">
 						<Button
 						  variant="primary"
@@ -176,7 +174,7 @@ export class AddRental extends React.Component {
 						  type="submit"
 						  className="mr-5"
 						>
-						  Add rental
+						  Add booking
 						</Button>
 						<Button
 						  variant="warning"
@@ -205,4 +203,4 @@ export class AddRental extends React.Component {
   }
 }
 
-AddRental.contextType = AppContext;
+AddBooking.contextType = AppContext;

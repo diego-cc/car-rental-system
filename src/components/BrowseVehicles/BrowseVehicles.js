@@ -13,7 +13,7 @@ export const BrowseVehicles = props => {
   return (
 	<AppConsumer>
 	  {
-		({loading, vehicles, services, rentals, fuelPurchases, deleteVehicle, notification}) => (
+		({loading, vehicles, services, bookings, fuelPurchases, deleteVehicle, notification}) => (
 		  <Container>
 			{
 			  notification.display ?
@@ -78,8 +78,8 @@ export const BrowseVehicles = props => {
 								  </Dropdown.Item>
 								  <Dropdown.Item
 									as={Link}
-									to={`/addRental/${vehicle.id}`}>
-									Add rental
+									to={`/addBooking/${vehicle.id}`}>
+									Add booking
 								  </Dropdown.Item>
 								  <Dropdown.Item
 									as={Link}
@@ -131,7 +131,7 @@ export const BrowseVehicles = props => {
 											services
 											  .filter(service => service.vehicleID === vehicle.id)
 											  .map((service, index) => (
-												<Accordion>
+												<Accordion key={index}>
 												  <Card key={service.id}>
 													<Card.Header>
 													  <Accordion.Toggle
@@ -175,16 +175,16 @@ export const BrowseVehicles = props => {
 										  as={Button}
 										  variant="link"
 										  eventKey={index}>
-										  Rental History
+										  Booking History
 										</Accordion.Toggle>
 									  </Card.Header>
 									  <Accordion.Collapse
 										eventKey={index}>
 										<Card.Body>
 										  {
-											rentals
-											  .filter(rental => rental.vehicleID === vehicle.id)
-											  .map((rental, index) => (
+											bookings
+											  .filter(booking => booking.vehicleID === vehicle.id)
+											  .map((booking, index) => (
 												<Accordion key={index}>
 												  <Card>
 													<Card.Header>
@@ -193,31 +193,27 @@ export const BrowseVehicles = props => {
 														as={Button}
 														variant="link"
 														eventKey={index}>
-														{new Date(rental.startDate).toLocaleDateString("en-AU")}
+														{new Date(booking.startDate).toLocaleDateString("en-AU")}
 													  </Accordion.Toggle>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>
-														<ListGroup key={rental.id}>
+														<ListGroup key={booking.id}>
 														  <ListGroup.Item>
 															Start
-															Date: {new Date(rental.startDate).toLocaleDateString("en-AU")}
+															Date: {new Date(booking.startDate).toLocaleDateString("en-AU")}
 														  </ListGroup.Item>
 														  <ListGroup.Item>
 															End
-															Date: {new Date(rental.endDate).toLocaleDateString("en-AU")}
+															Date: {new Date(booking.endDate).toLocaleDateString("en-AU")}
 														  </ListGroup.Item>
 														  <ListGroup.Item>
 															Start
-															Odometer: {rental.startOdometer} km
+															Odometer: {booking.startOdometer} km
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															End
-															Odometer: {rental.endOdometer} km
-														  </ListGroup.Item>
-														  <ListGroup.Item>
-															Rental
-															Type: {rental.rentalType === 'D' ? 'Per day' : 'Per kilometer'}
+															Booking
+															Type: {booking.bookingType === 'D' ? 'Per day' : 'Per kilometer'}
 														  </ListGroup.Item>
 														</ListGroup>
 													  </Card.Body>

@@ -7,7 +7,7 @@ import {AddVehicle} from "../AddVehicle/AddVehicle";
 import {firebase} from "../../Firebase/Firebase";
 import {AppProvider} from "../../AppContext/AppContext";
 import {EditVehicle} from "../EditVehicle/EditVehicle";
-import {AddRental} from "../AddRental/AddRental";
+import {AddBooking} from "../AddBooking/AddBooking";
 import {AddService} from "../AddService/AddService";
 
 export class App extends React.Component {
@@ -209,32 +209,32 @@ export class App extends React.Component {
 	  }));
 	};
 
-	this.addRental = rental => {
-	  console.dir(rental);
-	  const rentalID = require('uuid/v4')();
-	  const updatedRental = {
-		...rental,
-		id: rentalID
+	this.addBooking = booking => {
+	  console.dir(booking);
+	  const bookingID = require('uuid/v4')();
+	  const updatedBooking = {
+		...booking,
+		id: bookingID
 	  };
 	  this.setState(prevState => {
-		const {rentals} = prevState;
-		rentals.push(updatedRental);
+		const {bookings} = prevState;
+		bookings.push(updatedBooking);
 		return ({
 		  loading: true,
-		  rentals
+		  bookings
 		})
 	  }, () => {
 		const db = firebase.firestore();
 		db
-		  .collection('rentals')
-		  .doc(rentalID)
-		  .set(updatedRental)
+		  .collection('bookings')
+		  .doc(bookingID)
+		  .set(updatedBooking)
 		  .then(() => {
 			this.setState({
 			  loading: false,
 			  notification: {
 				display: true,
-				message: `The new rental has been successfully registered in the system`
+				message: `The new booking has been successfully registered in the system`
 			  }
 			}, () => {
 			  setTimeout(() => {
@@ -252,7 +252,7 @@ export class App extends React.Component {
 			  loading: false,
 			  notification: {
 				display: true,
-				message: `Could not register new rental. Error: ${err}`
+				message: `Could not register new booking. Error: ${err}`
 			  }
 			}, () => {
 			  setTimeout(() => {
@@ -275,11 +275,11 @@ export class App extends React.Component {
 		id: serviceID
 	  };
 	  this.setState(prevState => {
-		const {rentals} = prevState;
-		rentals.push(updatedService);
+		const {services} = prevState;
+		services.push(updatedService);
 		return ({
 		  loading: true,
-		  rentals
+		  services
 		})
 	  }, () => {
 		const db = firebase.firestore();
@@ -330,7 +330,7 @@ export class App extends React.Component {
 	  loading: true,
 	  vehicles: [],
 	  services: [],
-	  rentals: [],
+	  bookings: [],
 	  fuelPurchases: [],
 	  addVehicle: this.addVehicle,
 	  editVehicle: this.editVehicle,
@@ -340,7 +340,7 @@ export class App extends React.Component {
 		showDeleteModal: false,
 		setDeleteModalShow: this.setDeleteModalShow
 	  },
-	  addRental: this.addRental,
+	  addBooking: this.addBooking,
 	  addService: this.addService,
 	  notification: {
 		display: false,
@@ -352,7 +352,7 @@ export class App extends React.Component {
   componentDidMount() {
 	this.fetchCollection('vehicles', () => {
 	  this.fetchCollection('services', () => {
-		this.fetchCollection('rentals', () => {
+		this.fetchCollection('bookings', () => {
 		  this.fetchCollection('fuelPurchases', () => {
 			/*this.setState({
 			  notification: {
@@ -408,7 +408,7 @@ export class App extends React.Component {
 		  </Route>
 		  <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
 		  <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
-		  <Route path="/addRental/:vehicleID" render={(props) => <AddRental {...props} />}/>
+		  <Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
 		  <Route path="/addService/:vehicleID" render={(props) => <AddService {...props} />}/>
 		</Switch>
 	  </AppProvider>

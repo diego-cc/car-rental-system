@@ -14,7 +14,9 @@ export class EditVehicle extends React.Component {
 	  year: '',
 	  registrationNumber: '',
 	  odometerReading: '',
-	  tankCapacity: ''
+	  tankCapacity: '',
+		createdAt: '',
+		updatedAt: ''
 	};
 	this.state = {...this.initialState};
 	this.manufacturerInput = React.createRef();
@@ -46,8 +48,12 @@ export class EditVehicle extends React.Component {
   handleEdit = (e, vehicle) => {
 	e.preventDefault();
 
+	const updatedVehicle = {
+		...vehicle,
+		updatedAt: new Date().toLocaleString('en-AU')
+	};
 	const {editVehicle} = this.context;
-	editVehicle(vehicle);
+	editVehicle(updatedVehicle);
   };
 
   handleRestore = () => {
