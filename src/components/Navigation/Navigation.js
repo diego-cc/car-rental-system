@@ -26,8 +26,6 @@ export class Navigation extends React.Component {
 			<NavDropdown className="mr-lg-4" title="Manage vehicles" id="manage-vehicles">
 			  <NavDropdown.Item as={Link} to="/browse">Browse vehicles</NavDropdown.Item>
 			  <NavDropdown.Item as={Link} to="/add">Add a new vehicle</NavDropdown.Item>
-			  <NavDropdown.Item as={Link} to="/edit">Edit an existing vehicle</NavDropdown.Item>
-			  <NavDropdown.Item as={Link} to="/delete">Delete a vehicle from the system</NavDropdown.Item>
 			</NavDropdown>
 			<NavDropdown title="Record an incident" id="record-incident">
 			  <NavDropdown.Item as={Link} to="/safety-incident">Safety incident</NavDropdown.Item>
