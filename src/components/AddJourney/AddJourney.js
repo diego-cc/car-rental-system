@@ -73,6 +73,18 @@ export class AddJourney extends React.Component {
                       {
                         bookings
                           .filter(booking => booking.vehicleID === this.state.vehicle.id)
+                          .sort((booking1, booking2) => {
+                            const booking1StartDate = new Date(booking1.startDate);
+                            const booking2StartDate = new Date(booking2.startDate);
+
+                            if (booking1StartDate > booking2StartDate) {
+                              return -1;
+                            }
+                            else if (booking1StartDate < booking2StartDate) {
+                              return 1;
+                            }
+                            return 0;
+                          })
                           .map((booking, index) => (
                             <Card key={index} style={{overflow: 'visible'}}>
                               <Card.Header>
