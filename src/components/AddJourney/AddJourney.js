@@ -5,6 +5,7 @@ import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
+import {Link, Redirect} from "react-router-dom";
 
 export class AddJourney extends React.Component {
   constructor(props) {
@@ -79,8 +80,7 @@ export class AddJourney extends React.Component {
 
                             if (booking1StartDate > booking2StartDate) {
                               return -1;
-                            }
-                            else if (booking1StartDate < booking2StartDate) {
+                            } else if (booking1StartDate < booking2StartDate) {
                               return 1;
                             }
                             return 0;
@@ -95,9 +95,11 @@ export class AddJourney extends React.Component {
                                   eventKey={index}>
                                   {`${new Date(booking.startDate).toLocaleDateString('en-AU')}`}
                                 </Accordion.Toggle>
-                                <Button variant="outline-success">
-                                  <FontAwesomeIcon icon={faPlus} />
-                                </Button>
+                                <Link to={`/addJourneyForm/${booking.id}`}>
+                                  <Button variant="outline-success">
+                                    <FontAwesomeIcon icon={faPlus}/>
+                                  </Button>
+                                </Link>
                               </Card.Header>
                               <Accordion.Collapse eventKey={index}>
                                 <Card.Body>

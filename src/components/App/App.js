@@ -10,6 +10,7 @@ import {EditVehicle} from "../EditVehicle/EditVehicle";
 import {AddBooking} from "../AddBooking/AddBooking";
 import {AddService} from "../AddService/AddService";
 import {AddJourney} from "../AddJourney/AddJourney";
+import {AddJourneyForm} from "../AddJourney/AddJourneyForm";
 
 export class App extends React.Component {
   constructor(props) {
@@ -211,7 +212,6 @@ export class App extends React.Component {
     };
 
     this.addBooking = booking => {
-      console.dir(booking);
       const bookingID = require('uuid/v4')();
       const updatedBooking = {
         ...booking,
@@ -254,6 +254,67 @@ export class App extends React.Component {
               notification: {
                 display: true,
                 message: `Could not register new booking. Error: ${err}`
+              }
+            }, () => {
+              setTimeout(() => {
+                this.setState({
+                  notification: {
+                    display: false,
+                    message: ''
+                  }
+                })
+              }, 3500)
+            })
+          })
+      })
+    };
+
+    this.addJourney = journey => {
+      const journeyID = require('uuid/v4')();
+      const updatedJourney = {
+        ...journey,
+        id: journeyID,
+        createdAt: new Date().toLocaleString('en-AU'),
+        updatedAt: null
+      };
+
+      this.setState(prevState => {
+        const {journeys} = prevState;
+        journeys.push(updatedJourney);
+        return ({
+          loading: true,
+          journeys
+        })
+      }, () => {
+        const db = firebase.firestore();
+        db
+          .collection('journeys')
+          .doc(journeyID)
+          .set(updatedJourney)
+          .then(() => {
+            this.setState({
+              loading: false,
+              notification: {
+                display: true,
+                message: `The new journey has been successfully registered in the system`
+              }
+            }, () => {
+              setTimeout(() => {
+                this.setState({
+                  notification: {
+                    display: false,
+                    message: ''
+                  }
+                })
+              }, 3500)
+            })
+          })
+          .catch(err => {
+            this.setState({
+              loading: false,
+              notification: {
+                display: true,
+                message: `Could not register new journey. Error: ${err}`
               }
             }, () => {
               setTimeout(() => {
@@ -342,6 +403,7 @@ export class App extends React.Component {
         setDeleteModalShow: this.setDeleteModalShow
       },
       addBooking: this.addBooking,
+      addJourney: this.addJourney,
       addService: this.addService,
       notification: {
         display: false,
@@ -413,7 +475,9 @@ export class App extends React.Component {
           <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
           <Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
           <Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>
+          <Route path="/addJourneyForm/:bookingID" render={(props) => <AddJourneyForm {...props} />}/>
           <Route path="/addService/:vehicleID" render={(props) => <AddService {...props} />}/>
+          <Route path="*" render={(props) => <BrowseVehicles {...props}/>}/>
         </Switch>
       </AppProvider>
     )
