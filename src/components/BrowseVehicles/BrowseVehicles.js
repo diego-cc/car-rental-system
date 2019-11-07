@@ -81,6 +81,11 @@ export const BrowseVehicles = props => {
 									to={`/addBooking/${vehicle.id}`}>
 									Add booking
 								  </Dropdown.Item>
+                  <Dropdown.Item
+                    as={Link}
+                    to={`/addJourney/${vehicle.id}`}>
+                    Add journey
+                  </Dropdown.Item>
 								  <Dropdown.Item
 									as={Link}
 									to={`/addFuelPurchase/${vehicle.id}`}>
