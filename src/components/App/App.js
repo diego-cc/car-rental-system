@@ -393,6 +393,7 @@ export class App extends React.Component {
       vehicles: [],
       services: [],
       bookings: [],
+	  journeys: [],
       fuelPurchases: [],
       addVehicle: this.addVehicle,
       editVehicle: this.editVehicle,

@@ -5,7 +5,7 @@ import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
-import {Link, Redirect} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 export class AddJourney extends React.Component {
   constructor(props) {

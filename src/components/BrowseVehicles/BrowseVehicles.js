@@ -13,7 +13,7 @@ export const BrowseVehicles = props => {
   return (
     <AppConsumer>
       {
-        ({loading, vehicles, services, bookings, fuelPurchases, deleteVehicle, notification}) => (
+        ({loading, vehicles, services, bookings, journeys, fuelPurchases, deleteVehicle, notification}) => (
           <Container>
             {
               notification.display ?
@@ -135,6 +135,18 @@ export const BrowseVehicles = props => {
                                           {
                                             services
                                               .filter(service => service.vehicleID === vehicle.id)
+											  .sort((service1, service2) => {
+											    const service1At = new Date(service1.servicedAt);
+											    const service2At = new Date(service2.servicedAt);
+
+											    if (service1At > service2At) {
+											      return -1;
+												}
+											    else if (service1At > service2At) {
+											      return 1;
+												}
+											    return 0;
+											  })
                                               .map((service, index) => (
                                                 <Accordion key={index}>
                                                   <Card key={service.id}>
@@ -189,6 +201,18 @@ export const BrowseVehicles = props => {
                                           {
                                             bookings
                                               .filter(booking => booking.vehicleID === vehicle.id)
+											  .sort((booking1, booking2) => {
+											    const booking1StartedAt = new Date(booking1.startDate);
+												const booking2StartedAt = new Date(booking2.startDate);
+
+												if (booking1StartedAt > booking2StartedAt) {
+												  return -1;
+												}
+												else if (booking1StartedAt < booking2StartedAt) {
+												  return 1;
+												}
+												return 0;
+											  })
                                               .map((booking, index) => (
                                                 <Accordion key={index}>
                                                   <Card>
@@ -232,6 +256,85 @@ export const BrowseVehicles = props => {
                                     </Card>
                                   </Accordion>
                                 </ListGroup.Item>
+								<ListGroup.Item>
+								  <Accordion>
+									<Card>
+									  <Card.Header>
+										<Accordion.Toggle
+										  className="mr-auto"
+										  as={Button}
+										  variant="link"
+										  eventKey={index}>
+										  Journey History
+										</Accordion.Toggle>
+									  </Card.Header>
+									  <Accordion.Collapse
+										eventKey={index}>
+										<Card.Body>
+										  {
+											journeys
+											  .reduce((acc, journey) => {
+												if (bookings.some(booking => booking.id === journey.bookingID)) {
+												  acc.push(journey);
+												}
+												return acc;
+											  }, [])
+											  .sort((journey1, journey2) => {
+											    const journey1StartedAt = new Date(journey1.journeyStartedAt);
+												const journey2StartedAt = new Date(journey2.journeyStartedAt);
+											    if (journey1StartedAt > journey2StartedAt) {
+											      return -1;
+												}
+											    else if (journey1StartedAt < journey2StartedAt) {
+											      return 1;
+												}
+											    return 0;
+											  })
+											  .map((journey, index) => (
+												<Accordion key={index}>
+												  <Card>
+													<Card.Header>
+													  <Accordion.Toggle
+														className="mr-auto"
+														as={Button}
+														variant="link"
+														eventKey={index}>
+														{new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")}
+													  </Accordion.Toggle>
+													</Card.Header>
+													<Accordion.Collapse eventKey={index}>
+													  <Card.Body>
+														<ListGroup key={journey.id}>
+														  <ListGroup.Item>
+															Journey started at: {new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Journey ended at: {new Date(journey.journeyEndedAt).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Journey start odometer reading: {journey.journeyStartOdometerReading} km
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Journey end odometer reading: {journey.journeyEndOdometerReading} km
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Journey from: {journey.journeyFrom}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Journey to: {journey.journeyTo}
+														  </ListGroup.Item>
+														</ListGroup>
+													  </Card.Body>
+													</Accordion.Collapse>
+												  </Card>
+												</Accordion>
+											  ))
+										  }
+										</Card.Body>
+									  </Accordion.Collapse>
+									</Card>
+								  </Accordion>
+								</ListGroup.Item>
                               </ListGroup>
                             </Card.Body>
                           </Accordion.Collapse>
