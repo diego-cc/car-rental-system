@@ -335,6 +335,79 @@ export const BrowseVehicles = props => {
 									</Card>
 								  </Accordion>
 								</ListGroup.Item>
+								<ListGroup.Item>
+								  <Accordion>
+									<Card>
+									  <Card.Header>
+										<Accordion.Toggle
+										  className="mr-auto"
+										  as={Button}
+										  variant="link"
+										  eventKey={index}>
+										  Fuel Purchase History
+										</Accordion.Toggle>
+									  </Card.Header>
+									  <Accordion.Collapse
+										eventKey={index}>
+										<Card.Body>
+										  {
+											fuelPurchases
+											  .reduce((acc, fuelPurchase) => {
+												if (bookings.some(booking => booking.id === fuelPurchase.bookingID)) {
+												  acc.push(fuelPurchase);
+												}
+												return acc;
+											  }, [])
+											  .sort((fuelPurchase1, fuelPurchase2) => {
+											    const bookingFuelPurchase1 = bookings.find(booking => booking.id === fuelPurchase1.bookingID);
+											    const booking1StartedAt = new Date(bookingFuelPurchase1.startDate);
+												const bookingFuelPurchase2 = bookings.find(booking => booking.id === fuelPurchase2.bookingID);
+												const booking2StartedAt = new Date(bookingFuelPurchase2.startDate);
+												if (booking1StartedAt > booking2StartedAt) {
+												  return -1;
+												}
+												else if (booking1StartedAt < booking2StartedAt) {
+												  return 1;
+												}
+												return 0;
+											  })
+											  .map((fuelPurchase, index) => (
+												<Accordion key={index}>
+												  <Card>
+													<Card.Header>
+													  <Accordion.Toggle
+														className="mr-auto"
+														as={Button}
+														variant="link"
+														eventKey={index}>
+														{new Date(bookings.find(booking => booking.id === fuelPurchase.bookingID).startDate).toLocaleDateString("en-AU")}
+													  </Accordion.Toggle>
+													</Card.Header>
+													<Accordion.Collapse eventKey={index}>
+													  <Card.Body>
+														<ListGroup key={fuelPurchase.id}>
+														  <ListGroup.Item>
+															Fuel quantity: {fuelPurchase.fuelQuantity} L
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															{console.dir(fuelPurchase)}
+															Fuel price (per litre): ${Number.parseFloat(fuelPurchase.fuelPrice).toFixed(2)}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Total cost: ${(Number.parseFloat(fuelPurchase.fuelQuantity) * Number.parseFloat(fuelPurchase.fuelPrice)).toFixed(2)}
+														  </ListGroup.Item>
+														</ListGroup>
+													  </Card.Body>
+													</Accordion.Collapse>
+												  </Card>
+												</Accordion>
+											  ))
+										  }
+										</Card.Body>
+									  </Accordion.Collapse>
+									</Card>
+								  </Accordion>
+								</ListGroup.Item>
                               </ListGroup>
                             </Card.Body>
                           </Accordion.Collapse>
