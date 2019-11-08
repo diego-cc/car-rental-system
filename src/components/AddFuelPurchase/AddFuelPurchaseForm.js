@@ -134,7 +134,7 @@ export class AddFuelPurchaseForm extends React.Component {
 						  type="submit"
 						  className="mr-5"
 						>
-						  Add journey
+						  Add fuel purchase
 						</Button>
 						<Button
 						  variant="warning"
