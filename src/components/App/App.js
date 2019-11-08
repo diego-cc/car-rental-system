@@ -11,6 +11,8 @@ import {AddBooking} from "../AddBooking/AddBooking";
 import {AddService} from "../AddService/AddService";
 import {AddJourney} from "../AddJourney/AddJourney";
 import {AddJourneyForm} from "../AddJourney/AddJourneyForm";
+import {AddFuelPurchase} from "../AddFuelPurchase/AddFuelPurchase";
+import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
 
 export class App extends React.Component {
   constructor(props) {
@@ -388,6 +390,64 @@ export class App extends React.Component {
       })
     };
 
+    this.addFuelPurchase = fuelPurchase => {
+	  const fuelPurchaseID = require('uuid/v4')();
+	  const updatedFuelPurchase = {
+		...fuelPurchase,
+		id: fuelPurchaseID
+	  };
+	  this.setState(prevState => {
+		const {fuelPurchases} = prevState;
+		fuelPurchases.push(updatedFuelPurchase);
+		return ({
+		  loading: true,
+		  fuelPurchases
+		})
+	  }, () => {
+		const db = firebase.firestore();
+		db
+		  .collection('fuelPurchases')
+		  .doc(fuelPurchaseID)
+		  .set(updatedFuelPurchase)
+		  .then(() => {
+			this.setState({
+			  loading: false,
+			  notification: {
+				display: true,
+				message: `The fuel purchase has been successfully registered in the system`
+			  }
+			}, () => {
+			  setTimeout(() => {
+				this.setState({
+				  notification: {
+					display: false,
+					message: ''
+				  }
+				})
+			  }, 3500)
+			})
+		  })
+		  .catch(err => {
+			this.setState({
+			  loading: false,
+			  notification: {
+				display: true,
+				message: `Could not register new fuel purchase. Error: ${err}`
+			  }
+			}, () => {
+			  setTimeout(() => {
+				this.setState({
+				  notification: {
+					display: false,
+					message: ''
+				  }
+				})
+			  }, 3500)
+			})
+		  })
+	  })
+	};
+
     this.state = {
       loading: true,
       vehicles: [],
@@ -406,6 +466,7 @@ export class App extends React.Component {
       addBooking: this.addBooking,
       addJourney: this.addJourney,
       addService: this.addService,
+	  addFuelPurchase: this.addFuelPurchase,
       notification: {
         display: false,
         message: ''
@@ -414,29 +475,14 @@ export class App extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchCollection('vehicles', () => {
-      this.fetchCollection('services', () => {
-        this.fetchCollection('bookings', () => {
-          this.fetchCollection('journeys', () => {
-            this.fetchCollection('fuelPurchases', () => {
-              /*this.setState({
-                notification: {
-                display: true,
-                message: 'Data successfully fetched'
-                }
-              }, () => {
-                setTimeout(() => {
-                this.setState({
-                  display: false,
-                  message: ''
-                })
-                }, 3500)
-              })*/
-            });
-          })
-        });
-      });
-    });
+    this
+	  .fetchCollections('vehicles', 'services', 'bookings', 'journeys', 'fuelPurchases')
+	  .then(values => {
+	    // notify user that all collections have been successfully loaded
+	  })
+	  .catch(err => {
+	    // display error message
+	  })
   }
 
   fetchCollection = (collection, callback) => {
@@ -461,6 +507,10 @@ export class App extends React.Component {
       })
   };
 
+  async fetchCollections(...collections) {
+    return Promise.all(collections.map(collection => this.fetchCollection(collection)))
+  }
+
   render() {
     return (
       <AppProvider value={this.state}>
@@ -478,6 +528,8 @@ export class App extends React.Component {
           <Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>
           <Route path="/addJourneyForm/:bookingID" render={(props) => <AddJourneyForm {...props} />}/>
           <Route path="/addService/:vehicleID" render={(props) => <AddService {...props} />}/>
+		  <Route path="/addFuelPurchase/:vehicleID" render={(props) => <AddFuelPurchase {...props} />}/>
+		  <Route path="/addFuelPurchaseForm/:bookingID" render={(props) => <AddFuelPurchaseForm {...props} />}/>
           <Route path="*" render={(props) => <BrowseVehicles {...props}/>}/>
         </Switch>
       </AppProvider>

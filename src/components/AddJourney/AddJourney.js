@@ -43,7 +43,7 @@ export class AddJourney extends React.Component {
     return (
       <AppConsumer>
         {
-          ({vehicles, bookings, loading, notification}) => (
+          ({bookings, loading, notification}) => (
             <Container>
               {
                 notification.display ?
