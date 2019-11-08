@@ -222,7 +222,7 @@ export const BrowseVehicles = props => {
                                                         as={Button}
                                                         variant="link"
                                                         eventKey={index}>
-                                                        {new Date(booking.startDate).toLocaleDateString("en-AU")}
+                                                        {`${new Date(booking.startDate).toLocaleDateString("en-AU")} - ${new Date(booking.endDate).toLocaleDateString("en-AU")}`}
                                                       </Accordion.Toggle>
                                                     </Card.Header>
                                                     <Accordion.Collapse eventKey={index}>
@@ -299,7 +299,7 @@ export const BrowseVehicles = props => {
 														as={Button}
 														variant="link"
 														eventKey={index}>
-														{new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")}
+														{`${new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")} - ${new Date(journey.journeyEndedAt).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
@@ -380,7 +380,7 @@ export const BrowseVehicles = props => {
 														as={Button}
 														variant="link"
 														eventKey={index}>
-														{new Date(bookings.find(booking => booking.id === fuelPurchase.bookingID).startDate).toLocaleDateString("en-AU")}
+														{`${new Date(bookings.find(booking => booking.id === fuelPurchase.bookingID).startDate).toLocaleDateString("en-AU")} - ${new Date(bookings.find(booking => booking.id === fuelPurchase.bookingID).endDate).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
