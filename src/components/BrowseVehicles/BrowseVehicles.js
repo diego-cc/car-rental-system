@@ -390,7 +390,6 @@ export const BrowseVehicles = props => {
 															Fuel quantity: {fuelPurchase.fuelQuantity} L
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															{console.dir(fuelPurchase)}
 															Fuel price (per litre): ${Number.parseFloat(fuelPurchase.fuelPrice).toFixed(2)}
 														  </ListGroup.Item>
 														  <ListGroup.Item>
