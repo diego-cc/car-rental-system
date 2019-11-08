@@ -33,7 +33,11 @@ export class AddFuelPurchaseForm extends React.Component {
 	this.initialState = {
 	  ...this.initialState,
 	  vehicle,
-	  booking
+	  booking,
+	  fields: {
+	    ...this.initialState.fields,
+		bookingID
+	  }
 	};
 
 	this.setState({...this.initialState});

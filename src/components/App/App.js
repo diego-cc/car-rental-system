@@ -394,7 +394,9 @@ export class App extends React.Component {
 	  const fuelPurchaseID = require('uuid/v4')();
 	  const updatedFuelPurchase = {
 		...fuelPurchase,
-		id: fuelPurchaseID
+		id: fuelPurchaseID,
+		createdAt: new Date().toLocaleString('en-AU'),
+		updatedAt: null
 	  };
 	  this.setState(prevState => {
 		const {fuelPurchases} = prevState;
