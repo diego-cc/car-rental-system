@@ -274,7 +274,9 @@ export const BrowseVehicles = props => {
 										  {
 											journeys
 											  .reduce((acc, journey) => {
-												if (bookings.some(booking => booking.id === journey.bookingID)) {
+											    const filteredBookings = bookings.filter(booking => booking.vehicleID === vehicle.id);
+
+											    if (filteredBookings.some(b => b.id === journey.bookingID)) {
 												  acc.push(journey);
 												}
 												return acc;
@@ -353,7 +355,9 @@ export const BrowseVehicles = props => {
 										  {
 											fuelPurchases
 											  .reduce((acc, fuelPurchase) => {
-												if (bookings.some(booking => booking.id === fuelPurchase.bookingID)) {
+											    const filteredBookings = bookings.filter(booking => booking.vehicleID === vehicle.id);
+
+											    if (filteredBookings.some(b => b.id === fuelPurchase.bookingID)) {
 												  acc.push(fuelPurchase);
 												}
 												return acc;
