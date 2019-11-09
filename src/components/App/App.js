@@ -143,117 +143,72 @@ export class App extends React.Component {
 	};
 
 	this.confirmDeleteVehicle = vehicleId => {
-	  this.setState({
-		loading: true
+	  /**
+	   * TODO: First delete all fuel purchases, journeys, services and bookings associated
+	   * with the vehicle that is going to be deleted
+	   * See https://github.com/googleapis/nodejs-firestore/issues/64
+	   * Then delete the vehicle itself
+	   */
+
+	  this.setState(prevState => {
+	    const {vehicles} = prevState;
+	    const filteredVehicles = vehicles.filter(v => v.id !== vehicleId);
+
+	    return ({
+		  loading: true,
+		  vehicles: filteredVehicles,
+		  deleteVehicle: {
+			...prevState.deleteVehicle,
+			showDeleteModal: false
+		  }
+		})
 	  }, () => {
-		const filteredVehicles = this.state.vehicles.filter(vehicle => vehicle.id !== vehicleId);
-
-		const filteredBookings =
-		  this
-			.state
-			.bookings
-			.filter(booking => booking.vehicleID !== vehicleId);
-		const filteredFuelPurchases =
-		  this
-			.state
-			.fuelPurchases
-			.filter(fuelPurchase => {
-			  return !filteredBookings.some(
-				filteredBooking => fuelPurchase.bookingID === filteredBooking.id
-			  )
-			});
-		const filteredJourneys =
-		  this
-			.state
-			.journeys
-			.filter(filteredJourney => {
-			  return !filteredBookings.some(
-				filteredBooking => filteredJourney.bookingID === filteredBooking.id
-			  )
-			});
-
-		const filteredServices =
-		  this
-			.state
-			.services
-			.filter(service => {
-			  return !filteredVehicles.some(
-				filteredVehicle => service.vehicleID === filteredVehicle.id
-			  )
-			});
-
-		console.log('Filtered vehicles:');
-		console.dir(filteredVehicles);
-		console.log('Filtered bookings:');
-		console.dir(filteredBookings);
-		console.log('Filtered fuel purchases:');
-		console.dir(filteredFuelPurchases);
-		console.log('Filtered services:');
-		console.dir(filteredServices);
-		console.log('Filtered journeys:');
-		console.dir(filteredJourneys);
-	  });
-		/*this.setState({
-		  vehicles: filteredVehicles
-		}, () => {
-		  const db = firebase.firestore();*/
-		  /**
-		   * TODO: First delete all fuel purchases, journeys, services and bookings associated
-		   * with the vehicle that is going to be deleted
-		   * See https://github.com/googleapis/nodejs-firestore/issues/64
-		   * Then delete the vehicle itself
-		   */
-
-		  /*return db
-			.collection('vehicles')
-			.doc(vehicleId)
-			.delete()
-			.then(() => {
-			  this.setState(prevState => ({
+	    const db = firebase.firestore();
+		return db
+		  .collection('vehicles')
+		  .doc(vehicleId)
+		  .delete()
+		  .then(() => {
+			this.setState(prevState => ({
+			  loading: false,
+			  notification: {
+				display: true,
+				message: 'The vehicle has been successfully removed from the system'
+			  }
+			}), () => {
+			  setTimeout(() => {
+				this.setState({
+				  notification: {
+					display: false,
+					message: ''
+				  }
+				})
+			  }, 3500)
+			})
+		  })
+		  .catch(err => {
+			this.setState(prevState => ({
+			  notification: {
 				loading: false,
 				deleteVehicle: {
 				  ...prevState.deleteVehicle,
 				  showDeleteModal: false
 				},
-				notification: {
-				  display: true,
-				  message: 'The vehicle has been successfully deleted from the system'
-				}
-			  }), () => {
-				setTimeout(() => {
-				  this.setState({
-					notification: {
-					  display: false,
-					  message: ''
-					}
-				  })
-				}, 3500)
-			  })
+				display: true,
+				message: `The vehicle could not be deleted. Error: ${err}`
+			  }
+			}), () => {
+			  setTimeout(() => {
+				this.setState({
+				  notification: {
+					display: false,
+					message: ''
+				  }
+				})
+			  }, 3500)
 			})
-			.catch(err => {
-			  this.setState(prevState => ({
-				notification: {
-				  loading: false,
-				  deleteVehicle: {
-					...prevState.deleteVehicle,
-					showDeleteModal: false
-				  },
-				  display: true,
-				  message: `The vehicle could not be deleted. Error: ${err}`
-				}
-			  }), () => {
-				setTimeout(() => {
-				  this.setState({
-					notification: {
-					  display: false,
-					  message: ''
-					}
-				  })
-				}, 3500)
-			  })
-			})
-		})
-	  })*/
+		  })
+	  })
 	};
 
 	this.setDeleteModalShow = vehicleId => {

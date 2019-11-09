@@ -49,7 +49,9 @@ export class AddService extends React.Component {
 		updatedAt: null
 	};
 
-	addService(updatedService);
+	this.setState({...this.initialState}, () => {
+	  addService(updatedService);
+	})
   };
 
   handleChange = e => {

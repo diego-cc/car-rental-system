@@ -51,7 +51,9 @@ export class AddBooking extends React.Component {
       updatedAt: null
     };
 
-    addBooking(updatedBooking);
+    this.setState({...this.initialState}, () => {
+	  addBooking(updatedBooking);
+	})
   };
 
   handleChange = e => {

@@ -51,7 +51,10 @@ export class AddJourneyForm extends React.Component {
     e.preventDefault();
 
     const {addJourney} = this.context;
-    addJourney(journey);
+
+    this.setState({...this.initialState}, () => {
+	  addJourney(journey);
+	})
   };
 
   handleChange = e => {
