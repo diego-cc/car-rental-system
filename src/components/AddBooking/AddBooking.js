@@ -42,7 +42,8 @@ export class AddBooking extends React.Component {
 	  selectedVehicle,
 	  fields: {
 		...this.initialState.fields,
-		vehicleID
+		vehicleID,
+		startOdometer: selectedVehicle.odometerReading
 	  }
 	};
 

@@ -32,7 +32,8 @@ export class AddService extends React.Component {
 	  selectedVehicle,
 	  fields: {
 		...this.initialState.fields,
-		vehicleID
+		vehicleID,
+		serviceOdometer: selectedVehicle.odometerReading
 	  }
 	};
 

@@ -13,6 +13,8 @@ import {AddJourney} from "../AddJourney/AddJourney";
 import {AddJourneyForm} from "../AddJourney/AddJourneyForm";
 import {AddFuelPurchase} from "../AddFuelPurchase/AddFuelPurchase";
 import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
+import Moment from 'moment';
+import { extendMoment } from 'moment-range';
 
 export class App extends React.Component {
   constructor(props) {
@@ -151,10 +153,10 @@ export class App extends React.Component {
 	   */
 
 	  this.setState(prevState => {
-	    const {vehicles} = prevState;
-	    const filteredVehicles = vehicles.filter(v => v.id !== vehicleId);
+		const {vehicles} = prevState;
+		const filteredVehicles = vehicles.filter(v => v.id !== vehicleId);
 
-	    return ({
+		return ({
 		  loading: true,
 		  vehicles: filteredVehicles,
 		  deleteVehicle: {
@@ -163,7 +165,7 @@ export class App extends React.Component {
 		  }
 		})
 	  }, () => {
-	    const db = firebase.firestore();
+		const db = firebase.firestore();
 		return db
 		  .collection('vehicles')
 		  .doc(vehicleId)
@@ -488,16 +490,57 @@ export class App extends React.Component {
 	this
 	  .fetchCollections('vehicles', 'services', 'bookings', 'journeys', 'fuelPurchases')
 	  .then(values => {
-// notify user that all collections have been successfully loaded
+		// update vehicle odometers if a journey ends today
+		const {vehicles, journeys, bookings} = this.state;
+		const moment = extendMoment(Moment);
+		journeys.forEach(journey => {
+		  const momentEndDate = moment(journey.endDate);
+		  const now = moment();
+		  const selectedBooking = bookings.find(booking => booking.id === journey.bookingID);
+		  const selectedVehicle = vehicles.find(vehicle => vehicle.id === selectedBooking.vehicleID);
+		  if (momentEndDate.isSame(now) && selectedVehicle.odometerReading < journey.journeyEndOdometerReading) {
+		    this.setState(prevState => {
+		      const updatedVehicles = prevState.vehicles;
+			  updatedVehicles[vehicles.findIndex(vehicle => vehicle.id === selectedVehicle.id)].odometerReading = journey.journeyEndOdometerReading;
+
+			  return ({
+				vehicles: updatedVehicles
+			  })
+			}, () => {
+		      const db = firebase.firestore();
+		      db
+				.collection('vehicles')
+				.doc(`${selectedVehicle.id}`)
+				.set({
+				  ...selectedVehicle,
+				  odometerReading: journey.journeyEndOdometerReading
+				})
+				.then(() => {
+				  this.setState({
+					notification: {
+					  display: true,
+					  message: 'Successfully updated vehicle odometers'
+					}
+				  })
+				})
+			})
+		  }
+		})
 	  })
 	  .catch(err => {
-// display error message
+		// display error message
+		this.setState({
+		  notification: {
+			display: true,
+			message: `Error: ${err.message}`
+		  }
+		})
 	  })
   }
 
   fetchCollection = (collection, callback) => {
 	const db = firebase.firestore();
-	db
+	return db
 	  .collection(collection)
 	  .get()
 	  .then(querySnapshot => {
