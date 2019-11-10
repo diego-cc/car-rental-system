@@ -521,6 +521,15 @@ export class App extends React.Component {
 					  display: true,
 					  message: 'Successfully updated vehicle odometers'
 					}
+				  }, () => {
+				    setTimeout(() => {
+				      this.setState({
+						notification: {
+						  display: false,
+						  message: ''
+						}
+					  })
+					}, 3000)
 				  })
 				})
 			})
@@ -534,6 +543,15 @@ export class App extends React.Component {
 			display: true,
 			message: `Error: ${err.message}`
 		  }
+		}, () => {
+		  setTimeout(() => {
+			this.setState({
+			  notification: {
+				display: false,
+				message: ''
+			  }
+			})
+		  }, 3000)
 		})
 	  })
   }
