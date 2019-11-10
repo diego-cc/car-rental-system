@@ -182,7 +182,7 @@ export class AddBooking extends React.Component {
 					  show={this.state.vehicleDueForBooking}
 					  onHide={() => this.setState({vehicleDueForBooking: false})}
 					  headermessage={`Vehicle is unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}`}
-					  bodymessage={`Sorry, but this vehicle is currently unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}, because another booking has been for ${new Date(this.state.anotherBookingStartDate).toLocaleDateString('en-AU')} - ${new Date(this.state.anotherBookingEndDate).toLocaleDateString('en-AU')}.`}
+					  bodymessage={`Sorry, but this vehicle is currently unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}, because another booking has been made for ${new Date(this.state.anotherBookingStartDate).toLocaleDateString('en-AU')} - ${new Date(this.state.anotherBookingEndDate).toLocaleDateString('en-AU')}.`}
 					/>
 					:
 					''
