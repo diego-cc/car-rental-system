@@ -8,18 +8,46 @@ import {Link} from 'react-router-dom';
 import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 import {Notification} from "../Notification/Notification";
 import Dropdown from "react-bootstrap/Dropdown";
-import {calculateBookingCost} from "../../BookingCost";
+import {calculateBookingCost, calculateRevenueRecorded} from "../../BookingCost";
+import moment from "moment";
 
 export const BrowseVehicles = props => {
-  // TODO: format print details
+  // TODO: implement fuel economy
   const printDetails = (vehicle, vehicleBookings, vehicleJourneys, vehicleServices) => {
-    return ({
+	return ({
 	  'Vehicle': `${vehicle.manufacturer} ${vehicle.model} ${vehicle.year}`,
 	  'Registration Number': vehicle.registrationNumber,
 	  'Total Kilometers Travelled': `${vehicle.odometerReading} km`,
 	  'Total services': vehicleServices.length,
-	  'Revenue recorded': ''
+	  'Revenue recorded': `$ ${calculateRevenueRecorded(vehicleBookings, vehicleJourneys)}`,
+	  'Kilometers since the last service': `${vehicle.odometerReading - getLastServiceOdometerReading(vehicleServices)} km`,
+	  'Fuel economy': ``,
+	  'Requires a service': requiresService(vehicleServices) ? 'Yes' : 'No'
 	})
+  };
+
+  const getLastServiceOdometerReading = services => {
+	const now = moment();
+	let lastServiceIndex = 0;
+	const minimumDiff = now.diff(services[lastServiceIndex], 'days');
+	let currentDiff;
+
+	services.forEach((service, index) => {
+	  const servicedAt = moment(service.servicedAt);
+	  if (servicedAt.isBefore(now)) {
+		currentDiff = now.diff(servicedAt, 'days');
+		if (currentDiff < minimumDiff) {
+		  currentDiff = minimumDiff;
+		  lastServiceIndex = index;
+		}
+	  }
+	});
+
+	return services[lastServiceIndex].serviceOdometer;
+  };
+
+  const requiresService = services => {
+    return services.some(service => moment(service.servicedAt).isAfter(moment()));
   };
 
   return (
@@ -256,13 +284,13 @@ export const BrowseVehicles = props => {
 														  </ListGroup.Item>
 														  <ListGroup.Item>
 															Booking cost: {
-														    	Number.isNaN(calculateBookingCost(booking, journeys.filter(journey => journey.bookingID === booking.id)))
-															?
-																  'Pending (no journeys have' +
-																  ' been made for this booking' +
-																  ' yet)' :
-																  `$ ${Number.parseFloat(calculateBookingCost(booking, journeys.filter(journey => journey.bookingID === booking.id))).toFixed(2)}`
-															}
+															Number.isNaN(calculateBookingCost(booking, journeys.filter(journey => journey.bookingID === booking.id)))
+															  ?
+															  'Pending (no journeys have' +
+															  ' been made for this booking' +
+															  ' yet)' :
+															  `$ ${Number.parseFloat(calculateBookingCost(booking, journeys.filter(journey => journey.bookingID === booking.id))).toFixed(2)}`
+														  }
 														  </ListGroup.Item>
 														</ListGroup>
 													  </Card.Body>

@@ -20,6 +20,17 @@ export const calculateBookingCost = (booking, bookingJourneys) => {
 
   return bookingCost;
 };
+
+export const calculateRevenueRecorded = (bookings, journeys) => {
+  return Number.parseFloat(bookings.reduce((acc, booking) => {
+	const bookingJourneys = journeys.filter(journey => journey.bookingID === booking.id);
+	if (!Number.isNaN(calculateBookingCost(booking, bookingJourneys))) {
+	  acc += calculateBookingCost(booking, bookingJourneys);
+	}
+	return acc;
+  }, 0)).toFixed(2);
+};
+
 const calculateDistanceTravelledInKm = (booking, lastJourney) => {
   if (lastJourney) {
 	const endOdometer = lastJourney.journeyEndOdometerReading;
@@ -38,8 +49,6 @@ const calculateBookingDurationInDays = booking => {
 };
 
 const findLastJourney = (booking, bookingJourneys) => {
-  // const associatedJourneys = journeys.filter(journey => journey.bookingID === booking.id);
-
   if (bookingJourneys.length) {
 	const bookingEndDate = moment(booking.endDate);
 	let lastJourneyIndex = 0;
