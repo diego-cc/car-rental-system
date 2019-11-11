@@ -9,49 +9,17 @@ import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 import {Notification} from "../Notification/Notification";
 import Dropdown from "react-bootstrap/Dropdown";
 import {calculateBookingCost} from "../../BookingCost";
-import {BookingType} from "../../BookingType";
-import moment from 'moment';
 
 export const BrowseVehicles = props => {
-
-  const calculateDistanceTravelledInKm = (booking, lastJourney) => {
-    if (lastJourney) {
-	  const endOdometer = lastJourney.journeyEndOdometerReading;
-	  const startOdometer = booking.startOdometer;
-
-	  return endOdometer - startOdometer;
-	}
-    return 'Pending (no journeys have been made for this booking yet)';
-  };
-
-  const calculateBookingDurationInDays = booking => {
-	const bookingStartDate = moment(booking.startDate);
-	const bookingEndDate = moment(booking.endDate);
-
-	return bookingEndDate.diff(bookingStartDate, 'days');
-  };
-
-  const findLastJourney = (booking, journeys) => {
-	const associatedJourneys = journeys.filter(journey => journey.bookingID === booking.id);
-
-	if (associatedJourneys.length) {
-	  const bookingEndDate = moment(booking.endDate);
-	  let lastJourneyIndex = 0;
-	  let minimumDateDiff = bookingEndDate.diff(moment(associatedJourneys[lastJourneyIndex].journeyEndedAt), 'days');
-	  let currentDiff = minimumDateDiff;
-
-	  associatedJourneys.forEach((journey, index) => {
-		currentDiff = bookingEndDate.diff(moment(journey.journeyEndedAt), 'days');
-		if (currentDiff < minimumDateDiff) {
-		  currentDiff = minimumDateDiff;
-		  lastJourneyIndex = index;
-		}
-	  });
-
-	  return associatedJourneys[lastJourneyIndex];
-	}
-
-	return null;
+  // TODO: format print details
+  const printDetails = (vehicle, vehicleBookings, vehicleJourneys, vehicleServices) => {
+    return ({
+	  'Vehicle': `${vehicle.manufacturer} ${vehicle.model} ${vehicle.year}`,
+	  'Registration Number': vehicle.registrationNumber,
+	  'Total Kilometers Travelled': `${vehicle.odometerReading} km`,
+	  'Total services': vehicleServices.length,
+	  'Revenue recorded': ''
+	})
   };
 
   return (
@@ -288,21 +256,12 @@ export const BrowseVehicles = props => {
 														  </ListGroup.Item>
 														  <ListGroup.Item>
 															Booking cost: {
-															  Number.isNaN(calculateBookingCost({
-																bookingType: booking.bookingType === 'D' ? BookingType.PER_DAY : BookingType.PER_KM,
-																units: booking.bookingType === 'D' ?
-																  calculateBookingDurationInDays(booking)
-																  :
-																  calculateDistanceTravelledInKm(booking, findLastJourney(booking, journeys))
-															  })) ? 'Pending (no journeys have been made for this booking yet)'
-																 :
-																`$ ${Number.parseFloat(calculateBookingCost({
-																  bookingType: booking.bookingType === 'D' ? BookingType.PER_DAY : BookingType.PER_KM,
-																  units: booking.bookingType === 'D' ?
-																	calculateBookingDurationInDays(booking)
-																	:
-																	calculateDistanceTravelledInKm(booking, findLastJourney(booking, journeys))
-																})).toFixed(2)}`
+														    	Number.isNaN(calculateBookingCost(booking, journeys.filter(journey => journey.bookingID === booking.id)))
+															?
+																  'Pending (no journeys have' +
+																  ' been made for this booking' +
+																  ' yet)' :
+																  `$ ${Number.parseFloat(calculateBookingCost(booking, journeys.filter(journey => journey.bookingID === booking.id))).toFixed(2)}`
 															}
 														  </ListGroup.Item>
 														</ListGroup>

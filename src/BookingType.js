@@ -1,4 +1,4 @@
 export const BookingType = {
-  'PER_DAY': 0,
-  'PER_KM': 1
+  'PER_DAY': 'D',
+  'PER_KM': 'K'
 };
