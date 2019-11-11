@@ -8,254 +8,315 @@ import {Link} from 'react-router-dom';
 import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 import {Notification} from "../Notification/Notification";
 import Dropdown from "react-bootstrap/Dropdown";
+import {calculateBookingCost} from "../../BookingCost";
+import {BookingType} from "../../BookingType";
+import moment from 'moment';
 
 export const BrowseVehicles = props => {
+
+  const calculateDistanceTravelledInKm = (booking, lastJourney) => {
+    if (lastJourney) {
+	  const endOdometer = lastJourney.journeyEndOdometerReading;
+	  const startOdometer = booking.startOdometer;
+
+	  return endOdometer - startOdometer;
+	}
+    return 'Pending (no journeys have been made for this booking yet)';
+  };
+
+  const calculateBookingDurationInDays = booking => {
+	const bookingStartDate = moment(booking.startDate);
+	const bookingEndDate = moment(booking.endDate);
+
+	return bookingEndDate.diff(bookingStartDate, 'days');
+  };
+
+  const findLastJourney = (booking, journeys) => {
+	const associatedJourneys = journeys.filter(journey => journey.bookingID === booking.id);
+
+	if (associatedJourneys.length) {
+	  const bookingEndDate = moment(booking.endDate);
+	  let lastJourneyIndex = 0;
+	  let minimumDateDiff = bookingEndDate.diff(moment(associatedJourneys[lastJourneyIndex].journeyEndedAt), 'days');
+	  let currentDiff = minimumDateDiff;
+
+	  associatedJourneys.forEach((journey, index) => {
+		currentDiff = bookingEndDate.diff(moment(journey.journeyEndedAt), 'days');
+		if (currentDiff < minimumDateDiff) {
+		  currentDiff = minimumDateDiff;
+		  lastJourneyIndex = index;
+		}
+	  });
+
+	  return associatedJourneys[lastJourneyIndex];
+	}
+
+	return null;
+  };
+
   return (
-    <AppConsumer>
-      {
-        ({loading, vehicles, services, bookings, journeys, fuelPurchases, deleteVehicle, notification}) => (
-          <Container>
-            {
-              notification.display ?
-                (
-                  <Notification
-                    display={notification.display}
-                    message={notification.message}/>
-                ) : ''
-            }
-            <Row>
-              <Col>
-                <h2 className="text-center my-5">Browse vehicles</h2>
-              </Col>
-            </Row>
-            <DeleteVehicle/>
-            {
-              loading ?
-                (
-                  <Row className="justify-content-center mt-5">
-                    <LoadingSpinner/>
-                  </Row>
-                ) :
-                (
-                  <Accordion>
-                    {
-                      vehicles.map((vehicle, index) => (
-                        <Card key={vehicle.id} style={{overflow: 'visible'}}>
-                          <Card.Header>
-                            <Accordion.Toggle
-                              className="mr-auto"
-                              as={Button}
-                              variant="link"
-                              eventKey={index}>
-                              {`${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})`}
-                            </Accordion.Toggle>
-                            <ButtonGroup aria-label="Options">
-                              <Link
-                                to={`/edit/${vehicle.id}`}
-                                className="mr-3"
-                              >
-                                <Button
-                                  variant="outline-warning"
-                                >
-                                  <FontAwesomeIcon icon={faEdit}/>
-                                </Button>
-                              </Link>
-                              <Button
-                                onClick={() => deleteVehicle.setDeleteModalShow(vehicle.id)}
-                                className="mr-3"
-                                variant="outline-danger">
-                                <FontAwesomeIcon icon={faTrash}/>
-                              </Button>
-                              <Dropdown drop="right">
-                                <Dropdown.Toggle variant="outline-secondary">
-                                  <FontAwesomeIcon icon={faCog}/>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                  <Dropdown.Item
-                                    as={Link}
-                                    to={`/addService/${vehicle.id}`}>
-                                    Add service
-                                  </Dropdown.Item>
-                                  <Dropdown.Item
-                                    as={Link}
-                                    to={`/addBooking/${vehicle.id}`}>
-                                    Add booking
-                                  </Dropdown.Item>
-                                  <Dropdown.Item
-                                    as={Link}
-                                    to={`/addJourney/${vehicle.id}`}>
-                                    Add journey
-                                  </Dropdown.Item>
-                                  <Dropdown.Item
-                                    as={Link}
-                                    to={`/addFuelPurchase/${vehicle.id}`}>
-                                    Add fuel purchase
-                                  </Dropdown.Item>
-                                </Dropdown.Menu>
-                              </Dropdown>
-                            </ButtonGroup>
-                          </Card.Header>
-                          <Accordion.Collapse eventKey={index}>
-                            <Card.Body>
-                              <ListGroup>
-                                <ListGroup.Item>
-                                  Manufacturer: {vehicle.manufacturer}
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  Model: {vehicle.model}
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  Year: {vehicle.year}
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  Registration
-                                  Number: {vehicle.registrationNumber}
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  Odometer Reading: {vehicle.odometerReading} km
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  Tank Capacity: {vehicle.tankCapacity} L
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  <Accordion>
-                                    <Card>
-                                      <Card.Header>
-                                        <Accordion.Toggle
-                                          className="mr-auto"
-                                          as={Button}
-                                          variant="link"
-                                          eventKey={index}>
-                                          Service History
-                                        </Accordion.Toggle>
-                                      </Card.Header>
-                                      <Accordion.Collapse
-                                        eventKey={index}>
-                                        <Card.Body>
-                                          {
-                                            services
-                                              .filter(service => service.vehicleID === vehicle.id)
+	<AppConsumer>
+	  {
+		({loading, vehicles, services, bookings, journeys, fuelPurchases, deleteVehicle, notification}) => (
+		  <Container>
+			{
+			  notification.display ?
+				(
+				  <Notification
+					display={notification.display}
+					message={notification.message}/>
+				) : ''
+			}
+			<Row>
+			  <Col>
+				<h2 className="text-center my-5">Browse vehicles</h2>
+			  </Col>
+			</Row>
+			<DeleteVehicle/>
+			{
+			  loading ?
+				(
+				  <Row className="justify-content-center mt-5">
+					<LoadingSpinner/>
+				  </Row>
+				) :
+				(
+				  <Accordion>
+					{
+					  vehicles.map((vehicle, index) => (
+						<Card key={vehicle.id} style={{overflow: 'visible'}}>
+						  <Card.Header>
+							<Accordion.Toggle
+							  className="mr-auto"
+							  as={Button}
+							  variant="link"
+							  eventKey={index}>
+							  {`${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})`}
+							</Accordion.Toggle>
+							<ButtonGroup aria-label="Options">
+							  <Link
+								to={`/edit/${vehicle.id}`}
+								className="mr-3"
+							  >
+								<Button
+								  variant="outline-warning"
+								>
+								  <FontAwesomeIcon icon={faEdit}/>
+								</Button>
+							  </Link>
+							  <Button
+								onClick={() => deleteVehicle.setDeleteModalShow(vehicle.id)}
+								className="mr-3"
+								variant="outline-danger">
+								<FontAwesomeIcon icon={faTrash}/>
+							  </Button>
+							  <Dropdown drop="right">
+								<Dropdown.Toggle variant="outline-secondary">
+								  <FontAwesomeIcon icon={faCog}/>
+								</Dropdown.Toggle>
+								<Dropdown.Menu>
+								  <Dropdown.Item
+									as={Link}
+									to={`/addService/${vehicle.id}`}>
+									Add service
+								  </Dropdown.Item>
+								  <Dropdown.Item
+									as={Link}
+									to={`/addBooking/${vehicle.id}`}>
+									Add booking
+								  </Dropdown.Item>
+								  <Dropdown.Item
+									as={Link}
+									to={`/addJourney/${vehicle.id}`}>
+									Add journey
+								  </Dropdown.Item>
+								  <Dropdown.Item
+									as={Link}
+									to={`/addFuelPurchase/${vehicle.id}`}>
+									Add fuel purchase
+								  </Dropdown.Item>
+								</Dropdown.Menu>
+							  </Dropdown>
+							</ButtonGroup>
+						  </Card.Header>
+						  <Accordion.Collapse eventKey={index}>
+							<Card.Body>
+							  <ListGroup>
+								<ListGroup.Item>
+								  Manufacturer: {vehicle.manufacturer}
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  Model: {vehicle.model}
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  Year: {vehicle.year}
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  Registration
+								  Number: {vehicle.registrationNumber}
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  Odometer Reading: {vehicle.odometerReading} km
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  Tank Capacity: {vehicle.tankCapacity} L
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  <Accordion>
+									<Card>
+									  <Card.Header>
+										<Accordion.Toggle
+										  className="mr-auto"
+										  as={Button}
+										  variant="link"
+										  eventKey={index}>
+										  Service History
+										</Accordion.Toggle>
+									  </Card.Header>
+									  <Accordion.Collapse
+										eventKey={index}>
+										<Card.Body>
+										  {
+											services
+											  .filter(service => service.vehicleID === vehicle.id)
 											  .sort((service1, service2) => {
-											    const service1At = new Date(service1.servicedAt);
-											    const service2At = new Date(service2.servicedAt);
+												const service1At = new Date(service1.servicedAt);
+												const service2At = new Date(service2.servicedAt);
 
-											    if (service1At > service2At) {
-											      return -1;
-												}
-											    else if (service1At > service2At) {
-											      return 1;
-												}
-											    return 0;
-											  })
-                                              .map((service, index) => (
-                                                <Accordion key={index}>
-                                                  <Card key={service.id}>
-                                                    <Card.Header>
-                                                      <Accordion.Toggle
-                                                        className="mr-auto"
-                                                        as={Button}
-                                                        variant="link"
-                                                        eventKey={index}>
-                                                        {new Date(service.servicedAt).toLocaleDateString("en-AU")}
-                                                      </Accordion.Toggle>
-                                                    </Card.Header>
-                                                    <Accordion.Collapse
-                                                      eventKey={index}>
-                                                      <Card.Body>
-                                                        <ListGroup>
-                                                          <ListGroup.Item>
-                                                            Serviced
-                                                            at: {new Date(service.servicedAt).toLocaleDateString("en-AU")}
-                                                          </ListGroup.Item>
-                                                          <ListGroup.Item>
-                                                            Service
-                                                            odometer: {service.serviceOdometer} km
-                                                          </ListGroup.Item>
-                                                        </ListGroup>
-                                                      </Card.Body>
-                                                    </Accordion.Collapse>
-                                                  </Card>
-                                                </Accordion>
-                                              ))
-                                          }
-                                        </Card.Body>
-                                      </Accordion.Collapse>
-                                    </Card>
-                                  </Accordion>
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                  <Accordion>
-                                    <Card>
-                                      <Card.Header>
-                                        <Accordion.Toggle
-                                          className="mr-auto"
-                                          as={Button}
-                                          variant="link"
-                                          eventKey={index}>
-                                          Booking History
-                                        </Accordion.Toggle>
-                                      </Card.Header>
-                                      <Accordion.Collapse
-                                        eventKey={index}>
-                                        <Card.Body>
-                                          {
-                                            bookings
-                                              .filter(booking => booking.vehicleID === vehicle.id)
-											  .sort((booking1, booking2) => {
-											    const booking1StartedAt = new Date(booking1.startDate);
-												const booking2StartedAt = new Date(booking2.startDate);
-
-												if (booking1StartedAt > booking2StartedAt) {
+												if (service1At > service2At) {
 												  return -1;
-												}
-												else if (booking1StartedAt < booking2StartedAt) {
+												} else if (service1At > service2At) {
 												  return 1;
 												}
 												return 0;
 											  })
-                                              .map((booking, index) => (
-                                                <Accordion key={index}>
-                                                  <Card>
-                                                    <Card.Header>
-                                                      <Accordion.Toggle
-                                                        className="mr-auto"
-                                                        as={Button}
-                                                        variant="link"
-                                                        eventKey={index}>
-                                                        {`${new Date(booking.startDate).toLocaleDateString("en-AU")} - ${new Date(booking.endDate).toLocaleDateString("en-AU")}`}
-                                                      </Accordion.Toggle>
-                                                    </Card.Header>
-                                                    <Accordion.Collapse eventKey={index}>
-                                                      <Card.Body>
-                                                        <ListGroup key={booking.id}>
-                                                          <ListGroup.Item>
-                                                            Start
-                                                            Date: {new Date(booking.startDate).toLocaleDateString("en-AU")}
-                                                          </ListGroup.Item>
-                                                          <ListGroup.Item>
-                                                            End
-                                                            Date: {new Date(booking.endDate).toLocaleDateString("en-AU")}
-                                                          </ListGroup.Item>
-                                                          <ListGroup.Item>
-                                                            Start
-                                                            Odometer: {booking.startOdometer} km
-                                                          </ListGroup.Item>
-                                                          <ListGroup.Item>
-                                                            Booking
-                                                            Type: {booking.bookingType === 'D' ? 'Per day' : 'Per kilometer'}
-                                                          </ListGroup.Item>
-                                                        </ListGroup>
-                                                      </Card.Body>
-                                                    </Accordion.Collapse>
-                                                  </Card>
-                                                </Accordion>
-                                              ))
-                                          }
-                                        </Card.Body>
-                                      </Accordion.Collapse>
-                                    </Card>
-                                  </Accordion>
-                                </ListGroup.Item>
+											  .map((service, index) => (
+												<Accordion key={index}>
+												  <Card key={service.id}>
+													<Card.Header>
+													  <Accordion.Toggle
+														className="mr-auto"
+														as={Button}
+														variant="link"
+														eventKey={index}>
+														{new Date(service.servicedAt).toLocaleDateString("en-AU")}
+													  </Accordion.Toggle>
+													</Card.Header>
+													<Accordion.Collapse
+													  eventKey={index}>
+													  <Card.Body>
+														<ListGroup>
+														  <ListGroup.Item>
+															Serviced
+															at: {new Date(service.servicedAt).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Service
+															odometer: {service.serviceOdometer} km
+														  </ListGroup.Item>
+														</ListGroup>
+													  </Card.Body>
+													</Accordion.Collapse>
+												  </Card>
+												</Accordion>
+											  ))
+										  }
+										</Card.Body>
+									  </Accordion.Collapse>
+									</Card>
+								  </Accordion>
+								</ListGroup.Item>
+								<ListGroup.Item>
+								  <Accordion>
+									<Card>
+									  <Card.Header>
+										<Accordion.Toggle
+										  className="mr-auto"
+										  as={Button}
+										  variant="link"
+										  eventKey={index}>
+										  Booking History
+										</Accordion.Toggle>
+									  </Card.Header>
+									  <Accordion.Collapse
+										eventKey={index}>
+										<Card.Body>
+										  {
+											bookings
+											  .filter(booking => booking.vehicleID === vehicle.id)
+											  .sort((booking1, booking2) => {
+												const booking1StartedAt = new Date(booking1.startDate);
+												const booking2StartedAt = new Date(booking2.startDate);
+
+												if (booking1StartedAt > booking2StartedAt) {
+												  return -1;
+												} else if (booking1StartedAt < booking2StartedAt) {
+												  return 1;
+												}
+												return 0;
+											  })
+											  .map((booking, index) => (
+												<Accordion key={index}>
+												  <Card>
+													<Card.Header>
+													  <Accordion.Toggle
+														className="mr-auto"
+														as={Button}
+														variant="link"
+														eventKey={index}>
+														{`${new Date(booking.startDate).toLocaleDateString("en-AU")} - ${new Date(booking.endDate).toLocaleDateString("en-AU")}`}
+													  </Accordion.Toggle>
+													</Card.Header>
+													<Accordion.Collapse eventKey={index}>
+													  <Card.Body>
+														<ListGroup key={booking.id}>
+														  <ListGroup.Item>
+															Start
+															Date: {new Date(booking.startDate).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															End
+															Date: {new Date(booking.endDate).toLocaleDateString("en-AU")}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Start
+															Odometer: {booking.startOdometer} km
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Booking
+															Type: {booking.bookingType === 'D' ? 'Per day' : 'Per kilometer'}
+														  </ListGroup.Item>
+														  <ListGroup.Item>
+															Booking cost: {
+															  Number.isNaN(calculateBookingCost({
+																bookingType: booking.bookingType === 'D' ? BookingType.PER_DAY : BookingType.PER_KM,
+																units: booking.bookingType === 'D' ?
+																  calculateBookingDurationInDays(booking)
+																  :
+																  calculateDistanceTravelledInKm(booking, findLastJourney(booking, journeys))
+															  })) ? 'Pending (no journeys have been made for this booking yet)'
+																 :
+																`$ ${Number.parseFloat(calculateBookingCost({
+																  bookingType: booking.bookingType === 'D' ? BookingType.PER_DAY : BookingType.PER_KM,
+																  units: booking.bookingType === 'D' ?
+																	calculateBookingDurationInDays(booking)
+																	:
+																	calculateDistanceTravelledInKm(booking, findLastJourney(booking, journeys))
+																})).toFixed(2)}`
+															}
+														  </ListGroup.Item>
+														</ListGroup>
+													  </Card.Body>
+													</Accordion.Collapse>
+												  </Card>
+												</Accordion>
+											  ))
+										  }
+										</Card.Body>
+									  </Accordion.Collapse>
+									</Card>
+								  </Accordion>
+								</ListGroup.Item>
 								<ListGroup.Item>
 								  <Accordion>
 									<Card>
@@ -274,23 +335,22 @@ export const BrowseVehicles = props => {
 										  {
 											journeys
 											  .reduce((acc, journey) => {
-											    const filteredBookings = bookings.filter(booking => booking.vehicleID === vehicle.id);
+												const filteredBookings = bookings.filter(booking => booking.vehicleID === vehicle.id);
 
-											    if (filteredBookings.some(b => b.id === journey.bookingID)) {
+												if (filteredBookings.some(b => b.id === journey.bookingID)) {
 												  acc.push(journey);
 												}
 												return acc;
 											  }, [])
 											  .sort((journey1, journey2) => {
-											    const journey1StartedAt = new Date(journey1.journeyStartedAt);
+												const journey1StartedAt = new Date(journey1.journeyStartedAt);
 												const journey2StartedAt = new Date(journey2.journeyStartedAt);
-											    if (journey1StartedAt > journey2StartedAt) {
-											      return -1;
+												if (journey1StartedAt > journey2StartedAt) {
+												  return -1;
+												} else if (journey1StartedAt < journey2StartedAt) {
+												  return 1;
 												}
-											    else if (journey1StartedAt < journey2StartedAt) {
-											      return 1;
-												}
-											    return 0;
+												return 0;
 											  })
 											  .map((journey, index) => (
 												<Accordion key={index}>
@@ -308,16 +368,20 @@ export const BrowseVehicles = props => {
 													  <Card.Body>
 														<ListGroup key={journey.id}>
 														  <ListGroup.Item>
-															Journey started at: {new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")}
+															Journey started
+															at: {new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")}
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															Journey ended at: {new Date(journey.journeyEndedAt).toLocaleDateString("en-AU")}
+															Journey ended
+															at: {new Date(journey.journeyEndedAt).toLocaleDateString("en-AU")}
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															Journey start odometer reading: {journey.journeyStartOdometerReading} km
+															Journey start odometer
+															reading: {journey.journeyStartOdometerReading} km
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															Journey end odometer reading: {journey.journeyEndOdometerReading} km
+															Journey end odometer
+															reading: {journey.journeyEndOdometerReading} km
 														  </ListGroup.Item>
 														  <ListGroup.Item>
 															Journey from: {journey.journeyFrom}
@@ -355,22 +419,21 @@ export const BrowseVehicles = props => {
 										  {
 											fuelPurchases
 											  .reduce((acc, fuelPurchase) => {
-											    const filteredBookings = bookings.filter(booking => booking.vehicleID === vehicle.id);
+												const filteredBookings = bookings.filter(booking => booking.vehicleID === vehicle.id);
 
-											    if (filteredBookings.some(b => b.id === fuelPurchase.bookingID)) {
+												if (filteredBookings.some(b => b.id === fuelPurchase.bookingID)) {
 												  acc.push(fuelPurchase);
 												}
 												return acc;
 											  }, [])
 											  .sort((fuelPurchase1, fuelPurchase2) => {
-											    const bookingFuelPurchase1 = bookings.find(booking => booking.id === fuelPurchase1.bookingID);
-											    const booking1StartedAt = new Date(bookingFuelPurchase1.startDate);
+												const bookingFuelPurchase1 = bookings.find(booking => booking.id === fuelPurchase1.bookingID);
+												const booking1StartedAt = new Date(bookingFuelPurchase1.startDate);
 												const bookingFuelPurchase2 = bookings.find(booking => booking.id === fuelPurchase2.bookingID);
 												const booking2StartedAt = new Date(bookingFuelPurchase2.startDate);
 												if (booking1StartedAt > booking2StartedAt) {
 												  return -1;
-												}
-												else if (booking1StartedAt < booking2StartedAt) {
+												} else if (booking1StartedAt < booking2StartedAt) {
 												  return 1;
 												}
 												return 0;
@@ -391,13 +454,16 @@ export const BrowseVehicles = props => {
 													  <Card.Body>
 														<ListGroup key={fuelPurchase.id}>
 														  <ListGroup.Item>
-															Fuel quantity: {fuelPurchase.fuelQuantity} L
+															Fuel
+															quantity: {fuelPurchase.fuelQuantity} L
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															Fuel price (per litre): ${Number.parseFloat(fuelPurchase.fuelPrice).toFixed(2)}
+															Fuel price (per litre):
+															${Number.parseFloat(fuelPurchase.fuelPrice).toFixed(2)}
 														  </ListGroup.Item>
 														  <ListGroup.Item>
-															Total cost: ${(Number.parseFloat(fuelPurchase.fuelQuantity) * Number.parseFloat(fuelPurchase.fuelPrice)).toFixed(2)}
+															Total cost:
+															${(Number.parseFloat(fuelPurchase.fuelQuantity) * Number.parseFloat(fuelPurchase.fuelPrice)).toFixed(2)}
 														  </ListGroup.Item>
 														</ListGroup>
 													  </Card.Body>
@@ -411,18 +477,18 @@ export const BrowseVehicles = props => {
 									</Card>
 								  </Accordion>
 								</ListGroup.Item>
-                              </ListGroup>
-                            </Card.Body>
-                          </Accordion.Collapse>
-                        </Card>
-                      ))
-                    }
-                  </Accordion>
-                )
-            }
-          </Container>
-        )
-      }
-    </AppConsumer>
+							  </ListGroup>
+							</Card.Body>
+						  </Accordion.Collapse>
+						</Card>
+					  ))
+					}
+				  </Accordion>
+				)
+			}
+		  </Container>
+		)
+	  }
+	</AppConsumer>
   )
 };
