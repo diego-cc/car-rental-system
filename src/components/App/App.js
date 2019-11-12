@@ -14,7 +14,7 @@ import {AddJourneyForm} from "../AddJourney/AddJourneyForm";
 import {AddFuelPurchase} from "../AddFuelPurchase/AddFuelPurchase";
 import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
 import Moment from 'moment';
-import { extendMoment } from 'moment-range';
+import {extendMoment} from 'moment-range';
 import {ShowVehicle} from "../ShowVehicle/ShowVehicle";
 
 export class App extends React.Component {
@@ -500,16 +500,16 @@ export class App extends React.Component {
 		  const selectedBooking = bookings.find(booking => booking.id === journey.bookingID);
 		  const selectedVehicle = vehicles.find(vehicle => vehicle.id === selectedBooking.vehicleID);
 		  if (momentEndDate.isSame(now) && selectedVehicle.odometerReading < journey.journeyEndOdometerReading) {
-		    this.setState(prevState => {
-		      const updatedVehicles = prevState.vehicles;
+			this.setState(prevState => {
+			  const updatedVehicles = prevState.vehicles;
 			  updatedVehicles[vehicles.findIndex(vehicle => vehicle.id === selectedVehicle.id)].odometerReading = journey.journeyEndOdometerReading;
 
 			  return ({
 				vehicles: updatedVehicles
 			  })
 			}, () => {
-		      const db = firebase.firestore();
-		      db
+			  const db = firebase.firestore();
+			  db
 				.collection('vehicles')
 				.doc(`${selectedVehicle.id}`)
 				.set({
@@ -523,8 +523,8 @@ export class App extends React.Component {
 					  message: 'Successfully updated vehicle odometers'
 					}
 				  }, () => {
-				    setTimeout(() => {
-				      this.setState({
+					setTimeout(() => {
+					  this.setState({
 						notification: {
 						  display: false,
 						  message: ''
@@ -595,7 +595,7 @@ export class App extends React.Component {
 			<BrowseVehicles/>
 		  </Route>
 		  <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
-		  <Route path="/show/:vehicleID" render={(props) => <ShowVehicle {...props} />} />
+		  <Route path="/show/:vehicleID" render={(props) => <ShowVehicle {...props} />}/>
 		  <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
 		  <Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
 		  <Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>

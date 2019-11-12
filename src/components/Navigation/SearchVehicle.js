@@ -1,25 +1,23 @@
 import React from 'react';
-import {AppContext} from "../../AppContext/AppContext";
 import Autosuggest from 'react-autosuggest';
+import {AppContext} from "../../AppContext/AppContext";
 
 export class SearchVehicle extends React.Component {
-  state = {
-	vehicles: [],
-	value: '',
-	suggestions: []
-  };
+  constructor(props) {
+	super(props);
+	this.state = {
+	  value: '',
+	  suggestions: []
+	};
+  }
 
-  componentDidMount() {
-	const {vehicles} = this.context;
-	console.dir(vehicles);
-	this.setState({vehicles});
-  };
+  static contextType = AppContext;
 
   getSuggestions = value => {
 	const inputValue = value.trim().toLowerCase();
 	const inputLength = inputValue.length;
 
-	return inputLength === 0 ? [] : this.state.vehicles.filter(v => (
+	return inputLength === 0 ? [] : this.context.vehicles.filter(v => (
 	  v.manufacturer.trim().toLowerCase().slice(0, inputLength) === inputValue ||
 	  v.model.trim().toLowerCase().slice(0, inputLength) === inputValue ||
 	  v.year.trim().slice(0, inputLength) === inputValue
@@ -30,7 +28,7 @@ export class SearchVehicle extends React.Component {
 
   renderSuggestion = suggestion => (
 	<div>
-	  `${suggestion.manufacturer} ${suggestion.model} (${suggestion.year})`
+	  {`${suggestion.manufacturer} ${suggestion.model} (${suggestion.year})`}
 	</div>
   );
 
@@ -72,5 +70,3 @@ export class SearchVehicle extends React.Component {
 	);
   }
 }
-
-SearchVehicle.contextType = AppContext;

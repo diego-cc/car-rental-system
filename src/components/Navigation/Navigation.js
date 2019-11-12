@@ -1,19 +1,10 @@
 import React from 'react';
-import {Navbar, Nav, NavDropdown, Form, FormControl, Button} from 'react-bootstrap';
+import {Navbar, Nav, NavDropdown} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import NavItem from "react-bootstrap/NavItem";
 import {SearchVehicle} from "./SearchVehicle";
 
 export class Navigation extends React.Component {
-  state = {
-	search: ''
-  };
-
-  handleSearch = e => {
-	const {value} = e.target;
-	this.setState({search: value});
-  };
-
   render() {
 	return (
 	  <Navbar bg="light" variant="light" expand="lg">
@@ -29,7 +20,7 @@ export class Navigation extends React.Component {
 			  <NavDropdown.Item as={Link} to="/add">Add a new vehicle</NavDropdown.Item>
 			</NavDropdown>
 		  </Nav>
-		  <SearchVehicle />
+		  <SearchVehicle/>
 		</Navbar.Collapse>
 	  </Navbar>
 	)
