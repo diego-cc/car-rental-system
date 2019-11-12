@@ -27,10 +27,6 @@ export class Navigation extends React.Component {
 			  <NavDropdown.Item as={Link} to="/browse">Browse vehicles</NavDropdown.Item>
 			  <NavDropdown.Item as={Link} to="/add">Add a new vehicle</NavDropdown.Item>
 			</NavDropdown>
-			<NavDropdown title="Record an incident" id="record-incident">
-			  <NavDropdown.Item as={Link} to="/safety-incident">Safety incident</NavDropdown.Item>
-			  <NavDropdown.Item as={Link} to="/maintenance-incident">Maintenance incident</NavDropdown.Item>
-			</NavDropdown>
 		  </Nav>
 		  <Form inline className="mr-lg-3">
 			<FormControl

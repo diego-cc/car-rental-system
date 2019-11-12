@@ -157,25 +157,6 @@ export const BrowseVehicles = props => {
 									  </ListGroup.Item>
 									))
 								}
-								{/*<ListGroup.Item>
-								  Manufacturer: {vehicle.manufacturer}
-								</ListGroup.Item>
-								<ListGroup.Item>
-								  Model: {vehicle.model}
-								</ListGroup.Item>
-								<ListGroup.Item>
-								  Year: {vehicle.year}
-								</ListGroup.Item>
-								<ListGroup.Item>
-								  Registration
-								  Number: {vehicle.registrationNumber}
-								</ListGroup.Item>
-								<ListGroup.Item>
-								  Odometer Reading: {vehicle.odometerReading} km
-								</ListGroup.Item>
-								<ListGroup.Item>
-								  Tank Capacity: {vehicle.tankCapacity} L
-								</ListGroup.Item>*/}
 								<ListGroup.Item>
 								  <Accordion>
 									<Card>
@@ -185,7 +166,7 @@ export const BrowseVehicles = props => {
 										  as={Button}
 										  variant="link"
 										  eventKey={index}>
-										  Service History
+										  Service Records
 										</Accordion.Toggle>
 									  </Card.Header>
 									  <Accordion.Collapse
@@ -250,7 +231,7 @@ export const BrowseVehicles = props => {
 										  as={Button}
 										  variant="link"
 										  eventKey={index}>
-										  Booking History
+										  Booking Records
 										</Accordion.Toggle>
 									  </Card.Header>
 									  <Accordion.Collapse
@@ -332,7 +313,7 @@ export const BrowseVehicles = props => {
 										  as={Button}
 										  variant="link"
 										  eventKey={index}>
-										  Journey History
+										  Journey Records
 										</Accordion.Toggle>
 									  </Card.Header>
 									  <Accordion.Collapse
@@ -416,7 +397,7 @@ export const BrowseVehicles = props => {
 										  as={Button}
 										  variant="link"
 										  eventKey={index}>
-										  Fuel Purchase History
+										  Fuel Purchase Records
 										</Accordion.Toggle>
 									  </Card.Header>
 									  <Accordion.Collapse
