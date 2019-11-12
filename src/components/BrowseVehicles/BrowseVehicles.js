@@ -12,42 +12,42 @@ import {calculateBookingCost, calculateRevenueRecorded} from "../../BookingCost"
 import moment from "moment";
 
 export const BrowseVehicles = props => {
-  // TODO: implement fuel economy
   const printDetails = (vehicle, vehicleBookings, vehicleJourneys, vehicleServices) => {
 	return ({
 	  'Vehicle': `${vehicle.manufacturer} ${vehicle.model} ${vehicle.year}`,
 	  'Registration Number': vehicle.registrationNumber,
 	  'Total Kilometers Travelled': `${vehicle.odometerReading} km`,
-	  'Total services': vehicleServices.length,
+	  'Total services done': getTotalServicesDone(vehicleServices),
 	  'Revenue recorded': `$ ${calculateRevenueRecorded(vehicleBookings, vehicleJourneys)}`,
-	  'Kilometers since the last service': `${vehicle.odometerReading - getLastServiceOdometerReading(vehicleServices)} km`,
-	  'Fuel economy': ``,
+	  'Kilometers since the last service': Number.parseFloat(getLastServiceOdometerReading(vehicleServices)) ? `${vehicle.odometerReading - getLastServiceOdometerReading(vehicleServices)} km` : getLastServiceOdometerReading(vehicleServices),
 	  'Requires a service': requiresService(vehicleServices) ? 'Yes' : 'No'
 	})
   };
 
+  const getTotalServicesDone = services => {
+	return services.filter(s => moment(s.servicedAt).isBefore(moment())).length;
+  };
+
   const getLastServiceOdometerReading = services => {
-	const now = moment();
-	let lastServiceIndex = 0;
-	const minimumDiff = now.diff(services[lastServiceIndex], 'days');
-	let currentDiff;
+	if (services.length) {
+	  const now = moment();
+	  const servicesCopy = [...services];
+	  const firstServicesBeforeToday = servicesCopy.sort((firstService, secondService) => {
+		const firstServiceDate = moment(firstService.servicedAt);
+		const secondServiceDate = moment(secondService.servicedAt);
+		return secondServiceDate.diff(firstServiceDate, 'days');
+	  }).find(s => moment(s.servicedAt).isBefore(now));
 
-	services.forEach((service, index) => {
-	  const servicedAt = moment(service.servicedAt);
-	  if (servicedAt.isBefore(now)) {
-		currentDiff = now.diff(servicedAt, 'days');
-		if (currentDiff < minimumDiff) {
-		  currentDiff = minimumDiff;
-		  lastServiceIndex = index;
-		}
+	  if (firstServicesBeforeToday) {
+	    return firstServicesBeforeToday.serviceOdometer;
 	  }
-	});
-
-	return services[lastServiceIndex].serviceOdometer;
+	  return 'No services have been scheduled before today'
+	}
+	return 'No services have been scheduled yet';
   };
 
   const requiresService = services => {
-    return services.some(service => moment(service.servicedAt).isAfter(moment()));
+	return services.some(service => moment(service.servicedAt).isAfter(moment()));
   };
 
   return (
@@ -138,7 +138,26 @@ export const BrowseVehicles = props => {
 						  <Accordion.Collapse eventKey={index}>
 							<Card.Body>
 							  <ListGroup>
-								<ListGroup.Item>
+								{
+								  Object.keys(
+									printDetails(
+									  vehicle,
+									  bookings.filter(b => b.vehicleID === vehicle.id),
+									  journeys.filter(j => bookings.some(b => b.vehicleID === vehicle.id && (b.id === j.bookingID))),
+									  services.filter(s => s.vehicleID === vehicle.id)
+									))
+									.map((field, i) => (
+									  <ListGroup.Item key={i}>
+										{field}: {printDetails(
+										vehicle,
+										bookings.filter(b => b.vehicleID === vehicle.id),
+										journeys.filter(j => bookings.some(b => b.vehicleID === vehicle.id && (b.id === j.bookingID))),
+										services.filter(s => s.vehicleID === vehicle.id)
+									  )[field]}
+									  </ListGroup.Item>
+									))
+								}
+								{/*<ListGroup.Item>
 								  Manufacturer: {vehicle.manufacturer}
 								</ListGroup.Item>
 								<ListGroup.Item>
@@ -156,7 +175,7 @@ export const BrowseVehicles = props => {
 								</ListGroup.Item>
 								<ListGroup.Item>
 								  Tank Capacity: {vehicle.tankCapacity} L
-								</ListGroup.Item>
+								</ListGroup.Item>*/}
 								<ListGroup.Item>
 								  <Accordion>
 									<Card>

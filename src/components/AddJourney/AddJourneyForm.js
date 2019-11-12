@@ -98,7 +98,7 @@ export class AddJourneyForm extends React.Component {
                   <h2 className="text-center my-5">Add a new journey
                     for {this.state.vehicle ? `${this.state.vehicle.manufacturer} ${this.state.vehicle.model} (${this.state.vehicle.year})` : ''},
                     booked
-                    on {this.state.booking ? new Date(this.state.booking.startDate).toLocaleDateString('en-AU') : ''}
+                    for {this.state.booking ? new Date(this.state.booking.startDate).toLocaleDateString('en-AU') : ''}
                   </h2>
                 </Col>
               </Row>
