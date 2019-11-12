@@ -15,6 +15,7 @@ import {AddFuelPurchase} from "../AddFuelPurchase/AddFuelPurchase";
 import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
+import {ShowVehicle} from "../ShowVehicle/ShowVehicle";
 
 export class App extends React.Component {
   constructor(props) {
@@ -594,6 +595,7 @@ export class App extends React.Component {
 			<BrowseVehicles/>
 		  </Route>
 		  <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
+		  <Route path="/show/:vehicleID" render={(props) => <ShowVehicle {...props} />} />
 		  <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
 		  <Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
 		  <Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>
