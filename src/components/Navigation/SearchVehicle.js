@@ -1,18 +1,76 @@
 import React from 'react';
-import {Button, Form, FormControl} from "react-bootstrap";
+import {AppContext} from "../../AppContext/AppContext";
+import Autosuggest from 'react-autosuggest';
 
 export class SearchVehicle extends React.Component {
+  state = {
+	vehicles: [],
+	value: '',
+	suggestions: []
+  };
+
+  componentDidMount() {
+	const {vehicles} = this.context;
+	console.dir(vehicles);
+	this.setState({vehicles});
+  };
+
+  getSuggestions = value => {
+	const inputValue = value.trim().toLowerCase();
+	const inputLength = inputValue.length;
+
+	return inputLength === 0 ? [] : this.state.vehicles.filter(v => (
+	  v.manufacturer.trim().toLowerCase().slice(0, inputLength) === inputValue ||
+	  v.model.trim().toLowerCase().slice(0, inputLength) === inputValue ||
+	  v.year.trim().slice(0, inputLength) === inputValue
+	));
+  };
+
+  getSuggestionValue = suggestion => suggestion.id;
+
+  renderSuggestion = suggestion => (
+	<div>
+	  `${suggestion.manufacturer} ${suggestion.model} (${suggestion.year})`
+	</div>
+  );
+
+  onChange = (e, {newValue}) => {
+	this.setState({
+	  value: newValue
+	})
+  };
+
+  onSuggestionsFetchRequested = ({value}) => {
+	this.setState({
+	  suggestions: this.getSuggestions(value)
+	})
+  };
+
+  onSuggestionsClearRequested = () => {
+	this.setState({
+	  suggestions: []
+	})
+  };
 
   render() {
+	const {value, suggestions} = this.state;
+	const inputProps = {
+	  placeholder: 'Search for a vehicle...',
+	  value,
+	  onChange: this.onChange
+	};
+
 	return (
-	  <Form inline className="mr-lg-3">
-		<FormControl
-		  onChange={this.handleSearch}
-		  type="text"
-		  placeholder="Search for a vehicle..."
-		  className="mr-sm-3 mr-lg-3"/>
-		<Button variant="outline-info">Search</Button>
-	  </Form>
+	  <Autosuggest
+		suggestions={suggestions}
+		onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+		onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+		getSuggestionValue={this.getSuggestionValue}
+		renderSuggestion={this.renderSuggestion}
+		inputProps={inputProps}
+	  />
 	);
   }
 }
+
+SearchVehicle.contextType = AppContext;
