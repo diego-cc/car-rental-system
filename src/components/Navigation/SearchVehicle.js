@@ -1,6 +1,8 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import {AppContext} from "../../AppContext/AppContext";
+import {Form, ListGroup} from "react-bootstrap";
+import FormContext from "react-bootstrap/cjs/FormContext";
 
 export class SearchVehicle extends React.Component {
   constructor(props) {
@@ -26,10 +28,16 @@ export class SearchVehicle extends React.Component {
 
   getSuggestionValue = suggestion => suggestion.id;
 
+  handleSubmit = e => {
+
+  };
+
   renderSuggestion = suggestion => (
-	<div>
-	  {`${suggestion.manufacturer} ${suggestion.model} (${suggestion.year})`}
-	</div>
+	<ListGroup>
+	  <ListGroup.Item as="li" active>
+		{`${suggestion.manufacturer} ${suggestion.model} (${suggestion.year})`}
+	  </ListGroup.Item>
+	</ListGroup>
   );
 
   onChange = (e, {newValue}) => {
