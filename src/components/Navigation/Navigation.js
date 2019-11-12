@@ -2,6 +2,7 @@ import React from 'react';
 import {Navbar, Nav, NavDropdown, Form, FormControl, Button} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import NavItem from "react-bootstrap/NavItem";
+import {SearchVehicle} from "./SearchVehicle";
 
 export class Navigation extends React.Component {
   state = {
@@ -28,14 +29,7 @@ export class Navigation extends React.Component {
 			  <NavDropdown.Item as={Link} to="/add">Add a new vehicle</NavDropdown.Item>
 			</NavDropdown>
 		  </Nav>
-		  <Form inline className="mr-lg-3">
-			<FormControl
-			  onChange={this.handleSearch}
-			  type="text"
-			  placeholder="Search for a vehicle..."
-			  className="mr-sm-3 mr-lg-3"/>
-			<Button variant="outline-info">Search</Button>
-		  </Form>
+		  <SearchVehicle />
 		</Navbar.Collapse>
 	  </Navbar>
 	)

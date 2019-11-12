@@ -20,7 +20,7 @@ export const BrowseVehicles = props => {
 	  'Total services done': getTotalServicesDone(vehicleServices),
 	  'Revenue recorded': `$ ${calculateRevenueRecorded(vehicleBookings, vehicleJourneys)}`,
 	  'Kilometers since the last service': Number.parseFloat(getLastServiceOdometerReading(vehicleServices)) ? `${vehicle.odometerReading - getLastServiceOdometerReading(vehicleServices)} km` : getLastServiceOdometerReading(vehicleServices),
-	  'Requires a service': requiresService(vehicleServices) ? 'Yes' : 'No'
+	  'Requires service': requiresService(vehicleServices) ? 'Yes' : 'No'
 	})
   };
 
