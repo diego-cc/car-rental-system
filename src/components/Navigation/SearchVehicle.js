@@ -1,27 +1,43 @@
-import React from 'react';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import React, {useContext, useState} from 'react';
+import {Typeahead} from 'react-bootstrap-typeahead';
 import {AppConsumer, AppContext} from "../../AppContext/AppContext";
+import {Button, Container, Form, FormGroup} from "react-bootstrap";
+import { useHistory } from 'react-router-dom';
 
-export class SearchVehicle extends React.Component {
+export const SearchVehicle = props => {
+  const [selected, setSelected] = useState([]);
+  const history = useHistory();
 
-  render() {
-	return (
-	  <AppConsumer>
-		{
-		  ({vehicles}) => (
-			<Typeahead
-			  labelKey={(option) => `${option.manufacturer} ${option.model} (${option.year})`}
-			  filterBy={['manufacturer', 'model', 'year']}
-			  options={vehicles}
-			  placeholder="Search for a vehicle..."
-			  highlightOnlyResult
-			  minLength="1"
+  const handleSubmit = e => {
+	e.preventDefault();
+
+	if (selected && selected.length) {
+	  history.push(`/show/${selected[0].id}`);
+	}
+  };
+
+  return (
+	<AppConsumer>
+	  {
+		({vehicles}) => (
+		  <Form inline onSubmit={handleSubmit} className="mr-3">
+			<FormGroup>
+			  <Typeahead
+				labelKey={(option) => `${option.manufacturer} ${option.model} (${option.year})`}
+				filterBy={['manufacturer', 'model', 'year']}
+				options={vehicles}
+				placeholder="Search for a vehicle..."
+				highlightOnlyResult
+				minLength={1}
+				onChange={selected => setSelected(selected)}
 			  />
-		  )
-		}
-	  </AppConsumer>
-	)
-  }
-}
-
-SearchVehicle.contextType = AppContext;
+			  <Button variant="outline-primary" type="submit" className="ml-3">
+				Search
+			  </Button>
+			</FormGroup>
+		  </Form>
+		)
+	  }
+	</AppConsumer>
+  )
+};

@@ -20,7 +20,7 @@ export class Navigation extends React.Component {
 			  <NavDropdown.Item as={Link} to="/add">Add a new vehicle</NavDropdown.Item>
 			</NavDropdown>
 		  </Nav>
-		  <SearchVehicle/>
+		  <SearchVehicle />
 		</Navbar.Collapse>
 	  </Navbar>
 	)

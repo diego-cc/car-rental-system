@@ -2,7 +2,7 @@ import React from 'react';
 import {Navigation} from "../Navigation/Navigation";
 import {Header} from "../Header/Header";
 import {BrowseVehicles} from "../BrowseVehicles/BrowseVehicles";
-import {Switch, Route} from 'react-router-dom';
+import {Switch, Route, BrowserRouter as Router} from 'react-router-dom';
 import {AddVehicle} from "../AddVehicle/AddVehicle";
 import {firebase} from "../../Firebase/Firebase";
 import {AppProvider} from "../../AppContext/AppContext";
@@ -586,28 +586,30 @@ export class App extends React.Component {
   render() {
 	return (
 	  <AppProvider value={this.state}>
-		<Navigation/>
-		<Switch>
-		  <Route exact path="/">
-			<Header headerText="Welcome to the Car Rental System"/>
-		  </Route>
-		  <Route path="/browse">
-			<BrowseVehicles/>
-		  </Route>
-		  <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
-		  <Route path="/show/:vehicleID" render={(props) => <ShowVehicle {...props} />}/>
-		  <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
-		  <Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
-		  <Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>
-		  <Route path="/addJourneyForm/:bookingID"
-				 render={(props) => <AddJourneyForm {...props} />}/>
-		  <Route path="/addService/:vehicleID" render={(props) => <AddService {...props} />}/>
-		  <Route path="/addFuelPurchase/:vehicleID"
-				 render={(props) => <AddFuelPurchase {...props} />}/>
-		  <Route path="/addFuelPurchaseForm/:bookingID"
-				 render={(props) => <AddFuelPurchaseForm {...props} />}/>
-		  <Route path="*" render={(props) => <BrowseVehicles {...props}/>}/>
-		</Switch>
+		<Router>
+		  <Navigation/>
+		  <Switch>
+			<Route exact path="/">
+			  <Header headerText="Welcome to the Car Rental System"/>
+			</Route>
+			<Route path="/browse">
+			  <BrowseVehicles/>
+			</Route>
+			<Route path="/add" render={(props) => <AddVehicle {...props} />}/>
+			<Route path="/show/:vehicleID" render={(props) => <ShowVehicle {...props} />}/>
+			<Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
+			<Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
+			<Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>
+			<Route path="/addJourneyForm/:bookingID"
+				   render={(props) => <AddJourneyForm {...props} />}/>
+			<Route path="/addService/:vehicleID" render={(props) => <AddService {...props} />}/>
+			<Route path="/addFuelPurchase/:vehicleID"
+				   render={(props) => <AddFuelPurchase {...props} />}/>
+			<Route path="/addFuelPurchaseForm/:bookingID"
+				   render={(props) => <AddFuelPurchaseForm {...props} />}/>
+			<Route path="*" render={(props) => <BrowseVehicles {...props}/>}/>
+		  </Switch>
+		</Router>
 	  </AppProvider>
 	)
   }
