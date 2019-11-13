@@ -7,7 +7,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import {printDetails} from "../BrowseVehicles/BrowseVehicles";
 import moment from "moment";
 import {calculateBookingCost} from "../../BookingCost";
-import {DeleteResource} from "../DeleteVehicle/DeleteResource";
+import {DeleteResource} from "../DeleteResource/DeleteResource";
 import {AppContext} from "../../AppContext/AppContext";
 
 export const VehicleDetails = props => {

@@ -5,7 +5,7 @@ import {AppConsumer} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {calculateRevenueRecorded} from "../../BookingCost";
 import moment from "moment";
-import {DeleteResource} from "../DeleteVehicle/DeleteResource";
+import {DeleteResource} from "../DeleteResource/DeleteResource";
 import {VehicleDetails} from "../ShowVehicle/VehicleDetails";
 
 const getTotalServicesDone = services => {
