@@ -517,8 +517,11 @@ export class App extends React.Component {
 		  const momentEndDate = moment(journey.journeyEndedAt);
 		  const now = moment();
 		  const selectedBooking = bookings.find(booking => booking.id === journey.bookingID);
-		  const selectedVehicle = vehicles.find(vehicle => vehicle.id === selectedBooking.vehicleID);
-		  if (momentEndDate.isSame(now) && selectedVehicle.odometerReading < journey.journeyEndOdometerReading) {
+		  let selectedVehicle;
+		  if (selectedBooking) {
+			selectedVehicle = vehicles.find(vehicle => vehicle.id === selectedBooking.vehicleID);
+		  }
+		  if (selectedVehicle && selectedBooking && momentEndDate.isSame(now) && (selectedVehicle.odometerReading < journey.journeyEndOdometerReading)) {
 			this.setState(prevState => {
 			  const updatedVehicles = prevState.vehicles;
 			  updatedVehicles[vehicles.findIndex(vehicle => vehicle.id === selectedVehicle.id)].odometerReading = journey.journeyEndOdometerReading;
