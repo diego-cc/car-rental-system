@@ -383,12 +383,92 @@ export class App extends React.Component {
 	};
 
 	this.confirmDeleteResource = (resourceType, resource) => {
-	  console.log('Resource type:', resourceType);
-	  console.log('Resource:');
-	  console.dir(resource);
+	  if (resourceType && resource) {
+		this.setDeleteResourceModalShow(null, null, () => {
+		  this.setState(prevState => ({
+			...prevState,
+			loading: true
+		  }), () => {
+			let collection;
+			switch (resourceType.trim().toLowerCase()) {
+			  case 'vehicle':
+				collection = 'vehicles';
+				break;
+
+			  case 'journey':
+				collection = 'journeys';
+				break;
+
+			  case 'service':
+				collection = 'services';
+				break;
+
+			  case 'booking':
+				collection = 'bookings';
+				break;
+
+			  case 'fuel purchase':
+			  case 'fuelpurchase':
+				collection = 'fuelPurchases';
+				break;
+
+			  default:
+				break;
+			}
+			if (collection) {
+			  const db = firebase.firestore();
+			  db
+				.collection(collection)
+				.doc(resource.id)
+				.delete()
+				.then(() => {
+				  this.setState(prevState => {
+					const updatedCollection = prevState[collection];
+					return ({
+					  ...prevState,
+					  loading: false,
+					  notification: {
+						display: true,
+						message: `The ${resourceType} has been successfully removed from the system`
+					  },
+					  [collection]: updatedCollection.filter(r => r.id !== resource.id)
+					})
+				  }, () => {
+					setTimeout(() => {
+					  this.setState({
+						notification: {
+						  display: false,
+						  message: ''
+						}
+					  })
+					}, 3000)
+				  })
+				})
+				.catch(err => {
+				  this.setState({
+					loading: false,
+					notification: {
+					  display: true,
+					  message: `Error: ${err.message}`
+					}
+				  }, () => {
+					setTimeout(() => {
+					  this.setState({
+						notification: {
+						  display: false,
+						  message: ''
+						}
+					  })
+					}, 3000)
+				  })
+				})
+			}
+		  })
+		})
+	  }
 	};
 
-	this.setDeleteResourceModalShow = (resourceType, resource) => {
+	this.setDeleteResourceModalShow = (resourceType, resource, callback) => {
 	  this.setState(prevState => ({
 		deleteResource: {
 		  ...prevState.deleteResource,
@@ -396,7 +476,7 @@ export class App extends React.Component {
 		  resourceType: resourceType ? resourceType : prevState.deleteResource.resourceType,
 		  showDeleteResourceModal: !prevState.deleteResource.showDeleteResourceModal
 		}
-	  }));
+	  }), callback);
 	};
 
 	this.state = {
@@ -409,7 +489,7 @@ export class App extends React.Component {
 	  addVehicle: this.addVehicle,
 	  editVehicle: this.editVehicle,
 	  deleteResource: {
-	    resourceType: '',
+		resourceType: '',
 		resource: '',
 		confirmDeleteResource: this.confirmDeleteResource,
 		showDeleteResourceModal: false,
