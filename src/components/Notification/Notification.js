@@ -8,7 +8,7 @@ export const Notification = props => {
 	<Toast
 	  style={{
 		display: props.display ? "block" : "none",
-		position: 'relative',
+		position: 'absolute',
 		top: 0,
 		left: '50%',
 		transform: 'translateX(-50%)'
