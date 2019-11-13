@@ -15,8 +15,8 @@ export class AddVehicle extends React.Component {
 		registrationNumber: '',
 		odometerReading: '',
 		tankCapacity: '',
-        createdAt: '',
-        updatedAt: null
+		createdAt: '',
+		updatedAt: null
 	  }
 	};
 	this.state = {...this.initialState};
@@ -27,10 +27,10 @@ export class AddVehicle extends React.Component {
 	e.preventDefault();
 
 	const updatedVehicle = {
-	    ...vehicle,
-        createdAt: new Date().toLocaleString('en-AU'),
-        updatedAt: null
-    };
+	  ...vehicle,
+	  createdAt: new Date().toLocaleString('en-AU'),
+	  updatedAt: null
+	};
 	this.setState({...this.initialState}, () => {
 	  const {addVehicle} = this.context;
 	  addVehicle(updatedVehicle);
@@ -62,21 +62,17 @@ export class AddVehicle extends React.Component {
 		{
 		  ({loading, notification}) => (
 			<Container>
-			  <Row className="my-3">
+			  {
+				notification.display ?
+				  (
+					<Notification
+					  display={notification.display}
+					  message={notification.message}/>
+				  ) : ''
+			  }
+			  <Row>
 				<Col>
-				  {
-					notification.display ?
-					  (
-						<Notification
-						  display={notification.display}
-						  message={notification.message}/>
-					  ) : ''
-				  }
-				</Col>
-			  </Row>
-			  <Row className="mb-5">
-				<Col>
-				  <h2 className="text-center">Add a new vehicle</h2>
+				  <h2 className="text-center my-5">Add a new vehicle</h2>
 				</Col>
 			  </Row>
 			  {
