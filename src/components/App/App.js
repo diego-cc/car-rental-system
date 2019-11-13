@@ -431,10 +431,10 @@ export class App extends React.Component {
 	  .fetchCollections('vehicles', 'services', 'bookings', 'journeys', 'fuelPurchases')
 	  .then(values => {
 		// update vehicle odometers if a journey ends today
-		/*const {vehicles, journeys, bookings} = this.state;
+		const {vehicles, journeys, bookings} = this.state;
 		const moment = extendMoment(Moment);
 		journeys.forEach(journey => {
-		  const momentEndDate = moment(journey.endDate);
+		  const momentEndDate = moment(journey.journeyEndedAt);
 		  const now = moment();
 		  const selectedBooking = bookings.find(booking => booking.id === journey.bookingID);
 		  const selectedVehicle = vehicles.find(vehicle => vehicle.id === selectedBooking.vehicleID);
@@ -474,7 +474,7 @@ export class App extends React.Component {
 				})
 			})
 		  }
-		})*/
+		})
 	  })
 	  .catch(err => {
 		// display error message
