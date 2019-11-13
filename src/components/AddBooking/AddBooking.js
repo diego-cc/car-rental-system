@@ -52,7 +52,7 @@ export class AddBooking extends React.Component {
 
   handleSubmit = (e, booking) => {
 	e.preventDefault();
-	const {addBooking, services, bookings} = this.context;
+	const {addResource, services, bookings} = this.context;
 	const moment = extendMoment(Moment);
 
 	const bookingStartDate = booking.startDate;
@@ -111,7 +111,7 @@ export class AddBooking extends React.Component {
 	  };
 
 	  this.setState({...this.initialState}, () => {
-		addBooking(updatedBooking);
+		addResource('booking', updatedBooking);
 	  })
 	}
   };

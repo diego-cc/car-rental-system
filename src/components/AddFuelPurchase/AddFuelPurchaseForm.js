@@ -46,10 +46,10 @@ export class AddFuelPurchaseForm extends React.Component {
   handleSubmit = (e, fuelPurchase) => {
 	e.preventDefault();
 
-	const {addFuelPurchase} = this.context;
+	const {addResource} = this.context;
 
 	this.setState({...this.initialState}, () => {
-	  addFuelPurchase(fuelPurchase);
+	  addResource('fuel purchase', fuelPurchase);
 	})
   };
 

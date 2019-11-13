@@ -32,8 +32,8 @@ export class AddVehicle extends React.Component {
 	  updatedAt: null
 	};
 	this.setState({...this.initialState}, () => {
-	  const {addVehicle} = this.context;
-	  addVehicle(updatedVehicle);
+	  const {addResource} = this.context;
+	  addResource('vehicle', updatedVehicle);
 	})
   };
 

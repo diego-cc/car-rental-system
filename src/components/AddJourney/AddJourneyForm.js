@@ -50,10 +50,10 @@ export class AddJourneyForm extends React.Component {
   handleSubmit = (e, journey) => {
     e.preventDefault();
 
-    const {addJourney} = this.context;
+    const {addResource} = this.context;
 
     this.setState({...this.initialState}, () => {
-	  addJourney(journey);
+	  addResource('journey', journey);
 	})
   };
 

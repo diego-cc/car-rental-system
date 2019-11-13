@@ -21,16 +21,16 @@ export class App extends React.Component {
   constructor(props) {
 	super(props);
 
-	this.addVehicle = vehicle => {
+	/*this.addVehicle = vehicle => {
 	  this.setState({
 		loading: true
 	  }, () => {
 		// TODO: Validate fields before submission
-		/*Object.values(vehicle).some(value => value.trim() && ...)
+		/!*Object.values(vehicle).some(value => value.trim() && ...)
 		let emptyField = false;
 		for(let field in this.state) {
 		  ...
-		}*/
+		}*!/
 		const {vehicles} = this.state;
 		const vehicleId = require('uuid/v4')();
 		vehicles.push({
@@ -87,7 +87,7 @@ export class App extends React.Component {
 			});
 		})
 	  })
-	};
+	};*/
 
 	this.editVehicle = vehicle => {
 	  this.setState({
@@ -145,240 +145,115 @@ export class App extends React.Component {
 	  })
 	};
 
-	this.addBooking = booking => {
-	  const bookingID = require('uuid/v4')();
-	  const updatedBooking = {
-		...booking,
-		id: bookingID
+	this.addResource = (resourceType, resource) => {
+	  if (!resourceType || !resource) {
+		return this.setState({
+		  notification: {
+			display: true,
+			message: 'Error: missing resource or resource type'
+		  }
+		})
+	  }
+	  let collectionName, collection;
+
+	  switch (resourceType.trim().toLowerCase()) {
+		case 'vehicle':
+		  collectionName = 'vehicles';
+		  break;
+
+		case 'booking':
+		  collectionName = 'bookings';
+		  break;
+
+		case 'service':
+		  collectionName = 'services';
+		  break;
+
+		case 'journey':
+		  collectionName = 'journeys';
+		  break;
+
+		case 'fuelpurchase':
+		case 'fuel purchase':
+		  collectionName = 'fuelPurchases';
+		  break;
+
+		default:
+		  break;
+	  }
+
+	  const resourceID = require('uuid/v4')();
+	  const updatedResource = {
+		...resource,
+		id: resourceID
 	  };
 	  this.setState(prevState => {
-		const {bookings} = prevState;
-		bookings.push(updatedBooking);
+		collection = collectionName && prevState[collectionName];
+		if (!collection) {
+		  return ({
+			notification: {
+			  display: true,
+			  message: 'Error: invalid resource type provided'
+			}
+		  })
+		}
+		collection.push(updatedResource);
+
 		return ({
 		  loading: true,
-		  bookings
+		  [collection]: collection
 		})
 	  }, () => {
-		const db = firebase.firestore();
-		db
-		  .collection('bookings')
-		  .doc(bookingID)
-		  .set(updatedBooking)
-		  .then(() => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `The new booking has been successfully registered in the system`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
+		if (collectionName && collection) {
+		  const db = firebase.firestore();
+		  db
+			.collection(collectionName)
+			.doc(resourceID)
+			.set(updatedResource)
+			.then(() => {
+			  this.setState({
+				loading: false,
+				notification: {
+				  display: true,
+				  message: `The new ${resourceType} has been successfully added to the system`
+				}
+			  }, () => {
+				setTimeout(() => {
+				  this.setState({
+					notification: {
+					  display: false,
+					  message: ''
+					}
+				  })
+				}, 3500)
+			  })
 			})
-		  })
-		  .catch(err => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `Could not register new booking. Error: ${err}`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
+			.catch(err => {
+			  this.setState({
+				loading: false,
+				notification: {
+				  display: true,
+				  message: `Could not add new ${resourceType}. Error: ${err.message}`
+				}
+			  }, () => {
+				setTimeout(() => {
+				  this.setState({
+					notification: {
+					  display: false,
+					  message: ''
+					}
+				  })
+				}, 3500)
+			  })
 			})
+		} else {
+		  this.setState({
+			notification: {
+			  display: false,
+			  message: ''
+			}
 		  })
-	  })
-	};
-
-	this.addJourney = journey => {
-	  const journeyID = require('uuid/v4')();
-	  const updatedJourney = {
-		...journey,
-		id: journeyID,
-		createdAt: new Date().toLocaleString('en-AU'),
-		updatedAt: null
-	  };
-
-	  this.setState(prevState => {
-		const {journeys} = prevState;
-		journeys.push(updatedJourney);
-		return ({
-		  loading: true,
-		  journeys
-		})
-	  }, () => {
-		const db = firebase.firestore();
-		db
-		  .collection('journeys')
-		  .doc(journeyID)
-		  .set(updatedJourney)
-		  .then(() => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `The new journey has been successfully registered in the system`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-		  .catch(err => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `Could not register new journey. Error: ${err}`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-	  })
-	};
-
-	this.addService = service => {
-	  const serviceID = require('uuid/v4')();
-	  const updatedService = {
-		...service,
-		id: serviceID
-	  };
-	  this.setState(prevState => {
-		const {services} = prevState;
-		services.push(updatedService);
-		return ({
-		  loading: true,
-		  services
-		})
-	  }, () => {
-		const db = firebase.firestore();
-		db
-		  .collection('services')
-		  .doc(serviceID)
-		  .set(updatedService)
-		  .then(() => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `The new service has been successfully registered in the system`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-		  .catch(err => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `Could not register new service. Error: ${err}`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-	  })
-	};
-
-	this.addFuelPurchase = fuelPurchase => {
-	  const fuelPurchaseID = require('uuid/v4')();
-	  const updatedFuelPurchase = {
-		...fuelPurchase,
-		id: fuelPurchaseID,
-		createdAt: new Date().toLocaleString('en-AU'),
-		updatedAt: null
-	  };
-	  this.setState(prevState => {
-		const {fuelPurchases} = prevState;
-		fuelPurchases.push(updatedFuelPurchase);
-		return ({
-		  loading: true,
-		  fuelPurchases
-		})
-	  }, () => {
-		const db = firebase.firestore();
-		db
-		  .collection('fuelPurchases')
-		  .doc(fuelPurchaseID)
-		  .set(updatedFuelPurchase)
-		  .then(() => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `The fuel purchase has been successfully registered in the system`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-		  .catch(err => {
-			this.setState({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: `Could not register new fuel purchase. Error: ${err}`
-			  }
-			}, () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
+		}
 	  })
 	};
 
@@ -495,6 +370,7 @@ export class App extends React.Component {
 		showDeleteResourceModal: false,
 		setDeleteResourceModalShow: this.setDeleteResourceModalShow
 	  },
+	  addResource: this.addResource,
 	  addBooking: this.addBooking,
 	  addJourney: this.addJourney,
 	  addService: this.addService,

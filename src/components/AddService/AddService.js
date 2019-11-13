@@ -42,7 +42,7 @@ export class AddService extends React.Component {
 
   handleSubmit = (e, service) => {
 	e.preventDefault();
-	const {addService} = this.context;
+	const {addResource} = this.context;
 
 	const updatedService = {
 		...service,
@@ -51,7 +51,7 @@ export class AddService extends React.Component {
 	};
 
 	this.setState({...this.initialState}, () => {
-	  addService(updatedService);
+	  addResource('service', updatedService);
 	})
   };
 
