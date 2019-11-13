@@ -23,6 +23,7 @@ export const SearchVehicle = props => {
 		  <Form inline onSubmit={handleSubmit} className="mr-3">
 			<FormGroup>
 			  <Typeahead
+				id="search-vehicle"
 				labelKey={(option) => `${option.manufacturer} ${option.model} (${option.year})`}
 				filterBy={['manufacturer', 'model', 'year']}
 				options={vehicles}
