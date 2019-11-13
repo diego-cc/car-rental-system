@@ -1,7 +1,7 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import {AppConsumer, AppContext} from "../../AppContext/AppContext";
-import {Button, Container, Form, FormGroup} from "react-bootstrap";
+import {AppConsumer} from "../../AppContext/AppContext";
+import {Button, Form, FormGroup} from "react-bootstrap";
 import { useHistory } from 'react-router-dom';
 
 export const SearchVehicle = props => {

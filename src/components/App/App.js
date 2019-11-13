@@ -145,85 +145,6 @@ export class App extends React.Component {
 	  })
 	};
 
-	this.confirmDeleteVehicle = vehicleId => {
-	  /**
-	   * TODO: First delete all fuel purchases, journeys, services and bookings associated
-	   * with the vehicle that is going to be deleted
-	   * See https://github.com/googleapis/nodejs-firestore/issues/64
-	   * Then delete the vehicle itself
-	   */
-
-	  this.setState(prevState => {
-		const {vehicles} = prevState;
-		const filteredVehicles = vehicles.filter(v => v.id !== vehicleId);
-
-		return ({
-		  loading: true,
-		  vehicles: filteredVehicles,
-		  deleteVehicle: {
-			...prevState.deleteVehicle,
-			showDeleteModal: false
-		  }
-		})
-	  }, () => {
-		const db = firebase.firestore();
-		return db
-		  .collection('vehicles')
-		  .doc(vehicleId)
-		  .delete()
-		  .then(() => {
-			this.setState(prevState => ({
-			  loading: false,
-			  notification: {
-				display: true,
-				message: 'The vehicle has been successfully removed from the system'
-			  }
-			}), () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-		  .catch(err => {
-			this.setState(prevState => ({
-			  notification: {
-				loading: false,
-				deleteVehicle: {
-				  ...prevState.deleteVehicle,
-				  showDeleteModal: false
-				},
-				display: true,
-				message: `The vehicle could not be deleted. Error: ${err}`
-			  }
-			}), () => {
-			  setTimeout(() => {
-				this.setState({
-				  notification: {
-					display: false,
-					message: ''
-				  }
-				})
-			  }, 3500)
-			})
-		  })
-	  })
-	};
-
-	this.setDeleteModalShow = vehicleId => {
-	  this.setState(prevState => ({
-		deleteVehicle: {
-		  ...prevState.deleteVehicle,
-		  selectedVehicleId: vehicleId ? vehicleId : null,
-		  showDeleteModal: !prevState.deleteVehicle.showDeleteModal
-		}
-	  }));
-	};
-
 	this.addBooking = booking => {
 	  const bookingID = require('uuid/v4')();
 	  const updatedBooking = {
@@ -461,6 +382,23 @@ export class App extends React.Component {
 	  })
 	};
 
+	this.confirmDeleteResource = (resourceType, resource) => {
+	  console.log('Resource type:', resourceType);
+	  console.log('Resource:');
+	  console.dir(resource);
+	};
+
+	this.setDeleteResourceModalShow = (resourceType, resource) => {
+	  this.setState(prevState => ({
+		deleteResource: {
+		  ...prevState.deleteResource,
+		  resource: resource ? resource : prevState.deleteResource.resource,
+		  resourceType: resourceType ? resourceType : prevState.deleteResource.resourceType,
+		  showDeleteResourceModal: !prevState.deleteResource.showDeleteResourceModal
+		}
+	  }));
+	};
+
 	this.state = {
 	  loading: true,
 	  vehicles: [],
@@ -470,11 +408,12 @@ export class App extends React.Component {
 	  fuelPurchases: [],
 	  addVehicle: this.addVehicle,
 	  editVehicle: this.editVehicle,
-	  deleteVehicle: {
-		selectedVehicleId: null,
-		confirmDeleteVehicle: this.confirmDeleteVehicle,
-		showDeleteModal: false,
-		setDeleteModalShow: this.setDeleteModalShow
+	  deleteResource: {
+	    resourceType: '',
+		resource: '',
+		confirmDeleteResource: this.confirmDeleteResource,
+		showDeleteResourceModal: false,
+		setDeleteResourceModalShow: this.setDeleteResourceModalShow
 	  },
 	  addBooking: this.addBooking,
 	  addJourney: this.addJourney,
@@ -492,7 +431,7 @@ export class App extends React.Component {
 	  .fetchCollections('vehicles', 'services', 'bookings', 'journeys', 'fuelPurchases')
 	  .then(values => {
 		// update vehicle odometers if a journey ends today
-		const {vehicles, journeys, bookings} = this.state;
+		/*const {vehicles, journeys, bookings} = this.state;
 		const moment = extendMoment(Moment);
 		journeys.forEach(journey => {
 		  const momentEndDate = moment(journey.endDate);
@@ -535,7 +474,7 @@ export class App extends React.Component {
 				})
 			})
 		  }
-		})
+		})*/
 	  })
 	  .catch(err => {
 		// display error message

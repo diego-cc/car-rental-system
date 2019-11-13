@@ -5,11 +5,11 @@ import {AppConsumer} from "../../AppContext/AppContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCog, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {Link} from 'react-router-dom';
-import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 import {Notification} from "../Notification/Notification";
 import Dropdown from "react-bootstrap/Dropdown";
 import {calculateBookingCost, calculateRevenueRecorded} from "../../BookingCost";
 import moment from "moment";
+import {DeleteResource} from "../DeleteVehicle/DeleteResource";
 
 const getTotalServicesDone = services => {
   return services.filter(s => moment(s.servicedAt).isBefore(moment())).length;
@@ -53,7 +53,7 @@ export const BrowseVehicles = props => {
   return (
 	<AppConsumer>
 	  {
-		({loading, vehicles, services, bookings, journeys, fuelPurchases, deleteVehicle, notification}) => (
+		({loading, vehicles, services, bookings, journeys, fuelPurchases, deleteResource, notification}) => (
 		  <Container>
 			{
 			  notification.display ?
@@ -68,7 +68,7 @@ export const BrowseVehicles = props => {
 				<h2 className="text-center my-5">Browse vehicles</h2>
 			  </Col>
 			</Row>
-			<DeleteVehicle/>
+			<DeleteResource/>
 			{
 			  loading ?
 				(
@@ -101,7 +101,7 @@ export const BrowseVehicles = props => {
 								</Button>
 							  </Link>
 							  <Button
-								onClick={() => deleteVehicle.setDeleteModalShow(vehicle.id)}
+								onClick={() => deleteResource.setDeleteResourceModalShow('vehicle', vehicle)}
 								className="mr-3"
 								variant="outline-danger">
 								<FontAwesomeIcon icon={faTrash}/>
@@ -197,6 +197,12 @@ export const BrowseVehicles = props => {
 														eventKey={index}>
 														{new Date(service.servicedAt).toLocaleDateString("en-AU")}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('service', service)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse
 													  eventKey={index}>
@@ -262,6 +268,12 @@ export const BrowseVehicles = props => {
 														eventKey={index}>
 														{`${new Date(booking.startDate).toLocaleDateString("en-AU")} - ${new Date(booking.endDate).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('booking', booking)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>
@@ -350,6 +362,12 @@ export const BrowseVehicles = props => {
 														eventKey={index}>
 														{`${new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")} - ${new Date(journey.journeyEndedAt).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('journey', journey)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>
@@ -436,6 +454,12 @@ export const BrowseVehicles = props => {
 														eventKey={index}>
 														{`${new Date(bookings.find(booking => booking.id === fuelPurchase.bookingID).startDate).toLocaleDateString("en-AU")} - ${new Date(bookings.find(booking => booking.id === fuelPurchase.bookingID).endDate).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('fuel purchase', fuelPurchase)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>

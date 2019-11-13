@@ -16,9 +16,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCog, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "react-bootstrap/Dropdown";
 import {printDetails} from "../BrowseVehicles/BrowseVehicles";
-import {DeleteVehicle} from "../DeleteVehicle/DeleteVehicle";
 import moment from "moment";
 import {calculateBookingCost} from "../../BookingCost";
+import {DeleteResource} from "../DeleteVehicle/DeleteResource";
 
 export const ShowVehicle = props => {
   const history = useHistory();
@@ -29,7 +29,7 @@ export const ShowVehicle = props => {
 	services,
 	fuelPurchases,
 	loading,
-	deleteVehicle
+	deleteResource
   } = useContext(AppContext);
   let vehicle, vehicleBookings, vehicleJourneys, vehicleServices, vehicleFuelPurchases;
   vehicle = vehicles.find(v => v.id === props.match.params.vehicleID);
@@ -86,7 +86,7 @@ export const ShowVehicle = props => {
 								</Button>
 							  </Link>
 							  <Button
-								onClick={() => deleteVehicle.setDeleteModalShow(vehicle.id)}
+								onClick={() => deleteResource.setDeleteResourceModalShow('vehicle', vehicle)}
 								className="mr-3"
 								variant="outline-danger">
 								<FontAwesomeIcon icon={faTrash}/>
@@ -169,6 +169,12 @@ export const ShowVehicle = props => {
 														eventKey={index}>
 														{`${new Date(booking.startDate).toLocaleDateString("en-AU")} - ${new Date(booking.endDate).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('booking', booking)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>
@@ -249,6 +255,12 @@ export const ShowVehicle = props => {
 														eventKey={index}>
 														{`${new Date(journey.journeyStartedAt).toLocaleDateString("en-AU")} - ${new Date(journey.journeyEndedAt).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('journey', journey)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>
@@ -326,6 +338,12 @@ export const ShowVehicle = props => {
 														eventKey={index}>
 														{new Date(service.servicedAt).toLocaleDateString("en-AU")}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('service', service)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse
 													  eventKey={index}>
@@ -391,6 +409,12 @@ export const ShowVehicle = props => {
 														eventKey={index}>
 														{`${new Date(vehicleBookings.find(booking => booking.id === fuelPurchase.bookingID).startDate).toLocaleDateString("en-AU")} - ${new Date(vehicleBookings.find(booking => booking.id === fuelPurchase.bookingID).endDate).toLocaleDateString("en-AU")}`}
 													  </Accordion.Toggle>
+													  <Button
+														onClick={() => deleteResource.setDeleteResourceModalShow('fuel purchase', fuelPurchase)}
+														className="mr-3"
+														variant="outline-danger">
+														<FontAwesomeIcon icon={faTrash}/>
+													  </Button>
 													</Card.Header>
 													<Accordion.Collapse eventKey={index}>
 													  <Card.Body>
@@ -424,7 +448,7 @@ export const ShowVehicle = props => {
 						  </Accordion.Collapse>
 						</Card>
 					  </Accordion>
-					  <DeleteVehicle/>
+					  <DeleteResource/>
 					</>
 				  )
 			  }
