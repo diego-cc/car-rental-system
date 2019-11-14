@@ -1,4 +1,6 @@
 import moment from "moment";
+import {calculateRevenueRecorded} from "../BookingCost";
+import { Service } from "./Service";
 
 export class Vehicle {
   _id;
@@ -192,5 +194,17 @@ export class Vehicle {
 
   set updatedAt(value) {
     this._updatedAt = value;
+  }
+
+  printDetails() {
+    return ({
+      'Vehicle': `${this.manufacturer} ${this.model} (${this.year})`,
+      'Registration Number': this.registrationNumber,
+      'Total Kilometers Travelled': `${this.odometerReading} km`,
+      'Total services done': Service.getTotalServicesDone(this.services),
+      'Revenue recorded': `$ ${calculateRevenueRecorded(this.bookings, this.journeys)}`,
+      'Kilometers since the last service': Number.parseFloat(Service.getLastServiceOdometerReading(this.services)) ? `${this.odometerReading - Service.getLastServiceOdometerReading(this.services)} km` : Service.getLastServiceOdometerReading(this.services),
+      'Requires service': Service.requiresService(this.services) ? 'Yes' : 'No'
+    })
   }
 }

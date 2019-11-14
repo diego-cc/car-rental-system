@@ -4,7 +4,6 @@ import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCog, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "react-bootstrap/Dropdown";
-import {printDetails} from "../BrowseVehicles/BrowseVehicles";
 import moment from "moment";
 import {calculateBookingCost} from "../../BookingCost";
 import {DeleteResource} from "../DeleteResource/DeleteResource";
@@ -86,12 +85,12 @@ export const VehicleDetails = props => {
               <ListGroup>
                 {
                   Object.keys(
-                    printDetails(vehicle, vehicleBookings, vehicleJourneys, vehicleServices)
+                    vehicle.printDetails()
                   )
                     .map((field, index) => (
                       <ListGroup.Item key={index}>
                         {field}: {
-                        printDetails(vehicle, vehicleBookings, vehicleJourneys, vehicleServices)[field]
+                        vehicle.printDetails()[field]
                       }
                       </ListGroup.Item>
                     ))

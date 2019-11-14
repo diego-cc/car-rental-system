@@ -8,44 +8,6 @@ import moment from "moment";
 import {DeleteResource} from "../DeleteResource/DeleteResource";
 import {VehicleDetails} from "../ShowVehicle/VehicleDetails";
 
-const getTotalServicesDone = services => {
-  return services.filter(s => moment(s.servicedAt).isBefore(moment())).length;
-};
-
-const getLastServiceOdometerReading = services => {
-  if (services.length) {
-	const now = moment();
-	const servicesCopy = [...services];
-	const firstServicesBeforeToday = servicesCopy.sort((firstService, secondService) => {
-	  const firstServiceDate = moment(firstService.servicedAt);
-	  const secondServiceDate = moment(secondService.servicedAt);
-	  return secondServiceDate.diff(firstServiceDate, 'days');
-	}).find(s => moment(s.servicedAt).isBefore(now));
-
-	if (firstServicesBeforeToday) {
-	  return firstServicesBeforeToday.serviceOdometer;
-	}
-	return 'No services have been scheduled before today'
-  }
-  return 'No services have been scheduled yet';
-};
-
-const requiresService = services => {
-  return services.some(service => moment(service.servicedAt).isAfter(moment()));
-};
-
-export const printDetails = (vehicle, vehicleBookings, vehicleJourneys, vehicleServices) => {
-  return ({
-	'Vehicle': `${vehicle.manufacturer} ${vehicle.model} ${vehicle.year}`,
-	'Registration Number': vehicle.registrationNumber,
-	'Total Kilometers Travelled': `${vehicle.odometerReading} km`,
-	'Total services done': getTotalServicesDone(vehicleServices),
-	'Revenue recorded': `$ ${calculateRevenueRecorded(vehicleBookings, vehicleJourneys)}`,
-	'Kilometers since the last service': Number.parseFloat(getLastServiceOdometerReading(vehicleServices)) ? `${vehicle.odometerReading - getLastServiceOdometerReading(vehicleServices)} km` : getLastServiceOdometerReading(vehicleServices),
-	'Requires service': requiresService(vehicleServices) ? 'Yes' : 'No'
-  })
-};
-
 export const BrowseVehicles = props => {
   return (
 	<AppConsumer>

@@ -64,4 +64,30 @@ export class Service {
   set updatedAt(value) {
     this._updatedAt = value;
   }
+
+  static getTotalServicesDone = services => {
+    return services.filter(s => moment(s.servicedAt).isBefore(moment())).length;
+  };
+
+  static getLastServiceOdometerReading = services => {
+    if (services.length) {
+      const now = moment();
+      const servicesCopy = [...services];
+      const firstServicesBeforeToday = servicesCopy.sort((firstService, secondService) => {
+        const firstServiceDate = moment(firstService.servicedAt);
+        const secondServiceDate = moment(secondService.servicedAt);
+        return secondServiceDate.diff(firstServiceDate, 'days');
+      }).find(s => moment(s.servicedAt).isBefore(now));
+
+      if (firstServicesBeforeToday) {
+        return firstServicesBeforeToday.serviceOdometer;
+      }
+      return 'No services have been scheduled before today'
+    }
+    return 'No services have been scheduled yet';
+  };
+
+  static requiresService = services => {
+    return services.some(service => moment(service.servicedAt).isAfter(moment()));
+  }
 }
