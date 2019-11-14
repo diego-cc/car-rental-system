@@ -46,7 +46,7 @@ export class App extends React.Component {
             .collection('vehicles')
             .doc(vehicle.id)
             .update({
-              id: vehicle.id,
+              _id: vehicle.id,
               ...vehicle
             })
             .then(() => {
