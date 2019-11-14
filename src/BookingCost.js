@@ -7,7 +7,7 @@ export const calculateBookingCost = (booking, bookingJourneys) => {
   let bookingCost;
 
   if (booking.bookingType === BookingType.PER_DAY) {
-	bookingCost = calculateBookingDurationInDays(booking) * COST_PER_DAY;
+	bookingCost = calculateBookingCostInDays(booking);
   } else {
 	if (Number.isNaN(calculateDistanceTravelledInKm(booking, findLastOdometerReading(bookingJourneys)))) {
 	  bookingCost = calculateDistanceTravelledInKm(booking, findLastOdometerReading(bookingJourneys));
@@ -19,7 +19,27 @@ export const calculateBookingCost = (booking, bookingJourneys) => {
 };
 
 export const calculateRevenueRecorded = (bookings, journeys) => {
-  console.dir(bookings);
+  const bookingsPerDay = bookings.filter(b => b.bookingType === 'D');
+  const bookingsPerDayRevenue = bookingsPerDay.reduce((acc, b) => {
+	acc += calculateBookingCostInDays(b);
+	return acc;
+  }, 0);
+
+  const bookingsPerKm = bookings.filter(b => b.bookingType === 'K');
+  const bookingsPerKmRevenue = bookingsPerKm.reduce((acc, b) => {
+    // get all journeys associated with this booking
+	const bookingJourneys = journeys.filter(j => b.id === j.bookingID);
+	const totalKm = bookingJourneys.reduce((km, j) => {
+	  km += j.journeyEndOdometerReading - j.journeyStartOdometerReading;
+	  return km;
+	}, 0);
+	acc += totalKm;
+	return acc;
+  }, 0);
+
+  return bookingsPerDayRevenue + bookingsPerKmRevenue;
+};
+/*export const calculateRevenueRecorded = (bookings, journeys) => {
   return Number.parseFloat(bookings.reduce((acc, booking) => {
 	const bookingJourneys = journeys.filter(journey => journey.bookingID === booking.id);
 	if (!Number.isNaN(calculateBookingCost(booking, bookingJourneys))) {
@@ -27,7 +47,7 @@ export const calculateRevenueRecorded = (bookings, journeys) => {
 	}
 	return acc;
   }, 0)).toFixed(2);
-};
+};*/
 
 const calculateDistanceTravelledInKm = (booking, lastOdometerReading) => {
   if (lastOdometerReading) {
@@ -39,11 +59,11 @@ const calculateDistanceTravelledInKm = (booking, lastOdometerReading) => {
   return 'Pending (no journeys have been made for this booking yet)';
 };
 
-const calculateBookingDurationInDays = booking => {
+const calculateBookingCostInDays = booking => {
   const bookingStartDate = moment(booking.startDate);
   const bookingEndDate = moment(booking.endDate);
 
-  return bookingEndDate.diff(bookingStartDate, 'days');
+  return bookingEndDate.diff(bookingStartDate, 'days') * 100;
 };
 
 const findLastOdometerReading = bookingJourneys => {

@@ -1,6 +1,6 @@
 import moment from "moment";
 import {calculateRevenueRecorded} from "../BookingCost";
-import { Service } from "./Service";
+import {Service} from "./Service";
 
 export class Vehicle {
   _id;
@@ -202,9 +202,27 @@ export class Vehicle {
       'Registration Number': this.registrationNumber,
       'Total Kilometers Travelled': `${this.odometerReading} km`,
       'Total services done': Service.getTotalServicesDone(this.services),
-      'Revenue recorded': `$ ${calculateRevenueRecorded(this.bookings, this.journeys)}`,
+      'Revenue recorded': `$ ${this.calculateRevenueRecorded()}`,
       'Kilometers since the last service': Number.parseFloat(Service.getLastServiceOdometerReading(this.services)) ? `${this.odometerReading - Service.getLastServiceOdometerReading(this.services)} km` : Service.getLastServiceOdometerReading(this.services),
       'Requires service': Service.requiresService(this.services) ? 'Yes' : 'No'
     })
+  }
+
+  calculateRevenueRecorded() {
+    return this.bookings.reduce((total, b) => {
+      total += b.bookingCost;
+      return total;
+	}, 0);
+    /*if (this.bookings.length) {
+      const bookingsPerDay = this.bookings.filter(b => b.bookingType === 'D');
+
+      return bookingsPerDay.reduce((rev, b) => {
+        const bookingCost = moment(b.endDate).diff(moment.startDate, 'days') * 100;
+        rev += bookingCost;
+        console.log(rev);
+        return rev;
+	  }, 0)
+	}
+    return 0;*/
   }
 }
