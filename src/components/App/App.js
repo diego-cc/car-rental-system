@@ -16,78 +16,15 @@ import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
 import Moment from 'moment';
 import {extendMoment} from 'moment-range';
 import {ShowVehicle} from "../ShowVehicle/ShowVehicle";
+import {Vehicle} from "../../Model/Vehicle";
+import {Booking} from "../../Model/Booking";
+import {Journey} from "../../Model/Journey";
+import {Service} from "../../Model/Service";
+import {FuelPurchase} from "../../Model/FuelPurchase";
 
 export class App extends React.Component {
   constructor(props) {
     super(props);
-
-    /*this.addVehicle = vehicle => {
-      this.setState({
-      loading: true
-      }, () => {
-      // TODO: Validate fields before submission
-      /!*Object.values(vehicle).some(value => value.trim() && ...)
-      let emptyField = false;
-      for(let field in this.state) {
-        ...
-      }*!/
-      const {vehicles} = this.state;
-      const vehicleId = require('uuid/v4')();
-      vehicles.push({
-        id: vehicleId,
-        ...vehicle
-      });
-      this.setState({
-        vehicles
-      }, () => {
-        const db = firebase.firestore();
-        db
-        .collection('vehicles')
-        .doc(vehicleId)
-        .set({
-          id: vehicleId,
-          ...vehicle
-        })
-        .then(() => {
-          this.setState({
-          notification: {
-            display: true,
-            message: 'The vehicle has been successfully added to the system'
-          },
-          loading: false
-          }, () => {
-          setTimeout(() => {
-            this.setState({
-            notification: {
-              display: false,
-              message: ''
-            }
-            });
-          }, 3500)
-          })
-        })
-        .catch(e => {
-          this.setState({
-          loading: false,
-          notification: {
-            display: true,
-            message: 'The vehicle could not be added to the system. Please try again.'
-          }
-          }, () => {
-          console.dir(e);
-          setTimeout(() => {
-            this.setState({
-            notification: {
-              display: false,
-              message: ''
-            }
-            });
-          }, 3500)
-          })
-        });
-      })
-      })
-    };*/
 
     this.editVehicle = vehicle => {
       this.setState({
@@ -182,11 +119,6 @@ export class App extends React.Component {
           break;
       }
 
-      const resourceID = require('uuid/v4')();
-      const updatedResource = {
-        ...resource,
-        id: resourceID
-      };
       this.setState(prevState => {
         collection = collectionName && prevState[collectionName];
         if (!collection) {
@@ -197,7 +129,7 @@ export class App extends React.Component {
             }
           })
         }
-        collection.push(updatedResource);
+        collection.push(resource);
 
         return ({
           loading: true,
@@ -208,8 +140,8 @@ export class App extends React.Component {
           const db = firebase.firestore();
           db
             .collection(collectionName)
-            .doc(resourceID)
-            .set(updatedResource)
+            .doc(resource.id)
+            .set({...resource})
             .then(() => {
               this.setState({
                 loading: false,
@@ -461,7 +393,36 @@ export class App extends React.Component {
       .collection(collection)
       .get()
       .then(querySnapshot => {
-        const data = querySnapshot.docs.map(doc => doc.data());
+        let data = querySnapshot.docs.map(doc => doc.data());
+        data = data.map(resource => {
+          switch (collection.trim().toLowerCase()) {
+            case 'vehicles':
+              resource = new Vehicle(resource._manufacturer, resource._model, resource._year, resource._odometerReading, resource._registrationNumber, resource._tankCapacity, resource._id, resource._createdAt, resource._updatedAt);
+              break;
+
+            case 'bookings':
+              resource = new Booking(resource.vehicleID, resource._bookingType, resource._startDate, resource._endDate, resource._startOdometer, resource._id, resource._createdAt, resource._updatedAt);
+              break;
+
+            case 'journeys':
+              resource = new Journey(resource._bookingID, resource._journeyStartOdometerReading, resource._journeyEndOdometerReading, resource._journeyStartedAt, resource._journeyEndedAt, resource._journeyFrom, resource._journeyTo, resource._id, resource._createdAt, resource._updatedAt);
+              break;
+
+            case 'services':
+              resource = new Service(resource._vehicleID, resource._serviceOdometer, resource._servicedAt, resource._id, resource._createdAt, resource._updatedAt);
+              break;
+
+            case 'fuelpurchases':
+            case 'fuel purchases':
+              resource = new FuelPurchase(resource._bookingID, resource._fuelQuantity, resource._fuelPrice, resource._id, resource._createdAt, resource._updatedAt);
+              break;
+
+            default:
+              break;
+        }
+        return resource;
+      });
+
         this.setState({
           loading: false,
           [collection]: [...data]

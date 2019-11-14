@@ -3,6 +3,7 @@ import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
+import {FuelPurchase} from "../../Model/FuelPurchase";
 
 export class AddFuelPurchaseForm extends React.Component {
   constructor(props) {
@@ -49,7 +50,14 @@ export class AddFuelPurchaseForm extends React.Component {
 	const {addResource} = this.context;
 
 	this.setState({...this.initialState}, () => {
-	  addResource('fuel purchase', fuelPurchase);
+		const {
+			bookingID,
+			fuelQuantity,
+			fuelPrice
+		} = this.state.fields;
+
+		const fuelPurchaseToBeAdded = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
+	  addResource('fuel purchase', fuelPurchaseToBeAdded);
 		this.props.history.push(`/show/${this.state.vehicle.id}`);
 	})
   };

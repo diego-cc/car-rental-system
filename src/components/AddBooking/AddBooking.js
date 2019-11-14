@@ -6,6 +6,7 @@ import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {ErrorModal} from "./ErrorModal";
 import Moment from 'moment';
 import {extendMoment} from 'moment-range';
+import {Booking} from "../../Model/Booking";
 
 export class AddBooking extends React.Component {
   constructor(props) {
@@ -104,14 +105,18 @@ export class AddBooking extends React.Component {
         anotherBookingEndDate
       })
     } else {
-      const updatedBooking = {
-        ...booking,
-        createdAt: new Date().toLocaleString('en-AU'),
-        updatedAt: null
-      };
+      const {
+        vehicleID,
+        startDate,
+        endDate,
+        startOdometer,
+        bookingType
+      } = this.state.fields;
+
+      const bookingToBeAdded = new Booking(vehicleID, bookingType, startDate, endDate, startOdometer);
 
       this.setState({...this.initialState}, () => {
-        addResource('booking', updatedBooking);
+        addResource('booking', bookingToBeAdded);
         this.props.history.push(`/show/${this.state.fields.vehicleID}`);
       })
     }

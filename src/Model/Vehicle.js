@@ -16,7 +16,7 @@ export class Vehicle {
   _updatedAt;
 
 
-  constructor(id = require('uuid/v4')(), manufacturer, model, year, odometerReading, registrationNumber, tankCapacity, createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
+  constructor(manufacturer, model, year, odometerReading, registrationNumber, tankCapacity, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
     this._id = id;
     this._manufacturer = manufacturer;
     this._model = model;

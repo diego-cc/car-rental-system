@@ -12,7 +12,7 @@ export class Journey {
   _createdAt;
   _updatedAt;
 
-  constructor(id = require('uuid/v4')(), bookingID, journeyStartOdometerReading, journeyEndOdometerReading, journeyStartedAt, journeyEndedAt, journeyFrom, journeyTo, createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
+  constructor(bookingID, journeyStartOdometerReading, journeyEndOdometerReading, journeyStartedAt, journeyEndedAt, journeyFrom, journeyTo, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
     this._id = id;
     this._bookingID = bookingID;
     this._journeyStartOdometerReading = journeyStartOdometerReading;

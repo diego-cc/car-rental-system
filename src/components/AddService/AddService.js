@@ -3,6 +3,7 @@ import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
+import {Service} from "../../Model/Service";
 
 export class AddService extends React.Component {
   constructor(props) {
@@ -44,14 +45,15 @@ export class AddService extends React.Component {
     e.preventDefault();
     const {addResource} = this.context;
 
-    const updatedService = {
-      ...service,
-      createdAt: new Date().toLocaleString('en-AU'),
-      updatedAt: null
-    };
+    const {
+      vehicleID,
+      serviceOdometer,
+      servicedAt
+    } = this.state.fields;
 
+    const serviceToBeAdded = new Service(vehicleID, serviceOdometer, servicedAt);
     this.setState({...this.initialState}, () => {
-      addResource('service', updatedService);
+      addResource('service', serviceToBeAdded);
       this.props.history.push(`/show/${this.state.fields.vehicleID}`);
     })
   };

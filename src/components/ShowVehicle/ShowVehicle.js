@@ -74,12 +74,12 @@ export const ShowVehicle = props => {
                 </Col>
               </Row>
               <Row>
-                <Col>
+                <Col className="text-center">
                   <Button
-                    onClick={() => history.goBack()}
+                    onClick={() => history.push(`/browse`)}
                     variant="primary"
                     size="lg">
-                    Go back
+                    Browse vehicles
                   </Button>
                 </Col>
               </Row>

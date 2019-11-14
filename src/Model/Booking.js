@@ -10,7 +10,7 @@ export class Booking {
   _createdAt;
   _updatedAt;
 
-  constructor(id = require('uuid/v4')(), vehicleID, bookingType, startDate, endDate, startOdometer, createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
+  constructor(vehicleID, bookingType, startDate, endDate, startOdometer, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
     this._id = id;
     this._vehicleID = vehicleID;
     this._bookingType = bookingType;

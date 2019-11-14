@@ -8,7 +8,7 @@ export class FuelPurchase {
   _fuelQuantity;
   _updatedAt;
 
-  constructor(id = require('uuid/v4')(), bookingID, fuelQuantity, fuelPrice, createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
+  constructor(bookingID, fuelQuantity, fuelPrice, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
     this._id = id;
     this._bookingID = bookingID;
     this._fuelPrice = fuelPrice;

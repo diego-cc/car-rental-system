@@ -8,7 +8,7 @@ export class Service {
   _createdAt;
   _updatedAt;
 
-  constructor(id = require('uuid/v4')(), vehicleID, serviceOdometer, servicedAt, createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
+  constructor(vehicleID, serviceOdometer, servicedAt, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
     this._id = id;
     this._vehicleID = vehicleID;
     this._serviceOdometer = serviceOdometer;
