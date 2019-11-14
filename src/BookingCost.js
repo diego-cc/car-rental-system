@@ -19,6 +19,7 @@ export const calculateBookingCost = (booking, bookingJourneys) => {
 };
 
 export const calculateRevenueRecorded = (bookings, journeys) => {
+  console.dir(bookings);
   return Number.parseFloat(bookings.reduce((acc, booking) => {
 	const bookingJourneys = journeys.filter(journey => journey.bookingID === booking.id);
 	if (!Number.isNaN(calculateBookingCost(booking, bookingJourneys))) {

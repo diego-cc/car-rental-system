@@ -318,8 +318,22 @@ export class App extends React.Component {
     this
       .fetchCollections('vehicles', 'services', 'bookings', 'journeys', 'fuelPurchases')
       .then(values => {
+        // move services, bookings, journeys and fuel purchases to the respective vehicle
+        const {services, bookings, journeys, fuelPurchases, vehicles} = this.state;
+        /*vehicles.forEach(vehicle => {
+          const vehicleServices = services.filter(s => s.vehicleID === vehicle.id);
+          vehicleServices.forEach(s => vehicle.addService(s));
+
+          const vehicleBookings = bookings.filter(b => b.vehicleID === vehicle.id);
+          vehicleBookings.forEach(b => vehicle.addBooking(b));
+
+          const vehicleJourneys = journeys.filter(j => vehicleBookings.some(b => j.bookingID === b.id));
+          vehicleJourneys.forEach(j => vehicle.addJourney(j));
+
+          const vehicleFuelPurchases = fuelPurchases.filter(f => vehicleBookings.some(b => b.id === f.bookingID));
+          vehicleFuelPurchases.forEach(f => vehicle.addFuelPurchase(f));
+        });*/
         // update vehicle odometers if a journey ends today
-        const {vehicles, journeys, bookings} = this.state;
         const moment = extendMoment(Moment);
         journeys.forEach(journey => {
           const momentEndDate = moment(journey.journeyEndedAt);
@@ -401,7 +415,7 @@ export class App extends React.Component {
               break;
 
             case 'bookings':
-              resource = new Booking(resource.vehicleID, resource._bookingType, resource._startDate, resource._endDate, resource._startOdometer, resource._id, resource._createdAt, resource._updatedAt);
+              resource = new Booking(resource._vehicleID, resource._bookingType, resource._startDate, resource._endDate, resource._startOdometer, resource._id, resource._createdAt, resource._updatedAt);
               break;
 
             case 'journeys':
@@ -419,9 +433,9 @@ export class App extends React.Component {
 
             default:
               break;
-        }
-        return resource;
-      });
+          }
+          return resource;
+        });
 
         this.setState({
           loading: false,

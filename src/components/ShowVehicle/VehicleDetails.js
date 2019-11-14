@@ -18,6 +18,18 @@ export const VehicleDetails = props => {
     fuelPurchases: vehicleFuelPurchases
   } = props;
 
+  vehicleBookings.forEach(b => vehicle.addBooking(b));
+  vehicleJourneys.forEach(j => vehicle.addJourney(j));
+  vehicleServices.forEach(s => vehicle.addService(s));
+  vehicleFuelPurchases.forEach(f => vehicle.addFuelPurchase(f));
+
+  /*const {
+    bookings: vehicleBookings,
+    journeys: vehicleJourneys,
+    services: vehicleServices,
+    fuelPurchases: vehicleFuelPurchases
+  } = vehicle;*/
+
   const {deleteResource} = useContext(AppContext);
 
   return (
@@ -113,6 +125,7 @@ export const VehicleDetails = props => {
                       <Accordion.Collapse eventKey="0">
                         <Card.Body>
                           {
+                            vehicleBookings &&
                             vehicleBookings
                               .sort((b1, b2) => (
                                 moment(b2.startDate).isBefore(moment(b1.startDate))
