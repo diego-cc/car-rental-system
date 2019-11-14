@@ -54,6 +54,7 @@ export class AddJourneyForm extends React.Component {
 
     this.setState({...this.initialState}, () => {
 	  addResource('journey', journey);
+    this.props.history.push(`/show/${this.state.vehicle.id}`);
 	})
   };
 

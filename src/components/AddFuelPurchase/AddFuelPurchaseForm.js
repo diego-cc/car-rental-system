@@ -50,6 +50,7 @@ export class AddFuelPurchaseForm extends React.Component {
 
 	this.setState({...this.initialState}, () => {
 	  addResource('fuel purchase', fuelPurchase);
+		this.props.history.push(`/show/${this.state.vehicle.id}`);
 	})
   };
 
