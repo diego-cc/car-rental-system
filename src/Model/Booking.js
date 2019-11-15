@@ -5,6 +5,7 @@ export class Booking {
   _vehicleID;
   _bookingType;
   _journeys = [];
+  _fuelPurchases = [];
   _bookingCost;
   _startDate;
   _endDate;
@@ -102,6 +103,15 @@ export class Booking {
 
   set bookingCost(value) {
 	this._bookingCost = value;
+  }
+
+
+  get fuelPurchases() {
+	return this._fuelPurchases;
+  }
+
+  addFuelPurchase(newFuelPurchase) {
+    this.fuelPurchases.push(newFuelPurchase);
   }
 
   addJourney(newJourney) {

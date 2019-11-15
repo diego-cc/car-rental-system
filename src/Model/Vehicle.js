@@ -12,7 +12,7 @@ export class Vehicle {
   _bookings = [];
   // _journeys = [];
   _services = [];
-  _fuelPurchases = [];
+  // _fuelPurchases = [];
   _createdAt;
   _updatedAt;
 
@@ -75,7 +75,7 @@ export class Vehicle {
   }
 
   addFuelPurchase(newFuelPurchase) {
-    this.fuelPurchases.push(newFuelPurchase);
+    this.bookings.find(b => b.id === newFuelPurchase.bookingID).addFuelPurchase(newFuelPurchase);
   }
 
   removeFuelPurchaseByID(fuelPurchaseID) {

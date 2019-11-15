@@ -259,7 +259,40 @@ export class App extends React.Component {
                 break;
             }
             if (collection) {
-              const db = firebase.firestore();
+			  const db = firebase.firestore();
+              if (collection === 'vehicles') {
+                // delete everything associated with the vehicle first
+				resource.forEach(v => {
+				  // delete journeys and bookings
+				  v.bookings.forEach(b => {
+				    // delete all journeys for each booking
+				    b.journeys.forEach(j => {
+				      db
+						.collection('journeys')
+						.doc(j.id)
+						.delete()
+					});
+				    // delete the booking itself
+				    db
+					  .collection('bookings')
+					  .doc(b.id)
+					  .delete()
+				  });
+
+				  // delete services and fuel
+				});
+
+				// delete the vehicle itself
+				db
+				  .collection('vehicles')
+				  .doc(resource.id)
+				  .delete()
+				  .then(() => {
+
+				  })
+			  }
+              else
+
               db
                 .collection(collection)
                 .doc(resource.id)
