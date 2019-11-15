@@ -41,7 +41,7 @@ export class AddService extends React.Component {
     this.setState({...this.initialState});
   }
 
-  handleSubmit = (e, service) => {
+  handleSubmit = (e) => {
     e.preventDefault();
     const {addResource} = this.context;
 

@@ -11,7 +11,7 @@ export class Vehicle {
   _registrationNumber;
   _tankCapacity;
   _bookings = [];
-  _journeys = [];
+  // _journeys = [];
   _services = [];
   _fuelPurchases = [];
   _createdAt;
@@ -46,18 +46,18 @@ export class Vehicle {
   }
 
   addJourney(newJourney) {
-    this.journeys.push(newJourney);
+    this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
   }
 
   removeJourneyByID(journeyID) {
-    if (journeyID) {
+    /*if (journeyID) {
       const journeysCopy = [...this.journeys];
       const journeyToBeDeleted = journeysCopy.find(journey => journey.id === journeyID);
 
       if (journeyToBeDeleted) {
         this.journeys = journeysCopy.filter(journey => journey.id !== journeyToBeDeleted.id);
       }
-    }
+    }*/
   }
 
   addService(newService) {
@@ -101,12 +101,17 @@ export class Vehicle {
   }
 
   get journeys() {
-    return this._journeys;
+    return this._bookings.reduce((journeys, b) => {
+      b.journeys.forEach(j => {
+        journeys.push(j);
+      });
+      return journeys;
+    }, []);
   }
 
-  set journeys(value) {
+  /*set journeys(value) {
     this._journeys = value;
-  }
+  }*/
 
   get services() {
     return this._services;
@@ -202,7 +207,7 @@ export class Vehicle {
       'Registration Number': this.registrationNumber,
       'Total Kilometers Travelled': `${this.odometerReading} km`,
       'Total services done': Service.getTotalServicesDone(this.services),
-      'Revenue recorded': `$ ${this.calculateRevenueRecorded()}`,
+      'Revenue recorded': `$ ${Number.parseFloat(this.calculateRevenueRecorded()).toFixed(2)}`,
       'Kilometers since the last service': Number.parseFloat(Service.getLastServiceOdometerReading(this.services)) ? `${this.odometerReading - Service.getLastServiceOdometerReading(this.services)} km` : Service.getLastServiceOdometerReading(this.services),
       'Requires service': Service.requiresService(this.services) ? 'Yes' : 'No'
     })
@@ -210,7 +215,9 @@ export class Vehicle {
 
   calculateRevenueRecorded() {
     return this.bookings.reduce((total, b) => {
-      total += b.bookingCost;
+      if (Number.parseFloat(b.bookingCost)) {
+        total += b.bookingCost;
+      }
       return total;
 	}, 0);
     /*if (this.bookings.length) {

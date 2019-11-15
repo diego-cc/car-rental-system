@@ -82,7 +82,6 @@ export class App extends React.Component {
       })
     };
 
-    // TODO: Add new booking to vehicle.bookings[]
     this.addResource = (resourceType, resource) => {
       if (!resourceType || !resource) {
         return this.setState({
@@ -361,37 +360,25 @@ export class App extends React.Component {
         this.setState(prevState => {
           const {services, bookings, journeys, fuelPurchases, vehicles} = prevState;
 
-          let vehicleBookings, vehicleJourneys, vehicleServices, vehicleFuelPurchases;
+          let vehicleJourneys, vehicleServices, vehicleFuelPurchases;
 
-          // calculate each booking cost
-          // 1. push each journey to the associated booking
-          const bookingsWithJourneys = bookings.map(b => {
-            journeys.forEach(j => {
-              if (b.id === j.bookingID) {
-                b.journeys.push(j);
-              }
-            });
-            return b;
-          });
-
-          // 2. loop through the bookings to calculate the cost of each one
-          bookingsWithJourneys.forEach(b => {
-            b.bookingCost = b.calculateBookingCost();
-          });
-
-          // add each collection to the respective vehicle
+          // add each booking to the respective vehicle
           vehicles.forEach(v => {
-            vehicleBookings = bookingsWithJourneys.filter(b => b.vehicleID === v.id);
-            vehicleBookings.forEach(b => {
-              v.addBooking(b);
-            });
+            bookings
+              .filter(b => b.vehicleID === v.id)
+              .forEach(b => {
+                v.addBooking(b);
+              })
+          });
 
-            vehicleJourneys = journeys.filter(j => vehicleBookings.some(b => b.id === j.bookingID));
+          // add all other collections to the respective vehicle
+          vehicles.forEach(v => {
+            vehicleJourneys = journeys.filter(j => v.bookings.some(b => b.id === j.bookingID));
             vehicleJourneys.forEach(j => {
               v.addJourney(j);
             });
 
-            vehicleFuelPurchases = fuelPurchases.filter(f => vehicleBookings.id === f.bookingID);
+            vehicleFuelPurchases = fuelPurchases.filter(f => v.bookings.some(b => b.id === f.bookingID));
             vehicleFuelPurchases.forEach(f => {
               v.addFuelPurchase(f);
             });

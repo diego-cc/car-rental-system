@@ -9,169 +9,183 @@ export class AddFuelPurchaseForm extends React.Component {
   constructor(props) {
     super(props);
     this.initialState = {
-	  vehicle: '',
-	  booking: '',
-	  fields: {
-		id: '',
-		bookingID: '',
-		fuelQuantity: '',
-		fuelPrice: '',
-		createdAt: '',
-		updatedAt: ''
-	  }
-	};
+      vehicle: '',
+      booking: '',
+      fields: {
+        id: '',
+        bookingID: '',
+        fuelQuantity: '',
+        fuelPrice: '',
+        createdAt: '',
+        updatedAt: ''
+      }
+    };
     this.state = {...this.initialState};
     this.fuelQuantity = React.createRef();
   }
 
   componentDidMount() {
     const {bookingID} = this.props.match.params;
-    const {vehicles, bookings} = this.context;
+    const {vehicles} = this.context;
 
-    const booking = bookings.find(booking => booking.id === bookingID);
-	const vehicle = vehicles.find(vehicle => vehicle.id === booking.vehicleID);
+    const vehicle = vehicles.find(vehicle => vehicle.bookings.some(b => b.id === bookingID));
+    const booking = vehicle.bookings.find(b => b.id === bookingID);
 
-	this.initialState = {
-	  ...this.initialState,
-	  vehicle,
-	  booking,
-	  fields: {
-	    ...this.initialState.fields,
-		bookingID
-	  }
-	};
+    this.initialState = {
+      ...this.initialState,
+      vehicle,
+      booking,
+      fields: {
+        ...this.initialState.fields,
+        bookingID
+      }
+    };
 
-	this.setState({...this.initialState});
+    this.setState({...this.initialState});
   }
 
-  handleSubmit = (e, fuelPurchase) => {
-	e.preventDefault();
+  handleSubmit = (e) => {
+    e.preventDefault();
 
-	const {addResource} = this.context;
+    const {addResource} = this.context;
 
-	this.setState({...this.initialState}, () => {
-		const {
-			bookingID,
-			fuelQuantity,
-			fuelPrice
-		} = this.state.fields;
+    let fuelPurchaseToBeAdded;
+    this.setState(prevState => {
+      const {
+        bookingID,
+        fuelQuantity,
+        fuelPrice
+      } = prevState.fields;
 
-		const fuelPurchaseToBeAdded = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
-	  addResource('fuel purchase', fuelPurchaseToBeAdded);
-		this.props.history.push(`/show/${this.state.vehicle.id}`);
-	})
+      fuelPurchaseToBeAdded = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
+      return ({...this.initialState})
+    }, () => {
+      addResource('fuel purchase', fuelPurchaseToBeAdded);
+      this.props.history.push(`/show/${this.state.vehicle.id}`);
+    });
+    /*this.setState({...this.initialState}, () => {
+      const {
+        bookingID,
+        fuelQuantity,
+        fuelPrice
+      } = this.state.fields;
+
+      const fuelPurchaseToBeAdded = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
+      addResource('fuel purchase', fuelPurchaseToBeAdded);
+      this.props.history.push(`/show/${this.state.vehicle.id}`);
+    })*/
   };
 
   handleChange = e => {
-	const {id, value} = e.target;
+    const {id, value} = e.target;
 
-	this.setState(prevState => ({
-	  ...prevState,
-	  fields: {
-		...prevState.fields,
-		[id]: value
-	  }
-	}))
+    this.setState(prevState => ({
+      ...prevState,
+      fields: {
+        ...prevState.fields,
+        [id]: value
+      }
+    }))
   };
 
   handleClear = () => {
-	this.setState({...this.initialState}, () => {
-	  this.fuelQuantity.current.focus();
-	})
+    this.setState({...this.initialState}, () => {
+      this.fuelQuantity.current.focus();
+    })
   };
 
   handleCancel = () => {
-	this.props.history.push("/browse");
+    this.props.history.push("/browse");
   };
 
   render() {
-	return (
-	  <AppConsumer>
-		{
-		  ({loading, notification}) => (
-		    <Container>
-			  {
-				notification.display ?
-				  (
-					<Notification
-					  display={notification.display}
-					  message={notification.message}/>
-				  ) : ''
-			  }
-			  <Row>
-				<Col>
-				  <h2 className="text-center my-5">Register a new fuel purchase
-					for {this.state.vehicle ? `${this.state.vehicle.manufacturer} ${this.state.vehicle.model} (${this.state.vehicle.year})` : ''},
-					booked
-					on {this.state.booking ? new Date(this.state.booking.startDate).toLocaleDateString('en-AU') : ''}
-				  </h2>
-				</Col>
-			  </Row>
-			  {
-				loading ?
-				  (
-					<Row className="justify-content-center mt-5">
-					  <LoadingSpinner/>
-					</Row>
-				  ) :
-				  (
-					<Form
-					  onSubmit={e => this.handleSubmit(e, this.state.fields)}
-					>
-					  <Form.Group as={Row} controlId="fuelQuantity">
-						<Form.Label column="true" sm="2">Fuel quantity (litres):</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							ref={this.fuelQuantity}
-							onChange={this.handleChange}
-							value={this.state.fields.fuelQuantity}
-							type="number"
-							placeholder="Fuel quantity (litres)..."/>
-						</Col>
-					  </Form.Group>
-					  <Form.Group as={Row} controlId="fuelPrice">
-						<Form.Label column="true" sm="2">Fuel price (per L):</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							onChange={this.handleChange}
-							value={this.state.fields.fuelPrice}
-							type="number"
-							placeholder="Fuel price ($ / L).."/>
-						</Col>
-					  </Form.Group>
-					  <Row className="justify-content-center">
-						<Button
-						  variant="primary"
-						  size="lg"
-						  type="submit"
-						  className="mr-5"
-						>
-						  Add fuel purchase
-						</Button>
-						<Button
-						  variant="warning"
-						  size="lg"
-						  className="mr-5"
-						  onClick={this.handleClear}
-						>
-						  Clear
-						</Button>
-						<Button
-						  variant="danger"
-						  size="lg"
-						  onClick={this.handleCancel}
-						>
-						  Cancel
-						</Button>
-					  </Row>
-					</Form>
-				  )
-			  }
-			</Container>
-		  )
-		}
-	  </AppConsumer>
-	);
+    return (
+      <AppConsumer>
+        {
+          ({loading, notification}) => (
+            <Container>
+              {
+                notification.display ?
+                  (
+                    <Notification
+                      display={notification.display}
+                      message={notification.message}/>
+                  ) : ''
+              }
+              <Row>
+                <Col>
+                  <h2 className="text-center my-5">Register a new fuel purchase
+                    for {this.state.vehicle ? `${this.state.vehicle.manufacturer} ${this.state.vehicle.model} (${this.state.vehicle.year})` : ''},
+                    booked
+                    on {this.state.booking ? new Date(this.state.booking.startDate).toLocaleDateString('en-AU') : ''}
+                  </h2>
+                </Col>
+              </Row>
+              {
+                loading ?
+                  (
+                    <Row className="justify-content-center mt-5">
+                      <LoadingSpinner/>
+                    </Row>
+                  ) :
+                  (
+                    <Form
+                      onSubmit={e => this.handleSubmit(e, this.state.fields)}
+                    >
+                      <Form.Group as={Row} controlId="fuelQuantity">
+                        <Form.Label column="true" sm="2">Fuel quantity (litres):</Form.Label>
+                        <Col sm="10">
+                          <Form.Control
+                            ref={this.fuelQuantity}
+                            onChange={this.handleChange}
+                            value={this.state.fields.fuelQuantity}
+                            type="number"
+                            placeholder="Fuel quantity (litres)..."/>
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} controlId="fuelPrice">
+                        <Form.Label column="true" sm="2">Fuel price (per L):</Form.Label>
+                        <Col sm="10">
+                          <Form.Control
+                            onChange={this.handleChange}
+                            value={this.state.fields.fuelPrice}
+                            type="number"
+                            placeholder="Fuel price ($ / L).."/>
+                        </Col>
+                      </Form.Group>
+                      <Row className="justify-content-center">
+                        <Button
+                          variant="primary"
+                          size="lg"
+                          type="submit"
+                          className="mr-5"
+                        >
+                          Add fuel purchase
+                        </Button>
+                        <Button
+                          variant="warning"
+                          size="lg"
+                          className="mr-5"
+                          onClick={this.handleClear}
+                        >
+                          Clear
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="lg"
+                          onClick={this.handleCancel}
+                        >
+                          Cancel
+                        </Button>
+                      </Row>
+                    </Form>
+                  )
+              }
+            </Container>
+          )
+        }
+      </AppConsumer>
+    );
   }
 }
 

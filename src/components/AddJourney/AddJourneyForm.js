@@ -4,6 +4,7 @@ import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {Journey} from "../../Model/Journey";
+import moment from "moment";
 
 export class AddJourneyForm extends React.Component {
   constructor(props) {
@@ -36,12 +37,16 @@ export class AddJourneyForm extends React.Component {
     const vehicle = vehicles.find(vehicle => vehicle.bookings.some(b => b.id === bookingID));
     const booking = vehicle.bookings.find(b => b.id === bookingID);
 
+    // TODO: update journeyStartOdometerReading field to latest vehicle odometer reading
     this.initialState = {
       vehicle,
       booking,
       fields: {
         ...this.initialState.fields,
-        bookingID
+        bookingID,
+        journeyStartedAt: booking.startDate,
+        journeyEndedAt: booking.endDate,
+        journeyStartOdometerReading: booking.startOdometer
       }
     };
 
