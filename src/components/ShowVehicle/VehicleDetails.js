@@ -14,9 +14,7 @@ export const VehicleDetails = props => {
 
   const {
     bookings: vehicleBookings,
-    journeys: vehicleJourneys,
-    services: vehicleServices,
-    fuelPurchases: vehicleFuelPurchases
+    services: vehicleServices
   } = vehicle;
 
   const {deleteResource} = useContext(AppContext);
@@ -158,12 +156,12 @@ export const VehicleDetails = props => {
                                           </ListGroup.Item>
                                           <ListGroup.Item>
                                             Booking cost: {
-                                            Number.isNaN(calculateBookingCost(booking, vehicleJourneys.filter(journey => journey.bookingID === booking.id)))
+                                            Number.isNaN(calculateBookingCost(booking, booking.journeys))
                                               ?
                                               'Pending (no journeys have' +
                                               ' been made for this booking' +
                                               ' yet)' :
-                                              `$ ${Number.parseFloat(calculateBookingCost(booking, vehicleJourneys.filter(journey => journey.bookingID === booking.id))).toFixed(2)}`
+                                              `$ ${Number.parseFloat(calculateBookingCost(booking, booking.journeys)).toFixed(2)}`
                                           }
                                           </ListGroup.Item>
                                         </ListGroup>
@@ -194,7 +192,15 @@ export const VehicleDetails = props => {
                         eventKey="1">
                         <Card.Body>
                           {
-                            vehicleJourneys
+                            vehicle.bookings &&
+							  vehicle
+								.bookings
+								.reduce((journeys, b) => {
+								  b.journeys.forEach(j => {
+								    journeys.push(j);
+								  });
+								  return journeys;
+								}, [])
                               .sort((journey1, journey2) => {
                                 const journey1StartedAt = new Date(journey1.journeyStartedAt);
                                 const journey2StartedAt = new Date(journey2.journeyStartedAt);
@@ -346,7 +352,14 @@ export const VehicleDetails = props => {
                         eventKey="3">
                         <Card.Body>
                           {
-                            vehicleFuelPurchases
+							vehicle
+							  .bookings
+							  .reduce((fuelPurchases, b) => {
+								b.fuelPurchases.forEach(f => {
+								  fuelPurchases.push(f);
+								});
+								return fuelPurchases;
+							  }, [])
                               .sort((fuelPurchase1, fuelPurchase2) => {
                                 const bookingFuelPurchase1 = vehicleBookings.find(booking => booking.id === fuelPurchase1.bookingID);
                                 const booking1StartedAt = new Date(bookingFuelPurchase1.startDate);
