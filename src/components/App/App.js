@@ -304,10 +304,20 @@ export class App extends React.Component {
 					this.setState(prevState => {
 					  let {vehicles} = prevState;
 					  vehicles = vehicles.filter(v => v.id !== resource.id);
-					  return ({vehicles});
+					  return ({
+						vehicles,
+						loading: false,
+						notification: {
+						  display: true,
+						  message: `The ${resourceType} has been successfully removed from the system`
+						}
+					  });
 					})
 				  })
 			  } else
+			    if (collection === 'bookings') {
+
+				}
 				db
 				  .collection(collection)
 				  .doc(resource.id)
