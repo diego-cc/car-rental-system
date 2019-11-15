@@ -10,18 +10,7 @@ import {DeleteResource} from "../DeleteResource/DeleteResource";
 import {AppContext} from "../../AppContext/AppContext";
 
 export const VehicleDetails = props => {
-  const {
-    vehicle,
-    /*bookings: vehicleBookings,
-    journeys: vehicleJourneys,
-    services: vehicleServices,
-    fuelPurchases: vehicleFuelPurchases*/
-  } = props;
-
-  /*vehicleBookings.forEach(b => vehicle.addBooking(b));
-  vehicleJourneys.forEach(j => vehicle.addJourney(j));
-  vehicleServices.forEach(s => vehicle.addService(s));
-  vehicleFuelPurchases.forEach(f => vehicle.addFuelPurchase(f));*/
+  const {vehicle} = props;
 
   const {
     bookings: vehicleBookings,

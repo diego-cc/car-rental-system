@@ -1,5 +1,4 @@
 import moment from "moment";
-import {calculateRevenueRecorded} from "../BookingCost";
 import {Service} from "./Service";
 
 export class Vehicle {
@@ -220,16 +219,5 @@ export class Vehicle {
       }
       return total;
 	}, 0);
-    /*if (this.bookings.length) {
-      const bookingsPerDay = this.bookings.filter(b => b.bookingType === 'D');
-
-      return bookingsPerDay.reduce((rev, b) => {
-        const bookingCost = moment(b.endDate).diff(moment.startDate, 'days') * 100;
-        rev += bookingCost;
-        console.log(rev);
-        return rev;
-	  }, 0)
-	}
-    return 0;*/
   }
 }

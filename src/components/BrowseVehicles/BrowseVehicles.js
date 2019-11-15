@@ -10,7 +10,7 @@ export const BrowseVehicles = props => {
   return (
     <AppConsumer>
       {
-        ({loading, vehicles, services, bookings, journeys, fuelPurchases, notification}) => (
+        ({loading, vehicles, notification}) => (
           <Container>
             {
               notification.display ?
@@ -38,10 +38,6 @@ export const BrowseVehicles = props => {
                     <VehicleDetails
                       key={i}
                       vehicle={v}
-                      /*bookings={bookings.filter(b => b.vehicleID === v.id)}
-                      journeys={journeys.filter(j => bookings.filter(b => b.vehicleID === v.id).some(b => b.id === j.bookingID))}
-                      services={services.filter(s => s.vehicleID === v.id)}
-                      fuelPurchases={fuelPurchases.filter(f => bookings.filter(b => b.vehicleID === v.id).some(b => b.id === f.bookingID))}*/
                     />
                   ))
                 )

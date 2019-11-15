@@ -13,8 +13,6 @@ import {AddJourney} from "../AddJourney/AddJourney";
 import {AddJourneyForm} from "../AddJourney/AddJourneyForm";
 import {AddFuelPurchase} from "../AddFuelPurchase/AddFuelPurchase";
 import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
-import Moment from 'moment';
-import {extendMoment} from 'moment-range';
 import {ShowVehicle} from "../ShowVehicle/ShowVehicle";
 import {Vehicle} from "../../Model/Vehicle";
 import {Booking} from "../../Model/Booking";
