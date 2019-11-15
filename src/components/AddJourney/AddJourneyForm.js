@@ -3,6 +3,7 @@ import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
+import {Journey} from "../../Model/Journey";
 
 export class AddJourneyForm extends React.Component {
   constructor(props) {
@@ -30,32 +31,47 @@ export class AddJourneyForm extends React.Component {
 
   componentDidMount() {
     const {bookingID} = this.props.match.params;
-    const {vehicles, bookings} = this.context;
+    const {vehicles} = this.context;
 
-    const booking = bookings.find(booking => booking.id === bookingID);
-    const vehicle = vehicles.find(vehicle => vehicle.id === booking.vehicleID);
+    const vehicle = vehicles.find(vehicle => vehicle.bookings.some(b => b.id === bookingID));
+    const booking = vehicle.bookings.find(b => b.id === bookingID);
 
     this.initialState = {
-      booking,
       vehicle,
+      booking,
       fields: {
         ...this.initialState.fields,
-        bookingID: booking.id
+        bookingID
       }
     };
 
     this.setState({...this.initialState});
   }
 
-  handleSubmit = (e, journey) => {
+  handleSubmit = (e) => {
     e.preventDefault();
 
     const {addResource} = this.context;
+    let journeyToBeAdded;
 
-    this.setState({...this.initialState}, () => {
-	  addResource('journey', journey);
-    this.props.history.push(`/show/${this.state.vehicle.id}`);
-	})
+    this.setState(prevState => {
+      const {
+        bookingID,
+        journeyStartOdometerReading,
+        journeyEndOdometerReading,
+        journeyStartedAt,
+        journeyEndedAt,
+        journeyFrom,
+        journeyTo
+      } = prevState.fields;
+
+      journeyToBeAdded = new Journey(bookingID, journeyStartOdometerReading, journeyEndOdometerReading, journeyStartedAt, journeyEndedAt, journeyFrom, journeyTo);
+
+      return ({...this.initialState})
+    }, () => {
+      addResource('journey', journeyToBeAdded);
+      this.props.history.push(`/show/${this.state.vehicle.id}`);
+    })
   };
 
   handleChange = e => {
