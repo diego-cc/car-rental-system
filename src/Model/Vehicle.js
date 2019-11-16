@@ -44,6 +44,12 @@ export class Vehicle {
     }
   }
 
+  removeJourneyByBookingID(journey, bookingID) {
+	this.bookings.find(b => b.id === bookingID).removeJourney(journey);
+  }
+
+
+
   addJourney(newJourney) {
     this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
   }
@@ -78,17 +84,8 @@ export class Vehicle {
     this.bookings.find(b => b.id === newFuelPurchase.bookingID).addFuelPurchase(newFuelPurchase);
   }
 
-  removeFuelPurchaseByID(fuelPurchaseID) {
-    if (fuelPurchaseID) {
-      const fuelPurchasesCopy = [...this.fuelPurchases];
-      const fuelPurchaseToBeDeleted = fuelPurchasesCopy.find(fuelPurchase => fuelPurchase.id === fuelPurchaseID);
-
-      if (fuelPurchaseToBeDeleted) {
-        this.fuelPurchases = fuelPurchasesCopy.filter(
-          fuelPurchase => fuelPurchase.id !== fuelPurchaseToBeDeleted.id
-        );
-      }
-    }
+  removeFuelPurchaseByBookingID(fuelPurchase, bookingID) {
+    this.bookings.find(b => b.id === bookingID).removeFuelPurchase(fuelPurchase);
   }
 
   get bookings() {

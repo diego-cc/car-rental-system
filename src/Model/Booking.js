@@ -110,6 +110,10 @@ export class Booking {
 	return this._fuelPurchases;
   }
 
+  set fuelPurchases(newFuelPurchases) {
+    this._fuelPurchases = newFuelPurchases;
+  }
+
   addFuelPurchase(newFuelPurchase) {
     this.fuelPurchases.push(newFuelPurchase);
   }
@@ -117,6 +121,15 @@ export class Booking {
   addJourney(newJourney) {
 	this.journeys.push(newJourney);
 	this.bookingCost = this.calculateBookingCost();
+  }
+
+  removeJourney(journey) {
+    this.journeys = this.journeys.filter(j => j.id !== journey.id);
+    this.bookingCost = this.calculateBookingCost();
+  }
+
+  removeFuelPurchase(fuelPurchase) {
+    this.fuelPurchases = this.fuelPurchases.filter(f => f.id !== fuelPurchase.id);
   }
 
   calculateBookingCost() {

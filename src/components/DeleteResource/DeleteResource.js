@@ -5,21 +5,20 @@ import {calculateBookingCost} from "../../BookingCost";
 import moment from "moment";
 
 export const DeleteResource = props => {
-  const {vehicles, journeys, bookings, deleteResource} = useContext(AppContext);
+  const {vehicles, deleteResource} = useContext(AppContext);
   const {resource, resourceType} = deleteResource;
-  let vehicle;
+  let vehicle, journeys;
 
   if (resourceType && resourceType.trim().toLowerCase() !== 'vehicle') {
 	switch (resourceType.trim().toLowerCase()) {
 	  case 'booking':
-		vehicle = vehicles.find(v => v.id === resource.vehicleID);
+		vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.id));
 		break;
 
 	  case 'journey':
-	  case 'fuelPurchase':
+	  case 'fuelpurchase':
 	  case 'fuel purchase':
-		const associatedBooking = bookings.find(b => b.id === resource.bookingID);
-		vehicle = vehicles.find(v => v.id === associatedBooking.vehicleID);
+	    vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID));
 		break;
 
 	  case 'service':
@@ -29,6 +28,12 @@ export const DeleteResource = props => {
 	  default:
 		break;
 	}
+	journeys = vehicle.bookings.reduce((journeys, b) => {
+	  b.journeys.forEach(j => {
+	    journeys.push(j);
+	  });
+	  return journeys;
+	}, []);
   }
 
   const renderResourceInfo = (resourceType, resource) => {

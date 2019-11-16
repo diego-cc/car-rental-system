@@ -314,55 +314,143 @@ export class App extends React.Component {
 					  });
 					})
 				  })
-			  } else
-			    if (collection === 'bookings') {
-
-				}
-				db
-				  .collection(collection)
-				  .doc(resource.id)
-				  .delete()
-				  .then(() => {
-					this.setState(prevState => {
-					  const updatedCollection = prevState[collection];
-					  return ({
-						...prevState,
+			  } else if (collection === 'bookings') {
+				// delete booking from state first
+				this.setState(prevState => {
+				  const {vehicles} = prevState;
+				  const vehicleToBeModified = vehicles.find(v => v.bookings.some(b => b.id === resource.id));
+				  vehicleToBeModified.removeBookingByID(resource.id);
+				  return ({
+					vehicles: [
+					  ...vehicles.filter(v => v.id !== vehicleToBeModified.id),
+					  vehicleToBeModified
+					]
+				  })
+				}, () => {
+				  // delete booking from firebase
+				  db
+					.collection('bookings')
+					.doc(resource.id)
+					.delete()
+					.then(() => {
+					  this.setState({
 						loading: false,
 						notification: {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
-						},
-						[collection]: updatedCollection.filter(r => r.id !== resource.id)
+						}
 					  })
-					}, () => {
-					  setTimeout(() => {
-						this.setState({
-						  notification: {
-							display: false,
-							message: ''
-						  }
-						})
-					  }, 3000)
 					})
-				  })
-				  .catch(err => {
-					this.setState({
-					  loading: false,
-					  notification: {
-						display: true,
-						message: `Error: ${err.message}`
-					  }
-					}, () => {
-					  setTimeout(() => {
-						this.setState({
-						  notification: {
-							display: false,
-							message: ''
-						  }
-						})
-					  }, 3000)
+					.catch(err => {
+					  this.state({
+						loading: false,
+						notification: {
+						  display: true,
+						  message: `Error: ${err.message}`
+						}
+					  })
 					})
+				})
+			  } else if (collection === 'journeys') {
+				// delete journey from state
+				this.setState(prevState => {
+				  const {vehicles} = prevState;
+				  const vehicleToBeModified = vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID));
+				  vehicleToBeModified.removeJourneyByBookingID(resource, resource.bookingID);
+
+				  return ({
+					vehicles: [
+					  ...vehicles.filter(v => v.id !== vehicleToBeModified),
+					  vehicleToBeModified
+					]
 				  })
+				}, () => {
+				  // delete journey from firebase
+				  db
+					.collection('journeys')
+					.doc(resource.id)
+					.delete()
+					.then(() => {
+					  this.setState({
+						loading: false,
+						notification: {
+						  display: true,
+						  message: `The ${resourceType} has been successfully removed from the system`
+						}
+					  })
+					})
+				})
+
+			  }
+			  else if (collection === 'services') {
+			    // delete service from state
+				this.setState(prevState => {
+				  const {vehicles} = prevState;
+				  const vehicleToBeModified = vehicles.find(v => v.id === resource.vehicleID);
+				  vehicleToBeModified.removeServiceByID(resource.id);
+
+				  return ({
+					vehicles: [
+					  ...vehicles.filter(v => v.id !== vehicleToBeModified.id),
+					  vehicleToBeModified
+					]
+				  })
+				}, () => {
+				  // delete service from firebase
+				  db
+					.collection('services')
+					.doc(resource.id)
+					.delete()
+					.then(() => {
+					  this.setState({
+						loading: false,
+						notification: {
+						  display: true,
+						  message: `The ${resourceType} has been successfully removed from the system`
+						}
+					  })
+					})
+				})
+			  }
+			  else if (collection === 'fuelPurchases') {
+				// delete fuel purchase from the state
+				this.setState(prevState => {
+				  const {vehicles} = prevState;
+				  const vehicleToBeModified = vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID));
+				  vehicleToBeModified.removeFuelPurchaseByBookingID(resource, resource.bookingID);
+
+				  return ({
+					vehicles: [
+					  ...vehicles.filter(v => v.id !== vehicleToBeModified.id),
+					  vehicleToBeModified
+					]
+				  })
+				}, () => {
+				  // delete fuel purchase from firebase
+				  db
+					.collection('fuelPurchases')
+					.doc(resource.id)
+					.delete()
+					.then(() => {
+					  this.setState({
+						loading: false,
+						notification: {
+						  display: true,
+						  message: `The ${resourceType} has been successfully removed from the system`
+						}
+					  })
+					})
+				})
+			  }
+			  else {
+			    this.setState({
+				  loading: false,
+				  notification: {
+				    display: true,
+					message: `Error: the collection associated with the item to be deleted was not found`
+				  }
+				})
+			  }
 			}
 		  })
 		})
