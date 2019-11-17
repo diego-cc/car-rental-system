@@ -1,6 +1,5 @@
 import React from 'react';
 import {Navigation} from "../Navigation/Navigation";
-import {Header} from "../Header/Header";
 import {BrowseVehicles} from "../BrowseVehicles/BrowseVehicles";
 import {Route, Switch} from 'react-router-dom';
 import {AddVehicle} from "../AddVehicle/AddVehicle";
@@ -19,6 +18,7 @@ import {Booking} from "../../Model/Booking";
 import {Journey} from "../../Model/Journey";
 import {Service} from "../../Model/Service";
 import {FuelPurchase} from "../../Model/FuelPurchase";
+import {Dashboard} from "../Dashboard/Dashboard";
 
 export class App extends React.Component {
   constructor(props) {
@@ -603,9 +603,7 @@ export class App extends React.Component {
 	  <AppProvider value={this.state}>
 		<Navigation/>
 		<Switch>
-		  <Route exact path="/">
-			<Header headerText="Welcome to the Car Rental System"/>
-		  </Route>
+		  <Route exact path="/" render={props => <Dashboard {...props} />} />
 		  <Route path="/browse">
 			<BrowseVehicles/>
 		  </Route>
