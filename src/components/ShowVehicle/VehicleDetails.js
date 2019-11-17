@@ -5,7 +5,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCog, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "react-bootstrap/Dropdown";
 import moment from "moment";
-import {calculateBookingCost} from "../../BookingCost";
 import {DeleteResource} from "../DeleteResource/DeleteResource";
 import {AppContext} from "../../AppContext/AppContext";
 

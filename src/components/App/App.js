@@ -24,6 +24,17 @@ export class App extends React.Component {
   constructor(props) {
 	super(props);
 
+	this.dismissNotification = () => {
+	  setTimeout(() => {
+		this.setState({
+		  notification: {
+			display: false,
+			message: ''
+		  }
+		})
+	  }, 3500)
+	};
+
 	this.editVehicle = vehicle => {
 	  this.setState({
 		loading: true
@@ -54,16 +65,7 @@ export class App extends React.Component {
 				  display: true,
 				  message: `The vehicle has been successfully updated`
 				}
-			  }, () => {
-				setTimeout(() => {
-				  this.setState({
-					notification: {
-					  display: false,
-					  message: ''
-					}
-				  })
-				}, 3500)
-			  })
+			  }, this.dismissNotification)
 			})
 			.catch(err => {
 			  this.setState({
@@ -73,6 +75,7 @@ export class App extends React.Component {
 				  message: `Could not edit vehicle: ${err}`
 				}
 			  }, () => {
+			    this.dismissNotification();
 				console.dir(err);
 			  })
 			})
@@ -87,7 +90,7 @@ export class App extends React.Component {
 			display: true,
 			message: 'Error: missing resource or resource type'
 		  }
-		})
+		}, this.dismissNotification)
 	  }
 	  let collectionName, collection;
 
@@ -125,7 +128,7 @@ export class App extends React.Component {
 			  display: true,
 			  message: 'Error: invalid resource type provided'
 			}
-		  })
+		  }, this.dismissNotification)
 		} else {
 		  const {vehicles} = prevState;
 		  switch (collectionName) {
@@ -170,8 +173,6 @@ export class App extends React.Component {
 		  })
 		}
 	  }, () => {
-		console.log(`Added new entry to ${collectionName}:`);
-		console.dir(this.state);
 		if (collectionName && collection) {
 		  const db = firebase.firestore();
 		  db
@@ -185,16 +186,7 @@ export class App extends React.Component {
 				  display: true,
 				  message: `The new ${resourceType} has been successfully added to the system`
 				}
-			  }, () => {
-				setTimeout(() => {
-				  this.setState({
-					notification: {
-					  display: false,
-					  message: ''
-					}
-				  })
-				}, 3500)
-			  })
+			  }, this.dismissNotification)
 			})
 			.catch(err => {
 			  this.setState({
@@ -203,16 +195,7 @@ export class App extends React.Component {
 				  display: true,
 				  message: `Could not add new ${resourceType}. Error: ${err.message}`
 				}
-			  }, () => {
-				setTimeout(() => {
-				  this.setState({
-					notification: {
-					  display: false,
-					  message: ''
-					}
-				  })
-				}, 3500)
-			  })
+			  }, this.dismissNotification)
 			})
 		} else {
 		  this.setState({
@@ -312,7 +295,7 @@ export class App extends React.Component {
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
 					  });
-					})
+					}, this.dismissNotification)
 				  })
 			  } else if (collection === 'bookings') {
 				// delete booking from state first
@@ -339,7 +322,7 @@ export class App extends React.Component {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
-					  })
+					  }, this.dismissNotification)
 					})
 					.catch(err => {
 					  this.state({
@@ -377,7 +360,7 @@ export class App extends React.Component {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
-					  })
+					  }, this.dismissNotification)
 					})
 				})
 
@@ -408,7 +391,7 @@ export class App extends React.Component {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
-					  })
+					  }, this.dismissNotification)
 					})
 				})
 			  }
@@ -438,7 +421,7 @@ export class App extends React.Component {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
-					  })
+					  }, this.dismissNotification)
 					})
 				})
 			  }
@@ -449,7 +432,7 @@ export class App extends React.Component {
 				    display: true,
 					message: `Error: the collection associated with the item to be deleted was not found`
 				  }
-				})
+				}, this.dismissNotification)
 			  }
 			}
 		  })
@@ -543,68 +526,6 @@ export class App extends React.Component {
 			vehicles
 		  })
 		});
-
-		// update odometers
-		/*vehicles.forEach(vehicle => {
-		  const vehicleServices = services.filter(s => s.vehicleID === vehicle.id);
-		  vehicleServices.forEach(s => vehicle.addService(s));
-
-		  const vehicleBookings = bookings.filter(b => b.vehicleID === vehicle.id);
-		  vehicleBookings.forEach(b => vehicle.addBooking(b));
-
-		  const vehicleJourneys = journeys.filter(j => vehicleBookings.some(b => j.bookingID === b.id));
-		  vehicleJourneys.forEach(j => vehicle.addJourney(j));
-
-		  const vehicleFuelPurchases = fuelPurchases.filter(f => vehicleBookings.some(b => b.id === f.bookingID));
-		  vehicleFuelPurchases.forEach(f => vehicle.addFuelPurchase(f));
-		});*/
-		// update vehicle odometers if a journey ends today
-		/*const moment = extendMoment(Moment);
-		journeys.forEach(journey => {
-		  const momentEndDate = moment(journey.journeyEndedAt);
-		  const now = moment();
-		  const selectedBooking = bookings.find(booking => booking.id === journey.bookingID);
-		  let selectedVehicle;
-		  if (selectedBooking) {
-		  selectedVehicle = vehicles.find(vehicle => vehicle.id === selectedBooking.vehicleID);
-		  }
-		  if (selectedVehicle && selectedBooking && momentEndDate.isSame(now) && (selectedVehicle.odometerReading < journey.journeyEndOdometerReading)) {
-		  this.setState(prevState => {
-			const updatedVehicles = prevState.vehicles;
-			updatedVehicles[vehicles.findIndex(vehicle => vehicle.id === selectedVehicle.id)].odometerReading = journey.journeyEndOdometerReading;
-
-			return ({
-			vehicles: updatedVehicles
-			})
-		  }, () => {
-			const db = firebase.firestore();
-			db
-			.collection('vehicles')
-			.doc(`${selectedVehicle.id}`)
-			.set({
-			  ...selectedVehicle,
-			  odometerReading: journey.journeyEndOdometerReading
-			})
-			.then(() => {
-			  this.setState({
-			  notification: {
-				display: true,
-				message: 'Successfully updated vehicle odometers'
-			  }
-			  }, () => {
-			  setTimeout(() => {
-				this.setState({
-				notification: {
-				  display: false,
-				  message: ''
-				}
-				})
-			  }, 3000)
-			  })
-			})
-		  })
-		  }
-		})*/
 	  })
 	  .catch(err => {
 		// display error message
@@ -613,16 +534,7 @@ export class App extends React.Component {
 			display: true,
 			message: `Error: ${err.message}`
 		  }
-		}, () => {
-		  setTimeout(() => {
-			this.setState({
-			  notification: {
-				display: false,
-				message: ''
-			  }
-			})
-		  }, 3000)
-		})
+		}, this.dismissNotification)
 	  })
   }
 

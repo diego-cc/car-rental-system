@@ -4,7 +4,6 @@ import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {Journey} from "../../Model/Journey";
-import moment from "moment";
 
 export class AddJourneyForm extends React.Component {
   constructor(props) {

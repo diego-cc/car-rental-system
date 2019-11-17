@@ -1,41 +1,11 @@
 import React, {useContext} from 'react';
 import {Button, ListGroup, Modal} from "react-bootstrap";
 import {AppConsumer, AppContext} from "../../AppContext/AppContext";
-import {calculateBookingCost} from "../../BookingCost";
 import moment from "moment";
 
 export const DeleteResource = props => {
   const {vehicles, deleteResource} = useContext(AppContext);
   const {resource, resourceType} = deleteResource;
-
-  const handleConfirmDelete = () => {
-	/*if (resourceType && resourceType.trim().toLowerCase() !== 'vehicle') {
-	  switch (resourceType.trim().toLowerCase()) {
-		case 'booking':
-		  vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.id));
-		  break;
-
-		case 'journey':
-		case 'fuelpurchase':
-		case 'fuel purchase':
-		  vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID));
-		  break;
-
-		case 'service':
-		  vehicle = vehicles.find(v => v.id === resource.vehicleID);
-		  break;
-
-		default:
-		  break;
-	  }
-	  journeys = vehicle.bookings.reduce((journeys, b) => {
-		b.journeys.forEach(j => {
-		  journeys.push(j);
-		});
-		return journeys;
-	  }, []);
-	}*/
-  };
 
   const renderResourceInfo = (resourceType, resource) => {
 	if (resourceType && resource) {
