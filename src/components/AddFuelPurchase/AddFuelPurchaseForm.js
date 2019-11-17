@@ -153,7 +153,7 @@ export class AddFuelPurchaseForm extends React.Component {
                             placeholder="Fuel price ($ / L).."/>
                         </Col>
                       </Form.Group>
-                      <Row className="justify-content-center">
+                      <Row className="justify-content-center my-5">
                         <Button
                           variant="primary"
                           size="lg"

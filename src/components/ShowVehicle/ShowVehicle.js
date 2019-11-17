@@ -73,19 +73,19 @@ export const ShowVehicle = props => {
                   <h2 className="text-center my-5">Sorry, no vehicles were found</h2>
                 </Col>
               </Row>
-              <Row>
-                <Col className="text-center">
-                  <Button
-                    onClick={() => history.push(`/browse`)}
-                    variant="primary"
-                    size="lg">
-                    Browse vehicles
-                  </Button>
-                </Col>
-              </Row>
             </>
           )
       }
+	  <Row className="my-5">
+		<Col className="text-center">
+		  <Button
+			onClick={() => history.push(`/browse`)}
+			variant="primary"
+			size="lg">
+			Browse vehicles
+		  </Button>
+		</Col>
+	  </Row>
     </Container>
   )
 };

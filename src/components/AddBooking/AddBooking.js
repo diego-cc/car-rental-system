@@ -241,7 +241,7 @@ export class AddBooking extends React.Component {
 							placeholder="Start Odometer..."/>
 						</Col>
 					  </Form.Group>
-					  <Row className="justify-content-center">
+					  <Row className="justify-content-center my-5">
 						<Button
 						  variant="primary"
 						  size="lg"

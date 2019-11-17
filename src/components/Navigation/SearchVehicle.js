@@ -20,7 +20,7 @@ export const SearchVehicle = props => {
 	<AppConsumer>
 	  {
 		({vehicles}) => (
-		  <Form inline onSubmit={handleSubmit} className="mr-3">
+		  <Form inline onSubmit={handleSubmit} className="mr-md-3">
 			<FormGroup>
 			  <Typeahead
 				id="search-vehicle"
@@ -32,7 +32,7 @@ export const SearchVehicle = props => {
 				minLength={1}
 				onChange={selected => setSelected(selected)}
 			  />
-			  <Button variant="outline-primary" type="submit" className="ml-3">
+			  <Button variant="outline-primary" type="submit" className="ml-sm-3">
 				Search
 			  </Button>
 			</FormGroup>
