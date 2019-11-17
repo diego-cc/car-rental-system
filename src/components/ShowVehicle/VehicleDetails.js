@@ -156,12 +156,13 @@ export const VehicleDetails = props => {
                                           </ListGroup.Item>
                                           <ListGroup.Item>
                                             Booking cost: {
-                                            Number.isNaN(calculateBookingCost(booking, booking.journeys))
+                                            `$ ${Number.parseFloat(booking.bookingCost).toFixed(2)}`
+                                            /*Number.isNaN(calculateBookingCost(booking, booking.journeys))
                                               ?
                                               'Pending (no journeys have' +
                                               ' been made for this booking' +
                                               ' yet)' :
-                                              `$ ${Number.parseFloat(calculateBookingCost(booking, booking.journeys)).toFixed(2)}`
+                                              `$ ${Number.parseFloat(calculateBookingCost(booking, booking.journeys)).toFixed(2)}`*/
                                           }
                                           </ListGroup.Item>
                                         </ListGroup>

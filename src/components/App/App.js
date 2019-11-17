@@ -360,7 +360,7 @@ export class App extends React.Component {
 
 				  return ({
 					vehicles: [
-					  ...vehicles.filter(v => v.id !== vehicleToBeModified),
+					  ...vehicles.filter(v => v.id !== vehicleToBeModified.id),
 					  vehicleToBeModified
 					]
 				  })
@@ -534,10 +534,15 @@ export class App extends React.Component {
 
 		  });
 
+		  // update odometers
+		  vehicles.forEach(v => {
+		    v.updateVehicleOdometer();
+		  });
+
 		  return ({
 			vehicles
 		  })
-		}, () => console.dir(this.state));
+		});
 
 		// update odometers
 		/*vehicles.forEach(vehicle => {

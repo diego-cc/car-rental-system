@@ -88,6 +88,6 @@ export class Service {
   };
 
   static requiresService = services => {
-    return services.some(service => moment(service.servicedAt).isAfter(moment()));
+    return services.some(service => moment(service.servicedAt).isSameOrAfter(moment(), 'days'));
   }
 }

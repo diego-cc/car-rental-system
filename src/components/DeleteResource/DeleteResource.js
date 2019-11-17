@@ -7,34 +7,35 @@ import moment from "moment";
 export const DeleteResource = props => {
   const {vehicles, deleteResource} = useContext(AppContext);
   const {resource, resourceType} = deleteResource;
-  let vehicle, journeys;
 
-  if (resourceType && resourceType.trim().toLowerCase() !== 'vehicle') {
-	switch (resourceType.trim().toLowerCase()) {
-	  case 'booking':
-		vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.id));
-		break;
+  const handleConfirmDelete = () => {
+	/*if (resourceType && resourceType.trim().toLowerCase() !== 'vehicle') {
+	  switch (resourceType.trim().toLowerCase()) {
+		case 'booking':
+		  vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.id));
+		  break;
 
-	  case 'journey':
-	  case 'fuelpurchase':
-	  case 'fuel purchase':
-	    vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID));
-		break;
+		case 'journey':
+		case 'fuelpurchase':
+		case 'fuel purchase':
+		  vehicle = vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID));
+		  break;
 
-	  case 'service':
-		vehicle = vehicles.find(v => v.id === resource.vehicleID);
-		break;
+		case 'service':
+		  vehicle = vehicles.find(v => v.id === resource.vehicleID);
+		  break;
 
-	  default:
-		break;
-	}
-	journeys = vehicle.bookings.reduce((journeys, b) => {
-	  b.journeys.forEach(j => {
-	    journeys.push(j);
-	  });
-	  return journeys;
-	}, []);
-  }
+		default:
+		  break;
+	  }
+	  journeys = vehicle.bookings.reduce((journeys, b) => {
+		b.journeys.forEach(j => {
+		  journeys.push(j);
+		});
+		return journeys;
+	  }, []);
+	}*/
+  };
 
   const renderResourceInfo = (resourceType, resource) => {
 	if (resourceType && resource) {
@@ -59,7 +60,7 @@ export const DeleteResource = props => {
 			<ListGroup>
 			  <ListGroup.Item>
 				Journey
-				vehicle: {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''}
+				vehicle: {resource && vehicles.find(v => v.bookings.some(b => b.journeys.some(j => j.id === resource.id))) ? `${vehicles.find(v => v.bookings.some(b => b.journeys.some(j => j.id === resource.id))).manufacturer} ${vehicles.find(v => v.bookings.some(b => b.journeys.some(j => j.id === resource.id))).model} (${vehicles.find(v => v.bookings.some(b => b.journeys.some(j => j.id === resource.id))).year})` : ''}
 			  </ListGroup.Item>
 			  <ListGroup.Item>
 				Journey start date: {resource ? moment(resource.journeyStartedAt).format('DD/MM/YYYY') : ''}
@@ -89,7 +90,7 @@ export const DeleteResource = props => {
 			<ListGroup>
 			  <ListGroup.Item>
 				Booking
-				vehicle: {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''}
+				vehicle: {resource ? `${vehicles.find(v => v.id === resource.vehicleID).manufacturer} ${vehicles.find(v => v.id === resource.vehicleID).model} (${vehicles.find(v => v.id === resource.vehicleID).year})` : ''}
 			  </ListGroup.Item>
 			  <ListGroup.Item>
 				Booking start date: {resource ? moment(resource.startDate).format('DD/MM/YYYY') : ''}
@@ -106,12 +107,7 @@ export const DeleteResource = props => {
 			  </ListGroup.Item>
 			  <ListGroup.Item>
 				Booking cost: {
-				Number.isNaN(calculateBookingCost(resource, journeys.filter(journey => journey.bookingID === resource.id)))
-				  ?
-				  'Pending (no journeys have' +
-				  ' been made for this booking' +
-				  ' yet)' :
-				  `$ ${Number.parseFloat(calculateBookingCost(resource, journeys.filter(journey => journey.bookingID === resource.id))).toFixed(2)}`
+			    `$ ${Number.parseFloat(resource.bookingCost).toFixed(2)}`
 			  }
 			  </ListGroup.Item>
 			</ListGroup>
@@ -122,7 +118,7 @@ export const DeleteResource = props => {
 			<ListGroup>
 			  <ListGroup.Item>
 				Service
-				vehicle: {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''}
+				vehicle: {resource && vehicles.find(v => v.bookings.some(b => b.fuelPurchases.some(f => f.id === resource.id))) ? `${vehicles.find(v => v.services.some(s => s.id === resource.id)).manufacturer} ${vehicles.find(v => v.services.some(s => s.id === resource.id)).model} (${vehicles.find(v => v.services.some(s => s.id === resource.id)).year})` : ''}
 			  </ListGroup.Item>
 			  <ListGroup.Item>
 				Serviced at: {resource ? moment(resource.servicedAt).format('DD/MM/YYYY') : ''}
@@ -139,7 +135,7 @@ export const DeleteResource = props => {
 			<ListGroup>
 			  <ListGroup.Item>
 				Fuel purchased for
-				vehicle: {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''}
+				vehicle: {resource && vehicles.find(v => v.bookings.some(b => b.fuelPurchases.some(f => f.id === resource.id))) ? `${vehicles.find(v => v.bookings.some(b => b.fuelPurchases.some(f => f.id === resource.id))).manufacturer} ${vehicles.find(v => v.bookings.some(b => b.fuelPurchases.some(f => f.id === resource.id))).model} (${vehicles.find(v => v.bookings.some(b => b.fuelPurchases.some(f => f.id === resource.id))).year})` : ''}
 			  </ListGroup.Item>
 			  <ListGroup.Item>
 				Fuel quantity: {resource ? `${resource.fuelQuantity} L` : ''}

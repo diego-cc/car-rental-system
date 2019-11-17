@@ -1,5 +1,6 @@
 import moment from "moment";
 import {Service} from "./Service";
+import {firebase} from "../Firebase/Firebase";
 
 export class Vehicle {
   _id;
@@ -10,9 +11,7 @@ export class Vehicle {
   _registrationNumber;
   _tankCapacity;
   _bookings = [];
-  // _journeys = [];
   _services = [];
-  // _fuelPurchases = [];
   _createdAt;
   _updatedAt;
 
@@ -48,21 +47,8 @@ export class Vehicle {
 	this.bookings.find(b => b.id === bookingID).removeJourney(journey);
   }
 
-
-
   addJourney(newJourney) {
     this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
-  }
-
-  removeJourneyByID(journeyID) {
-    /*if (journeyID) {
-      const journeysCopy = [...this.journeys];
-      const journeyToBeDeleted = journeysCopy.find(journey => journey.id === journeyID);
-
-      if (journeyToBeDeleted) {
-        this.journeys = journeysCopy.filter(journey => journey.id !== journeyToBeDeleted.id);
-      }
-    }*/
   }
 
   addService(newService) {
@@ -104,10 +90,6 @@ export class Vehicle {
       return journeys;
     }, []);
   }
-
-  /*set journeys(value) {
-    this._journeys = value;
-  }*/
 
   get services() {
     return this._services;
@@ -216,5 +198,34 @@ export class Vehicle {
       }
       return total;
 	}, 0);
+  }
+
+  updateVehicleOdometer() {
+	// get all journeys
+	if (this.bookings.length) {
+	  const journeys = this.bookings.reduce((j, b) => {
+		if (b.journeys.length) {
+		  j.push(...b.journeys);
+		}
+		return j;
+	  }, []);
+
+	  // if a journey is scheduled for today, update vehicle odometer
+	  const todaysJourney = journeys.find(j => moment(j.journeyEndedAt).isSame(moment(), 'days'));
+
+	  if (todaysJourney) {
+		this.odometerReading = todaysJourney.journeyEndOdometerReading;
+
+		// update vehicle on firebase
+		const db = firebase.firestore();
+		db
+		  .collection('vehicles')
+		  .doc(this.id)
+		  .update({
+			'_odometerReading': this.odometerReading,
+			'_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
+		  })
+	  }
+	}
   }
 }
