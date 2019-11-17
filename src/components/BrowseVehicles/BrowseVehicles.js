@@ -22,7 +22,7 @@ export const BrowseVehicles = props => {
             }
             <Row>
               <Col>
-                <h2 className="text-center my-5">Browse vehicles</h2>
+                <h2 className="text-center my-5">All vehicles</h2>
               </Col>
             </Row>
             <DeleteResource/>

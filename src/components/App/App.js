@@ -19,6 +19,7 @@ import {Journey} from "../../Model/Journey";
 import {Service} from "../../Model/Service";
 import {FuelPurchase} from "../../Model/FuelPurchase";
 import {Dashboard} from "../Dashboard/Dashboard";
+import moment from "moment";
 
 export class App extends React.Component {
   constructor(props) {
@@ -75,7 +76,7 @@ export class App extends React.Component {
 				  message: `Could not edit vehicle: ${err}`
 				}
 			  }, () => {
-			    this.dismissNotification();
+				this.dismissNotification();
 				console.dir(err);
 			  })
 			})
@@ -128,7 +129,7 @@ export class App extends React.Component {
 			  display: true,
 			  message: 'Error: invalid resource type provided'
 			}
-		  }, this.dismissNotification)
+		  })
 		} else {
 		  const {vehicles} = prevState;
 		  switch (collectionName) {
@@ -180,13 +181,14 @@ export class App extends React.Component {
 			.doc(resource.id)
 			.set({...resource})
 			.then(() => {
-			  this.setState({
+			  this.setState(prevState => ({
 				loading: false,
+				revenue: this.calculateTotalRevenue(prevState.vehicles),
 				notification: {
 				  display: true,
 				  message: `The new ${resourceType} has been successfully added to the system`
 				}
-			  }, this.dismissNotification)
+			  }), this.dismissNotification)
 			})
 			.catch(err => {
 			  this.setState({
@@ -290,6 +292,7 @@ export class App extends React.Component {
 					  return ({
 						vehicles,
 						loading: false,
+						revenue: this.calculateTotalRevenue(vehicles),
 						notification: {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
@@ -316,13 +319,14 @@ export class App extends React.Component {
 					.doc(resource.id)
 					.delete()
 					.then(() => {
-					  this.setState({
+					  this.setState(prevState => ({
 						loading: false,
+						revenue: this.calculateTotalRevenue(prevState.vehicles),
 						notification: {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
-					  }, this.dismissNotification)
+					  }), this.dismissNotification)
 					})
 					.catch(err => {
 					  this.state({
@@ -354,19 +358,19 @@ export class App extends React.Component {
 					.doc(resource.id)
 					.delete()
 					.then(() => {
-					  this.setState({
+					  this.setState(prevState =>({
 						loading: false,
+						revenue: this.calculateTotalRevenue(prevState.vehicles),
 						notification: {
 						  display: true,
 						  message: `The ${resourceType} has been successfully removed from the system`
 						}
-					  }, this.dismissNotification)
+					  }), this.dismissNotification)
 					})
 				})
 
-			  }
-			  else if (collection === 'services') {
-			    // delete service from state
+			  } else if (collection === 'services') {
+				// delete service from state
 				this.setState(prevState => {
 				  const {vehicles} = prevState;
 				  const vehicleToBeModified = vehicles.find(v => v.id === resource.vehicleID);
@@ -394,8 +398,7 @@ export class App extends React.Component {
 					  }, this.dismissNotification)
 					})
 				})
-			  }
-			  else if (collection === 'fuelPurchases') {
+			  } else if (collection === 'fuelPurchases') {
 				// delete fuel purchase from the state
 				this.setState(prevState => {
 				  const {vehicles} = prevState;
@@ -424,12 +427,11 @@ export class App extends React.Component {
 					  }, this.dismissNotification)
 					})
 				})
-			  }
-			  else {
-			    this.setState({
+			  } else {
+				this.setState({
 				  loading: false,
 				  notification: {
-				    display: true,
+					display: true,
 					message: `Error: the collection associated with the item to be deleted was not found`
 				  }
 				}, this.dismissNotification)
@@ -458,6 +460,7 @@ export class App extends React.Component {
 	  bookings: [],
 	  journeys: [],
 	  fuelPurchases: [],
+	  revenue: [],
 	  addVehicle: this.addVehicle,
 	  editVehicle: this.editVehicle,
 	  deleteResource: {
@@ -519,11 +522,13 @@ export class App extends React.Component {
 
 		  // update odometers
 		  vehicles.forEach(v => {
-		    v.updateVehicleOdometer();
+			v.updateVehicleOdometer();
 		  });
 
+		  const revenue = this.calculateTotalRevenue(vehicles);
 		  return ({
-			vehicles
+			vehicles,
+			revenue
 		  })
 		});
 	  })
@@ -598,12 +603,69 @@ export class App extends React.Component {
 	return Promise.all(collections.map(collection => this.fetchCollection(collection)))
   }
 
+  calculateTotalRevenue = vehicles => {
+	let data = [];
+	vehicles = vehicles || this.state.vehicles;
+	if (vehicles && vehicles.length) {
+	  vehicles.forEach(v => {
+		const vehicleRevenue =
+		  v
+			.bookings
+			.reduce((mappedBookings, b) => {
+			  const {bookingCost} = b;
+			  const bookingMonthAndYear = moment(b.startDate, "YYYY-MM-DD").format('MMMM YYYY');
+			  const mappedBooking = {
+				bookingMonthAndYear,
+				bookingCost
+			  };
+			  mappedBookings.push(mappedBooking);
+			  return mappedBookings;
+			}, [])
+			.sort((mappedBooking1, mappedBooking2) => {
+			  return moment(mappedBooking1.bookingMonthAndYear, 'MMMM YYYY').isSameOrBefore(moment(mappedBooking2.bookingMonthAndYear, 'MMMM YYYY'))
+			})
+			.reduce((bookingsByMonthAndYear, mappedBooking) => {
+			  if (bookingsByMonthAndYear.some(b => moment(b.monthAndYear, 'MMMM YYYY').isSame(moment(mappedBooking.bookingMonthAndYear, 'MMMM YYYY')))) {
+				bookingsByMonthAndYear[bookingsByMonthAndYear.findIndex(entry => moment(entry.monthAndYear, 'MMMM YYYY').isSame(moment(mappedBooking.bookingMonthAndYear, 'MMMM YYYY')))].revenue += mappedBooking.bookingCost;
+			  } else {
+				bookingsByMonthAndYear.push({
+				  monthAndYear: mappedBooking.bookingMonthAndYear,
+				  revenue: mappedBooking.bookingCost
+				})
+			  }
+			  return bookingsByMonthAndYear;
+			}, []);
+		data.push(...vehicleRevenue);
+	  });
+	  data =
+		data
+		  .reduce((mappedRevenue, entry) => {
+			if (mappedRevenue.some(r => moment(r.monthAndYear, 'MMMM YYYY').isSame(moment(entry.monthAndYear, 'MMMM YYYY')))) {
+			  mappedRevenue[mappedRevenue.findIndex(r => moment(r.monthAndYear, 'MMMM YYYY').isSame(moment(entry.monthAndYear, 'MMMM YYYY')))].revenue += entry.revenue;
+			} else {
+			  mappedRevenue.push({
+				monthAndYear: entry.monthAndYear,
+				revenue: entry.revenue
+			  })
+			}
+			return mappedRevenue;
+		  }, []);
+	}
+	return data
+	  .sort((revenue1, revenue2) => {
+	  return moment(revenue1.monthAndYear, 'MMMM YYYY').diff(moment(revenue2.monthAndYear, 'MMMM' +
+		' YYYY'))
+	})
+	  .filter(revenue => moment(revenue.monthAndYear, 'MMMM YYYY').isSameOrBefore(moment(moment(), 'MMMM YYYY')))
+	  .filter(revenue => moment(revenue.monthAndYear, 'MMMM YYYY').isSameOrAfter(moment(moment(), 'MMMM YYYY').subtract(6, 'months')));
+  };
+
   render() {
 	return (
 	  <AppProvider value={this.state}>
 		<Navigation/>
 		<Switch>
-		  <Route exact path="/" render={props => <Dashboard {...props} />} />
+		  <Route exact path="/" render={props => <Dashboard {...props} />}/>
 		  <Route path="/browse">
 			<BrowseVehicles/>
 		  </Route>

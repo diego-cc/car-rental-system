@@ -1,13 +1,15 @@
 import React, {useContext} from 'react';
-import {Container, Row} from "react-bootstrap";
+import {Button, Col, Container, Row} from "react-bootstrap";
 import {Header} from "../Header/Header";
 import {AppContext} from "../../AppContext/AppContext";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
+import {RevenueChart} from "./RevenueChart";
 
-export const Dashboard = () => {
-  const {vehicles, loading} = useContext(AppContext);
+export const Dashboard = props => {
+  const {loading, revenue} = useContext(AppContext);
+
   return (
-	<Container>
+	<Container className="text-center">
 	  <Header headerText="Welcome to the Car Rental System"/>
 	  {
 		loading ?
@@ -17,9 +19,22 @@ export const Dashboard = () => {
 			</Row>
 		  ) :
 		  (
-		    <h2>Content goes here</h2>
+			<>
+			  <h2 className="my-5 text-center">Revenue history (last 6 months):</h2>
+			  <Row>
+				<RevenueChart data={revenue}/>
+			  </Row>
+			</>
 		  )
 	  }
+	  <Button
+		size="lg"
+		variant="primary"
+		className="mt-5"
+		onClick={() => props.history.push('/browse')}
+	  >
+		Browse vehicles
+	  </Button>
 	</Container>
   )
 };
