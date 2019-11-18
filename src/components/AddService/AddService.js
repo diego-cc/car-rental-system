@@ -1,172 +1,156 @@
-import React from 'react';
-import {AppConsumer, AppContext} from "../../AppContext/AppContext";
+import React, {useContext} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {AppContext} from "../../AppContext/AppContext";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {Service} from "../../Model/Service";
+import {Formik} from "formik";
+import moment from "moment";
+import * as yup from "yup";
 
-export class AddService extends React.Component {
-  constructor(props) {
-    super(props);
-    this.initialState = {
-      selectedVehicle: null,
-      fields: {
-        id: '',
-        vehicleID: '',
-        serviceOdometer: '',
-        servicedAt: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() < 10 ? `0${new Date().getDate()}` : new Date().getDate()}`,
-        createdAt: '',
-        updatedAt: null
-      }
-    };
+const cloneDeep = require('lodash.clonedeep');
 
-    this.state = {...this.initialState};
-    this.servicedAt = React.createRef();
-  }
 
-  componentDidMount() {
-    const {vehicleID} = this.props.match.params;
-    const {vehicles} = this.context;
+export const AddService = () => {
+  const {loading, notification, vehicles, addResource} = useContext(AppContext);
+  const {vehicleID} = useParams();
+  const history = useHistory();
 
-    const selectedVehicle = vehicles.find(vehicle => vehicle.id === vehicleID);
-    this.initialState = {
-      selectedVehicle,
-      fields: {
-        ...this.initialState.fields,
-        vehicleID,
-        serviceOdometer: selectedVehicle.odometerReading
-      }
-    };
+  const vehicleToBeModified = vehicles.find(v => v.id === vehicleID);
+  const vehicle = cloneDeep(vehicleToBeModified);
 
-    this.setState({...this.initialState});
-  }
+  const schema = yup.object().shape({
+	servicedAt: yup
+	  .date()
+	  .min(moment().subtract(1, 'day'), 'Invalid date')
+	  .required('This field is required'),
+	serviceOdometer: yup
+	  .number()
+	  .min(vehicle ? vehicle.odometerReading : 0,
+		'Invalid service odometer')
+	  .required('This field is required')
+  });
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const {addResource} = this.context;
+  return (
+	<Container>
+	  {
+		notification && notification.display ?
+		  (
+			<Notification
+			  display={notification.display}
+			  message={notification.message}/>
+		  ) : ''
+	  }
+	  <Row>
+		<Col>
+		  <h2 className="text-center my-5">Register new service
+			for: {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''}</h2>
+		</Col>
+	  </Row>
+	  {
+		loading ?
+		  (
+			<Row className="justify-content-center mt-5">
+			  <LoadingSpinner/>
+			</Row>
+		  )
+		  :
+		  (
+			<Formik
+			  validationSchema={schema}
+			  onSubmit={(values) => {
+				const {serviceOdometer, servicedAt} = values;
+				const service = new Service(vehicle.id, serviceOdometer, servicedAt);
+				addResource('service', service);
+				history.push(`/show/${vehicle.id}`);
+			  }}
+			  initialValues={{
+				servicedAt: '',
+				serviceOdometer: vehicle ? vehicle.odometerReading : 0
+			  }}
+			>
+			  {({
+				  handleSubmit,
+				  handleChange,
+				  resetForm,
+				  values,
+				  touched,
+				  errors,
+				  isSubmitting
+				}) => (
+				<Form noValidate onSubmit={handleSubmit}>
+				  <Form.Group as={Row} controlId="servicedAt">
+					<Form.Label column="true" sm="2">Serviced at:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="servicedAt"
+						value={values.servicedAt}
+						type="date"
+						placeholder={new Date()}
+						isInvalid={!!errors.servicedAt}
+						isValid={touched.servicedAt && !errors.servicedAt}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.servicedAt}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
 
-    const {
-      vehicleID,
-      serviceOdometer,
-      servicedAt
-    } = this.state.fields;
+				  <Form.Group as={Row} controlId="serviceOdometer">
+					<Form.Label column="true" sm="2">Service odometer:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="serviceOdometer"
+						value={values.serviceOdometer}
+						type="number"
+						placeholder="Service odometer..."
+						isValid={touched.serviceOdometer && !errors.serviceOdometer}
+						isInvalid={!!errors.serviceOdometer}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.serviceOdometer}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
 
-    const serviceToBeAdded = new Service(vehicleID, serviceOdometer, servicedAt);
-    this.setState({...this.initialState}, () => {
-      addResource('service', serviceToBeAdded);
-      this.props.history.push(`/show/${this.state.fields.vehicleID}`);
-    })
-  };
-
-  handleChange = e => {
-    const {id, value} = e.target;
-
-    this.setState(prevState => ({
-      ...prevState,
-      fields: {
-        ...prevState.fields,
-        [id]: value
-      }
-    }))
-  };
-
-  handleClear = () => {
-    this.setState({...this.initialState}, () => {
-      this.servicedAt.current.focus();
-    })
-  };
-
-  handleCancel = () => {
-    this.props.history.push("/browse");
-  };
-
-  render() {
-    return (
-      <AppConsumer>
-        {
-          ({notification, loading}) => (
-            <Container>
-              {
-                notification.display ?
-                  (
-                    <Notification
-                      display={notification.display}
-                      message={notification.message}/>
-                  ) : ''
-              }
-              <Row>
-                <Col>
-                  <h2 className="text-center my-5">Register new service
-                    for {this.state.selectedVehicle ? `${this.state.selectedVehicle.manufacturer} ${this.state.selectedVehicle.model} (${this.state.selectedVehicle.year})` : ''}</h2>
-                </Col>
-              </Row>
-              {
-                loading ?
-                  (
-                    <Row className="justify-content-center mt-5">
-                      <LoadingSpinner/>
-                    </Row>
-                  ) :
-                  (
-                    <Form
-                      onSubmit={e => this.handleSubmit(e, this.state.fields)}
-                    >
-                      <Form.Group as={Row} controlId="servicedAt">
-                        <Form.Label column="true" sm="2">Service Date:</Form.Label>
-                        <Col sm="10">
-                          <Form.Control
-                            ref={this.servicedAt}
-                            onChange={this.handleChange}
-                            value={this.state.fields.servicedAt}
-                            type="date"
-                            placeholder="Serviced At..."/>
-                        </Col>
-                      </Form.Group>
-                      <Form.Group as={Row} controlId="serviceOdometer" className="mb-5">
-                        <Form.Label column="true" sm="2">Service Odometer:</Form.Label>
-                        <Col sm="10">
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.serviceOdometer}
-                            type="number"
-                            placeholder="Service Odometer..."/>
-                        </Col>
-                      </Form.Group>
-
-                      <Row className="justify-content-center">
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          type="submit"
-                          className="mr-5"
-                        >
-                          Add service
-                        </Button>
-                        <Button
-                          variant="warning"
-                          size="lg"
-                          className="mr-5"
-                          onClick={this.handleClear}
-                        >
-                          Clear
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="lg"
-                          onClick={this.handleCancel}
-                        >
-                          Cancel
-                        </Button>
-                      </Row>
-                    </Form>
-                  )
-              }
-            </Container>
-          )
-        }
-      </AppConsumer>
-    )
-  }
-}
-
-AddService.contextType = AppContext;
+				  <Row className="justify-content-center">
+					<Button
+					  variant="primary"
+					  size="lg"
+					  type="submit"
+					  className="mr-5"
+					  disabled={isSubmitting}
+					>
+					  Add service
+					</Button>
+					<Button
+					  variant="warning"
+					  size="lg"
+					  className="mr-5"
+					  onClick={() => {
+						resetForm();
+					  }}
+					>
+					  Clear
+					</Button>
+					<Button
+					  variant="danger"
+					  size="lg"
+					  onClick={() => history.push(`/browse`)}
+					>
+					  Cancel
+					</Button>
+				  </Row>
+				</Form>
+			  )}
+			</Formik>
+		  )
+	  }
+	</Container>
+  )
+};

@@ -31,7 +31,7 @@ const schema = yup.object().shape({
 });
 
 export const VehicleForm = props => {
-  const {loading, notification, addResource, editVehicle} = useContext(AppContext);
+  const {loading, notification} = useContext(AppContext);
   const history = useHistory();
   const manufacturerInputRef = useRef(null);
   let {vehicle, handleSubmit, type} = props;
