@@ -4,7 +4,8 @@ import {Button, Modal} from "react-bootstrap";
 export const WarningModal = props => {
   return (
 	<Modal
-	  {...props}
+	  show={props.show}
+	  onHide={props.cancelhandler}
 	  size="xl"
 	  aria-labelledby="contained-modal-title-vcenter"
 	  centered
@@ -15,16 +16,25 @@ export const WarningModal = props => {
 		</Modal.Title>
 	  </Modal.Header>
 	  <Modal.Body>
-		<h4>{props.headermessage}</h4>
+		<h4>{props.header}</h4>
 		<p>
-		  {props.bodymessage}
+		  {props.body}
 		</p>
 	  </Modal.Body>
 	  <Modal.Footer>
-		<Button>
-
+		<Button
+		onClick={props.accepthandler}
+		size="lg"
+		variant="danger"
+		>
+		  {props.accept}
 		</Button>
-		<Button variant="info" onClick={props.onHide}>Close</Button>
+		<Button
+		  variant="info"
+		  size="lg"
+		  onClick={props.cancelhandler}>
+		  {props.cancel}
+		</Button>
 	  </Modal.Footer>
 	</Modal>
   )

@@ -2,9 +2,8 @@ import React from 'react';
 import {
   Bar,
   BarChart,
-  CartesianGrid, Legend,
-  Line,
-  LineChart,
+  CartesianGrid,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,

@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {Button, Col, Container, Row} from "react-bootstrap";
+import {Button, Container, Row} from "react-bootstrap";
 import {Header} from "../Header/Header";
 import {AppContext} from "../../AppContext/AppContext";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";

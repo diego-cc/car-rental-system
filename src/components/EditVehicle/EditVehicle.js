@@ -1,13 +1,8 @@
-import React, {useContext, useRef} from 'react';
+import React, {useContext} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
-import {AppConsumer, AppContext} from "../../AppContext/AppContext";
-import {Button, Col, Container, Form, Row} from "react-bootstrap";
-import {Notification} from "../Notification/Notification";
-import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
+import {AppContext} from "../../AppContext/AppContext";
 import {Vehicle} from "../../Model/Vehicle";
 import moment from "moment";
-import {schema} from '../AddVehicle/AddVehicle';
-import {Formik} from "formik";
 import {VehicleForm} from "../VehicleForm/VehicleForm";
 
 const cloneDeep = require('lodash.clonedeep');
