@@ -1,190 +1,233 @@
-import React from 'react';
-import {Container, Form, Row, Col, Button} from "react-bootstrap";
+import React, {useContext, useRef} from 'react';
+import {Button, Col, Container, Form, Row} from "react-bootstrap";
+import {useHistory} from 'react-router-dom';
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {Notification} from "../Notification/Notification";
-import {AppConsumer, AppContext} from "../../AppContext/AppContext";
+import {AppContext} from "../../AppContext/AppContext";
 import {Vehicle} from "../../Model/Vehicle";
+import {Formik} from 'formik';
+import * as yup from 'yup';
+import moment from "moment";
 
-export class AddVehicle extends React.Component {
-  constructor(props) {
-    super(props);
-    this.initialState = {
-      fields: {
-        manufacturer: '',
-        model: '',
-        year: '',
-        registrationNumber: '',
-        odometerReading: '',
-        tankCapacity: '',
-        createdAt: '',
-        updatedAt: null
-      }
-    };
-    this.state = {...this.initialState};
-    this.manufacturerInput = React.createRef();
-  }
+const schema = yup.object().shape({
+  manufacturer: yup.string().trim().required('This field is required'),
+  model: yup.string().trim().required('This field is required'),
+  year: yup
+	.number()
+	.min(moment().subtract(70, 'years').get("year"), 'Too old')
+	.max(
+	  moment()
+		.add(1, 'year')
+		.get('year'),
+	  'Invalid year'),
+  registrationNumber: yup
+	.string()
+	.trim()
+	.length(7, '7 characters are required')
+	.matches(/^[A-Za-z0-9]{7}$/, 'Only letters and numbers are valid')
+	.required('This field is required'),
+  odometerReading: yup.number().min(0, 'Invalid reading').required('This field is required'),
+  tankCapacity: yup.number().min(0, 'Invalid tank capacity')
+});
 
-  handleSubmit = (e, vehicle) => {
-    e.preventDefault();
+export const AddVehicle = props => {
+  const {loading, notification, addResource} = useContext(AppContext);
+  const history = useHistory();
+  const manufacturerInputRef = useRef(null);
 
-    const {
-      manufacturer,
-      model,
-      year,
-      registrationNumber,
-      odometerReading,
-      tankCapacity
-    } = this.state.fields;
+  return (
+	<Container>
+	  {
+		notification && notification.display ?
+		  (
+			<Notification
+			  display={notification.display}
+			  message={notification.message}/>
+		  ) : ''
+	  }
+	  <Row>
+		<Col>
+		  <h2 className="text-center my-5">Add a new vehicle</h2>
+		</Col>
+	  </Row>
+	  {
+		loading ?
+		  (
+			<Row className="justify-content-center mt-5">
+			  <LoadingSpinner/>
+			</Row>
+		  )
+		  :
+		  (
+			<Formik
+			  validationSchema={schema}
+			  onSubmit={(values) => {
+				console.log("submitting...");
+				const {manufacturer, model, year, odometerReading, registrationNumber, tankCapacity} = values;
+				const vehicleToBeAdded = new Vehicle(manufacturer, model, year, odometerReading, registrationNumber, tankCapacity);
+				addResource('vehicle', vehicleToBeAdded);
+				history.push(`/show/${vehicleToBeAdded.id}`);
+			  }}
+			  initialValues={{
+				manufacturer: '',
+				model: '',
+				year: '',
+				registrationNumber: '',
+				odometerReading: '',
+				tankCapacity: ''
+			  }}
+			>
+			  {({
+				  handleSubmit,
+				  handleChange,
+				  resetForm,
+				  values,
+				  touched,
+				  errors,
+				  isSubmitting
+				}) => (
+				<Form noValidate onSubmit={handleSubmit}>
+				  <Form.Row className="mb-lg-3">
+					<Form.Group as={Col} controlId="manufacturer" lg="4" md="12">
+					  <Form.Label>Manufacturer:<span className="text-danger">*</span></Form.Label>
+					  <Form.Control
+						ref={manufacturerInputRef}
+						onChange={handleChange}
+						name="manufacturer"
+						value={values.manufacturer}
+						type="text"
+						placeholder="Manufacturer..."
+						isInvalid={!!errors.manufacturer}
+						isValid={touched.manufacturer && !errors.manufacturer}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.manufacturer}
+					  </Form.Control.Feedback>
+					</Form.Group>
 
-    const vehicleToBeAdded = new Vehicle(manufacturer, model, year, odometerReading, registrationNumber, tankCapacity);
-    this.setState({...this.initialState}, () => {
-      const {addResource} = this.context;
-      addResource('vehicle', vehicleToBeAdded);
-      this.props.history.push(`/show/${vehicleToBeAdded.id}`);
-    })
-  };
+					<Form.Group as={Col} controlId="model" lg="4" md="12">
+					  <Form.Label>Model:<span className="text-danger">*</span></Form.Label>
+					  <Form.Control
+						onChange={handleChange}
+						name="model"
+						value={values.model}
+						type="text"
+						placeholder="Model..."
+						isValid={touched.model && !errors.model}
+						isInvalid={!!errors.model}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.model}
+					  </Form.Control.Feedback>
+					</Form.Group>
 
-  handleClear = () => {
-    const state = {...this.initialState};
-    this.setState(state, () => this.manufacturerInput.current.focus());
-  };
+					<Form.Group as={Col} controlId="year" lg="4" md="12">
+					  <Form.Label>Year:</Form.Label>
+					  <Form.Control
+						onChange={handleChange}
+						name="year"
+						value={values.year}
+						type="number"
+						min={moment().subtract(60, 'years').get("year")}
+						max={moment().add(1, 'year').get("year")}
+						step="1"
+						placeholder="Year..."
+						isValid={touched.year && !errors.year}
+						isInvalid={!!errors.year}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.year}
+					  </Form.Control.Feedback>
+					</Form.Group>
 
-  handleChange = e => {
-    const {id, value} = e.target;
-    this.setState(prevState => ({
-      fields: {
-        ...prevState.fields,
-        [id]: value
-      }
-    }));
-  };
+				  </Form.Row>
+				  <Form.Row className="mb-lg-3">
+					<Form.Group as={Col} controlId="registrationNumber" lg="6" md="12">
+					  <Form.Label>Registration Number:<span className="text-danger">*</span></Form.Label>
+					  <Form.Control
+						onChange={handleChange}
+						name="registrationNumber"
+						value={values.registrationNumber}
+						type="text"
+						placeholder="Registration Number..."
+						isValid={touched.registrationNumber && !errors.registrationNumber}
+						isInvalid={!!errors.registrationNumber}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.registrationNumber}
+					  </Form.Control.Feedback>
+					</Form.Group>
+				  </Form.Row>
 
-  handleCancel = () => {
-    this.props.history.push("/browse");
-  };
+				  <Form.Row className="mb-lg-3">
+					<Form.Group as={Col} controlId="odometerReading" lg="6" md="12">
+					  <Form.Label>Odometer Reading (in kilometres):<span className="text-danger">*</span></Form.Label>
+					  <Form.Control
+						onChange={handleChange}
+						name="odometerReading"
+						value={values.odometerReading}
+						type="number"
+						placeholder="Odometer Reading..."
+						isValid={touched.odometerReading && !errors.odometerReading}
+						isInvalid={!!errors.odometerReading}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.odometerReading}
+					  </Form.Control.Feedback>
+					</Form.Group>
+				  </Form.Row>
 
-  render() {
-    return (
-      <AppConsumer>
-        {
-          ({loading, notification}) => (
-            <Container>
-              {
-                notification.display ?
-                  (
-                    <Notification
-                      display={notification.display}
-                      message={notification.message}/>
-                  ) : ''
-              }
-              <Row>
-                <Col>
-                  <h2 className="text-center my-5">Add a new vehicle</h2>
-                </Col>
-              </Row>
-              {
-                loading ?
-                  (
-                    <Row className="justify-content-center mt-5">
-                      <LoadingSpinner/>
-                    </Row>
-                  )
-                  :
-                  (
-                    <Form
-                      onSubmit={e => this.handleSubmit(e, this.state.fields)}
-                    >
-                      <Form.Row className="mb-lg-3">
-                        <Form.Group as={Col} controlId="manufacturer" lg="4" md="12">
-                          <Form.Label>Manufacturer:</Form.Label>
-                          <Form.Control
-                            ref={this.manufacturerInput}
-                            onChange={this.handleChange}
-                            value={this.state.fields.manufacturer}
-                            type="text"
-                            placeholder="Manufacturer..."/>
-                        </Form.Group>
-                        <Form.Group as={Col} controlId="model" lg="4" md="12">
-                          <Form.Label>Model:</Form.Label>
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.model}
-                            type="text"
-                            placeholder="Model..."/>
-                        </Form.Group>
-                        <Form.Group as={Col} controlId="year" lg="4" md="12">
-                          <Form.Label>Year:</Form.Label>
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.year}
-                            type="number"
-                            placeholder="Year..."/>
-                        </Form.Group>
-                      </Form.Row>
-                      <Form.Row className="mb-lg-3">
-                        <Form.Group as={Col} controlId="registrationNumber" lg="6" md="12">
-                          <Form.Label>Registration Number:</Form.Label>
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.registrationNumber}
-                            type="text"
-                            placeholder="Registration Number..."/>
-                        </Form.Group>
-                      </Form.Row>
-                      <Form.Row className="mb-lg-3">
-                        <Form.Group as={Col} controlId="odometerReading" lg="6" md="12">
-                          <Form.Label>Odometer Reading (in kilometres):</Form.Label>
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.odometerReading}
-                            type="number"
-                            placeholder="Odometer Reading (km)..."/>
-                        </Form.Group>
-                      </Form.Row>
-                      <Form.Row className="mb-lg-5">
-                        <Form.Group as={Col} controlId="tankCapacity" lg="6" md="12">
-                          <Form.Label>Tank Capacity (in litres):</Form.Label>
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.tankCapacity}
-                            type="number"
-                            placeholder="Tank Capacity (L)..."/>
-                        </Form.Group>
-                      </Form.Row>
-                      <Row className="justify-content-center">
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          type="submit"
-                          className="mr-5"
-                        >
-                          Add vehicle
-                        </Button>
-                        <Button
-                          variant="warning"
-                          size="lg"
-                          className="mr-5"
-                          onClick={this.handleClear}
-                        >
-                          Clear
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="lg"
-                          onClick={this.handleCancel}
-                        >
-                          Cancel
-                        </Button>
-                      </Row>
-                    </Form>
-                  )
-              }
-            </Container>
-          )
-        }
-      </AppConsumer>
-    )
-  }
-}
-
-AddVehicle.contextType = AppContext;
+				  <Form.Row className="mb-lg-5">
+					<Form.Group as={Col} controlId="tankCapacity" lg="6" md="12">
+					  <Form.Label>Tank Capacity (in litres):</Form.Label>
+					  <Form.Control
+						onChange={handleChange}
+						name="tankCapacity"
+						value={values.tankCapacity}
+						type="number"
+						placeholder="Tank Capacity..."
+						isValid={touched.tankCapacity && !errors.tankCapacity}
+						isInvalid={!!errors.tankCapacity}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.tankCapacity}
+					  </Form.Control.Feedback>
+					</Form.Group>
+				  </Form.Row>
+				  <Row className="justify-content-center">
+					<Button
+					  variant="primary"
+					  size="lg"
+					  type="submit"
+					  className="mr-5"
+					  disabled={isSubmitting}
+					>
+					  Add vehicle
+					</Button>
+					<Button
+					  variant="warning"
+					  size="lg"
+					  className="mr-5"
+					  onClick={() => {
+						resetForm();
+						manufacturerInputRef.current.focus()
+					  }}
+					>
+					  Clear
+					</Button>
+					<Button
+					  variant="danger"
+					  size="lg"
+					  onClick={() => history.push(`/browse`)}
+					>
+					  Cancel
+					</Button>
+				  </Row>
+				</Form>
+			  )}
+			</Formik>
+		  )
+	  }
+	</Container>
+  )
+};
