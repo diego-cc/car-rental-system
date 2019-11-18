@@ -56,7 +56,6 @@ export class App extends React.Component {
 			.collection('vehicles')
 			.doc(vehicle.id)
 			.update({
-			  _id: vehicle.id,
 			  ...vehicle
 			})
 			.then(() => {
@@ -671,7 +670,7 @@ export class App extends React.Component {
 		  </Route>
 		  <Route path="/add" render={(props) => <AddVehicle {...props} />}/>
 		  <Route path="/show/:vehicleID" render={(props) => <ShowVehicle {...props} />}/>
-		  <Route path="/edit/:vehicleId" render={(props) => <EditVehicle {...props} />}/>
+		  <Route path="/edit/:vehicleID" render={(props) => <EditVehicle {...props} />}/>
 		  <Route path="/addBooking/:vehicleID" render={(props) => <AddBooking {...props} />}/>
 		  <Route path="/addJourney/:vehicleID" render={(props) => <AddJourney {...props} />}/>
 		  <Route path="/addJourneyForm/:bookingID"
