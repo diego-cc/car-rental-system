@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {AppConsumer} from "../../AppContext/AppContext";
 import {Button, Form, FormGroup} from "react-bootstrap";
@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 export const SearchVehicle = props => {
   const [selected, setSelected] = useState([]);
+  const typeaheadRef = useRef(null);
   const history = useHistory();
 
   const handleSubmit = e => {
@@ -31,9 +32,20 @@ export const SearchVehicle = props => {
 				highlightOnlyResult
 				minLength={1}
 				onChange={selected => setSelected(selected)}
+				ref={typeaheadRef}
 			  />
 			  <Button variant="outline-primary" type="submit" className="ml-sm-3">
 				Search
+			  </Button>
+			  <Button
+				onClick={() => {
+				  typeaheadRef.current.clear();
+				  typeaheadRef.current.focus();
+				}
+				}
+				variant="outline-danger"
+				className="ml-sm-3">
+				Clear
 			  </Button>
 			</FormGroup>
 		  </Form>

@@ -120,6 +120,19 @@ export class AddFuelPurchase extends React.Component {
                     </Accordion>
                   )
               }
+			  <Button
+				className="my-5"
+				style={{
+				  position: 'relative',
+				  left: '50%',
+				  transform: 'translateX(-50%)'
+				}}
+				variant="danger"
+				size="lg"
+				onClick={() => this.props.history.push(`/show/${this.state.vehicle.id}`)}
+			  >
+				Cancel
+			  </Button>
             </Container>
           )
         }
