@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {AppContext} from "../../AppContext/AppContext";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
@@ -20,6 +20,7 @@ export const AddService = () => {
   const [bookingConflict, setBookingConflict] = useState({status: false, booking: null});
   const [serviceConflict, setServiceConflict] = useState({status: false, service: null});
   const [serviceToBeAdded, setServiceToBeAdded] = useState(null);
+  const [addService, setAddService] = useState(false);
   const {vehicleID} = useParams();
   const history = useHistory();
   const vehicleToBeModified = vehicles.find(v => v.id === vehicleID);
@@ -44,6 +45,13 @@ export const AddService = () => {
 		'Invalid service odometer')
 	  .required('This field is required')
   });
+
+  useEffect(() => {
+    if (addService && serviceToBeAdded) {
+      addResource('service', serviceToBeAdded);
+      history.push(`/show/${vehicle.id}`);
+	}
+  }, [addService]);
 
   return (
 	<Container>
@@ -77,7 +85,7 @@ export const AddService = () => {
 		onHide={() => setServiceConflict({status: false})}
 		show={serviceConflict.status}
 		header="Service conflict"
-		body={`New service could not be added to the system, because there is another serviced also scheduled for ${serviceConflict.service ? moment(serviceConflict.service.servicedAt, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel that service and add this one instead?`}
+		body={`New service could not be added to the system, because there is another service also scheduled for ${serviceConflict.service ? moment(serviceConflict.service.servicedAt, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel that service and add this one instead?`}
 		accept="Yes, cancel the other service"
 		cancel="No, keep it as it is"
 		accepthandler={() => {
@@ -116,12 +124,11 @@ export const AddService = () => {
 					service: serviceConflict
 				  });
 				} else {
-				  addResource('service', serviceToBeAdded);
-				  history.push(`/show/${vehicle.id}`);
+				  setAddService(true);
 				}
 			  }}
 			  initialValues={{
-				servicedAt: '',
+				servicedAt: moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
 				serviceOdometer: vehicle ? vehicle.odometerReading : 0
 			  }}
 			>
@@ -144,7 +151,6 @@ export const AddService = () => {
 						name="servicedAt"
 						value={values.servicedAt}
 						type="date"
-						placeholder={new Date()}
 						isInvalid={!!errors.servicedAt}
 						isValid={touched.servicedAt && !errors.servicedAt}
 					  />
@@ -196,7 +202,7 @@ export const AddService = () => {
 					<Button
 					  variant="danger"
 					  size="lg"
-					  onClick={() => history.push(`/browse`)}
+					  onClick={() => history.push(`/show/${vehicleID}`)}
 					>
 					  Cancel
 					</Button>

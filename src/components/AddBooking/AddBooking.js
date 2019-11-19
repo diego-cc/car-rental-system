@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useContext, useState, useEffect} from 'react';
+import {useParams, useHistory} from 'react-router-dom';
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
@@ -7,274 +8,266 @@ import {ErrorModal} from "../Modals/ErrorModal";
 import Moment from 'moment';
 import {extendMoment} from 'moment-range';
 import {Booking} from "../../Model/Booking";
+import * as yup from "yup";
+import {WarningModal} from "../Modals/WarningModal";
+import {Formik} from "formik";
+import {Service} from "../../Model/Service";
 
-export class AddBooking extends React.Component {
-  constructor(props) {
-	super(props);
-	this.initialState = {
-	  selectedVehicle: null,
-	  vehicleDueForService: false,
-	  servicedAt: '',
-	  vehicleDueForBooking: false,
-	  anotherBookingStartDate: '',
-	  anotherBookingEndDate: '',
-	  fields: {
-		id: '',
-		vehicleID: '',
-		startDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate() < 10 ? `0${new Date().getDate()}` : new Date().getDate()}`,
-		endDate: '',
-		startOdometer: '',
-		bookingType: 'D',
-		createdAt: '',
-		updatedAt: null
-	  }
-	};
+const moment = extendMoment(Moment);
+const cloneDeep = require('lodash.clonedeep');
 
-	this.state = {...this.initialState};
-	this.startDate = React.createRef();
-  }
+export const AddBooking = () => {
+  const {loading, notification, vehicles, addResource, deleteResource} = useContext(AppContext);
+  const [bookingConflict, setBookingConflict] = useState({status: false, booking: null});
+  const [serviceConflict, setServiceConflict] = useState({status: false, service: null});
+  const [bookingToBeAdded, setBookingToBeAdded] = useState(null);
+  const [addBooking, setAddBooking] = useState(false);
+  const {vehicleID} = useParams();
+  const history = useHistory();
+  const vehicleToBeModified = vehicles.find(v => v.id === vehicleID);
+  const vehicle = cloneDeep(vehicleToBeModified);
 
-  componentDidMount() {
-	const {vehicleID} = this.props.match.params;
-	const {vehicles} = this.context;
+  const schema = yup.object().shape({
+	bookingType: yup.string().required('This field is required'),
+	startDate: yup
+	  .date()
+	  .min(moment().subtract(1, 'day'), 'Invalid date')
+	  .max(moment(moment(), 'YYYY-MM-DD').add(1, 'year'), 'Invalid date')
+	  .required('This field is required'),
+	endDate: yup
+	  .date()
+	  .min(moment().subtract(1, 'day'), 'Invalid date')
+	  .min(yup.ref('startDate'), 'End date cannot be before start date')
+	  .max(moment(moment(), 'YYYY-MM-DD').add(1, 'year'), 'Invalid date')
+	  .required('This field is required'),
+	startOdometer: yup
+	  .number()
+	  .min(vehicle ? vehicle.odometerReading : 0, 'Invalid odometer reading')
+	  .required('This field is required')
+  });
 
-	const selectedVehicle = vehicles.find(vehicle => vehicle.id === vehicleID);
-	this.initialState = {
-	  selectedVehicle,
-	  fields: {
-		...this.initialState.fields,
-		vehicleID,
-		startOdometer: selectedVehicle.odometerReading
-	  }
-	};
-
-	this.setState({...this.initialState});
-  }
-
-  handleSubmit = (e, booking) => {
-	e.preventDefault();
-	const {addResource} = this.context;
-	const moment = extendMoment(Moment);
-
-	const bookingStartDate = booking.startDate;
-	const bookingEndDate = booking.endDate;
-	const bookingRange = moment.range(moment(bookingStartDate), moment(bookingEndDate));
-
-	const bookingFallsWithinServiceDateRange = this.state.selectedVehicle.services.some(service => {
-	  const momentServicedAt = moment(service.servicedAt);
-	  return momentServicedAt.within(bookingRange);
+  const confirmDeleteConflictedResource = (conflictedResourceType, conflictedResource, newResourceType, newResource) => {
+	deleteResource.confirmDeleteResource(conflictedResourceType, conflictedResource);
+	deleteResource.setDeleteResourceModalShow(null, null, () => {
+	  addResource(newResourceType, newResource);
+	  history.push(`/show/${vehicle.id}`);
 	});
+  };
 
-	const bookingFallsWithinAnotherBookingDateRange = this.state.selectedVehicle.bookings.some(b => {
-	  const b1Range = moment.range(moment(b.startDate), moment(b.endDate));
-	  const b2range = moment.range(moment(booking.startDate), moment(booking.endDate));
-	  return b1Range.overlaps(b2range);
-	});
-
-	if (bookingFallsWithinServiceDateRange) {
-	  const {servicedAt} = this.state.selectedVehicle.services.find(service => {
-		const momentServicedAt = moment(service.servicedAt);
-		return momentServicedAt.within(bookingRange);
-	  });
-	  this.setState({
-		vehicleDueForService: true,
-		servicedAt
-	  })
-	} else if (bookingFallsWithinAnotherBookingDateRange) {
-	  const {startDate: anotherBookingStartDate, endDate: anotherBookingEndDate} = this.state.selectedVehicle.bookings.find(b => {
-		const b1Range = moment.range(moment(b.startDate), moment(b.endDate));
-		const b2range = moment.range(moment(booking.startDate), moment(booking.endDate));
-		return b1Range.overlaps(b2range);
-	  });
-	  this.setState({
-		vehicleDueForBooking: true,
-		anotherBookingStartDate,
-		anotherBookingEndDate
-	  })
-	} else {
-	  const {
-		vehicleID,
-		startDate,
-		endDate,
-		startOdometer,
-		bookingType
-	  } = this.state.fields;
-
-	  const bookingToBeAdded = new Booking(vehicleID, bookingType, startDate, endDate, startOdometer);
-
-	  this.setState({...this.initialState}, () => {
-		addResource('booking', bookingToBeAdded);
-		this.props.history.push(`/show/${this.state.fields.vehicleID}`);
-	  })
+  useEffect(() => {
+	if (addBooking && bookingToBeAdded) {
+	  addResource('booking', bookingToBeAdded);
+	  history.push(`/show/${vehicle.id}`);
 	}
-  };
+  }, [addBooking]);
 
-  handleChange = e => {
-	const {id, value} = e.target;
-
-	this.setState(prevState => ({
-	  ...prevState,
-	  fields: {
-		...prevState.fields,
-		[id]: value
+  return (
+	<Container>
+	  {
+		notification && notification.display ?
+		  (
+			<Notification
+			  display={notification.display}
+			  message={notification.message}/>
+		  ) : ''
 	  }
-	}))
-  };
-
-  handleBookingTypeChange = e => {
-	const {value} = e.target;
-	this.setState(prevState => ({
-	  ...prevState,
-	  fields: {
-		...prevState.fields,
-		bookingType: value === 'perDay' ? 'D' : 'K'
-	  }
-	}))
-  };
-
-  handleClear = () => {
-	this.setState({...this.initialState}, () => {
-	  this.startDate.current.focus();
-	})
-  };
-
-  handleCancel = () => {
-	this.props.history.push("/browse");
-  };
-
-  render() {
-	return (
-	  <AppConsumer>
-		{
-		  ({notification, loading}) => (
-			<Container>
-			  {
-				notification.display ?
-				  (
-					<Notification
-					  display={notification.display}
-					  message={notification.message}/>
-				  ) : ''
-			  }
-			  <Row>
-				<Col>
-				  <h2 className="text-center my-5">Register new booking
-					for {this.state.selectedVehicle ? `${this.state.selectedVehicle.manufacturer} ${this.state.selectedVehicle.model} (${this.state.selectedVehicle.year})` : ''}</h2>
-				</Col>
-			  </Row>
-			  {
-				this.state.vehicleDueForService ?
-				  <ErrorModal
-					show={this.state.vehicleDueForService}
-					onHide={() => this.setState({vehicleDueForService: false})}
-					headermessage={`Vehicle is unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}`}
-					bodymessage={`Sorry, but this vehicle is currently unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}, because it due for service on ${new Date(this.state.servicedAt).toLocaleDateString('en-AU')}.`}
-				  />
-				  :
-				  this.state.vehicleDueForBooking ?
-					<ErrorModal
-					  show={this.state.vehicleDueForBooking}
-					  onHide={() => this.setState({vehicleDueForBooking: false})}
-					  headermessage={`Vehicle is unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}`}
-					  bodymessage={`Sorry, but this vehicle is currently unavailable for booking between ${new Date(this.state.fields.startDate).toLocaleDateString('en-AU')} and ${new Date(this.state.fields.endDate).toLocaleDateString('en-AU')}, because another booking has been made for ${new Date(this.state.anotherBookingStartDate).toLocaleDateString('en-AU')} - ${new Date(this.state.anotherBookingEndDate).toLocaleDateString('en-AU')}.`}
-					/>
-					:
-					''
-			  }
-			  {
-				loading ?
-				  (
-					<Row className="justify-content-center mt-5">
-					  <LoadingSpinner/>
-					</Row>
-				  ) :
-				  (
-					<Form
-					  onSubmit={e => this.handleSubmit(e, this.state.fields)}
-					>
-					  <Form.Group as={Row} controlId="bookingType">
-						<Form.Label column="true" sm="2">Booking Type:</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							as="select"
-							value={this.state.fields.bookingType.trim().toUpperCase() === 'D' ? 'perDay' : 'perKm'}
-							onChange={this.handleBookingTypeChange}>
-							<option
-							  value="perDay">
-							  Per day
-							</option>
-							<option
-							  value="perKm">
-							  Per kilometer
-							</option>
-						  </Form.Control>
-						</Col>
-					  </Form.Group>
-					  <Form.Group as={Row} controlId="startDate">
-						<Form.Label column="true" sm="2">Start Date:</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							ref={this.startDate}
-							onChange={this.handleChange}
-							value={this.state.fields.startDate}
-							type="date"
-							placeholder="Start Date..."/>
-						</Col>
-					  </Form.Group>
-					  <Form.Group as={Row} controlId="endDate">
-						<Form.Label column="true" sm="2">End Date:</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							onChange={this.handleChange}
-							value={this.state.fields.endDate}
-							type="date"
-							placeholder="End Date..."/>
-						</Col>
-					  </Form.Group>
-					  <Form.Group as={Row} controlId="startOdometer">
-						<Form.Label column="true" sm="2">Start Odometer:</Form.Label>
-						<Col sm="10">
-						  <Form.Control
-							onChange={this.handleChange}
-							value={this.state.fields.startOdometer}
-							type="number"
-							placeholder="Start Odometer..."/>
-						</Col>
-					  </Form.Group>
-					  <Row className="justify-content-center my-5">
-						<Button
-						  variant="primary"
-						  size="lg"
-						  type="submit"
-						  className="mr-5"
-						>
-						  Add booking
-						</Button>
-						<Button
-						  variant="warning"
-						  size="lg"
-						  className="mr-5"
-						  onClick={this.handleClear}
-						>
-						  Clear
-						</Button>
-						<Button
-						  variant="danger"
-						  size="lg"
-						  onClick={this.handleCancel}
-						>
-						  Cancel
-						</Button>
-					  </Row>
-					</Form>
-				  )
-			  }
-			</Container>
+	  <Row>
+		<Col>
+		  <h2 className="text-center my-5">Add new booking
+			for: {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''}</h2>
+		</Col>
+	  </Row>
+	  <WarningModal
+		onHide={() => setBookingConflict({status: false})}
+		show={bookingConflict.status}
+		header="Booking conflict"
+		body={`New booking could not be added to the system, because there is another booking scheduled between ${bookingConflict.booking ? moment(bookingConflict.booking.startDate, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''} and ${bookingConflict.booking ? moment(bookingConflict.booking.endDate, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel the other booking and add this one now?`}
+		accept="Yes, cancel the other booking"
+		cancel="No, keep it as it is"
+		accepthandler={() => {
+		  confirmDeleteConflictedResource('booking', bookingConflict.booking, 'booking', bookingToBeAdded);
+		}}
+		cancelhandler={() => setBookingConflict({status: false})}
+	  />
+	  <WarningModal
+		onHide={() => setServiceConflict({status: false})}
+		show={serviceConflict.status}
+		header="Service conflict"
+		body={`New booking could not be added to the system, because there is a service scheduled for ${serviceConflict.service ? moment(serviceConflict.service.servicedAt, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel that service and add this booking?`}
+		accept="Yes, cancel the service"
+		cancel="No, keep it as it is"
+		accepthandler={() => {
+		  confirmDeleteConflictedResource('service', serviceConflict.service, 'booking', bookingToBeAdded);
+		}}
+		cancelhandler={() => setServiceConflict({status: false})}
+	  />
+	  {
+		loading ?
+		  (
+			<Row className="justify-content-center mt-5">
+			  <LoadingSpinner/>
+			</Row>
 		  )
-		}
-	  </AppConsumer>
-	)
-  }
-}
+		  :
+		  (
+			<Formik
+			  validationSchema={schema}
+			  onSubmit={(values) => {
+				const {bookingType, startDate, endDate, startOdometer} = values;
+				const booking = new Booking(vehicle.id, bookingType, startDate, endDate, startOdometer);
+				setBookingToBeAdded(booking);
+				// check booking conflicts
+				if (vehicle.bookings.some(b => {
+				  return moment.range(moment(b.startDate, 'YYYY-MM-DD'), moment(b.endDate, 'YYYY-MM-DD')).overlaps(moment.range(moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')))
+				})) {
+				  const bookingConflict = vehicle.bookings.find(b => moment.range(moment(b.startDate, 'YYYY-MM-DD'), moment(b.endDate, 'YYYY-MM-DD')).overlaps(moment.range(moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD'))));
+				  setBookingConflict({
+					status: true,
+					booking: bookingConflict
+				  });
+				}
+				// check service conflicts
+				else if (vehicle.services.some(s => moment(s.servicedAt, 'YYYY-MM-DD').within(moment.range(moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD'))))) {
 
-AddBooking.contextType = AppContext;
+				  const serviceConflict = vehicle.services.find(s => moment(s.servicedAt, 'YYYY-MM-DD').within(moment.range(moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD'))));
+				  setServiceConflict({
+					status: true,
+					service: serviceConflict
+				  });
+				} else {
+				  setAddBooking(true);
+				  /*addResource('booking', bookingToBeAdded);
+				  history.push(`/show/${vehicle.id}`);*/
+				}
+			  }}
+			  initialValues={{
+				bookingType: 'D',
+				startDate: moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+				endDate: moment(moment(), 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD'),
+				startOdometer: vehicle ? vehicle.odometerReading : 0
+			  }}
+			>
+			  {({
+				  handleSubmit,
+				  handleChange,
+				  resetForm,
+				  values,
+				  touched,
+				  errors,
+				  isSubmitting
+				}) => (
+				<Form
+				  onSubmit={handleSubmit}
+				>
+				  <Form.Group as={Row} controlId="bookingType">
+					<Form.Label column="true" sm="2">Booking Type:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						as="select"
+						name="bookingType"
+						value={values.bookingType}
+						onChange={handleChange}
+						isValid={touched.bookingType && !errors.bookingType}
+						isInvalid={!!errors.bookingType}
+					  >
+						<option
+						  value="D">
+						  Per day
+						</option>
+						<option
+						  value="K">
+						  Per kilometer
+						</option>
+					  </Form.Control>
+					  <Form.Control.Feedback type="invalid">
+						{errors.bookingType}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
+				  <Form.Group as={Row} controlId="startDate">
+					<Form.Label column="true" sm="2">Start Date:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="startDate"
+						value={values.startDate}
+						type="date"
+						isInvalid={!!errors.startDate}
+						isValid={touched.startDate && !errors.startDate}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.startDate}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
+				  <Form.Group as={Row} controlId="endDate">
+					<Form.Label column="true" sm="2">End Date:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="endDate"
+						value={values.endDate}
+						type="date"
+						isInvalid={!!errors.endDate}
+						isValid={touched.endDate && !errors.endDate}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.endDate}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
+				  <Form.Group as={Row} controlId="startOdometer">
+					<Form.Label column="true" sm="2">Start Odometer:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="startOdometer"
+						value={values.startOdometer}
+						type="number"
+						placeholder="Start odometer..."
+						isValid={touched.startOdometer && !errors.startOdometer}
+						isInvalid={!!errors.startOdometer}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.startOdometer}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
+				  <Row className="justify-content-center my-5">
+					<Button
+					  variant="primary"
+					  size="lg"
+					  type="submit"
+					  className="mr-5"
+					  disabled={isSubmitting}
+					>
+					  Add booking
+					</Button>
+					<Button
+					  variant="warning"
+					  size="lg"
+					  className="mr-5"
+					  onClick={resetForm}
+					>
+					  Clear
+					</Button>
+					<Button
+					  variant="danger"
+					  size="lg"
+					  onClick={() => history.push(`/show/${vehicleID}`)}
+					>
+					  Cancel
+					</Button>
+				  </Row>
+				</Form>
+			  )}
+			</Formik>
+		  )
+	  }
+	</Container>
+  )
+};
