@@ -88,7 +88,7 @@ export const DeleteResource = props => {
 			<ListGroup>
 			  <ListGroup.Item>
 				Service
-				vehicle: {resource && vehicles.find(v => v.bookings.some(b => b.fuelPurchases.some(f => f.id === resource.id))) ? `${vehicles.find(v => v.services.some(s => s.id === resource.id)).manufacturer} ${vehicles.find(v => v.services.some(s => s.id === resource.id)).model} (${vehicles.find(v => v.services.some(s => s.id === resource.id)).year})` : ''}
+				vehicle: {resource && vehicles.some(v => v.id === resource.vehicleID) ? `${vehicles.find(v => v.id === resource.vehicleID).manufacturer} ${vehicles.find(v => v.id === resource.vehicleID).model} (${vehicles.find(v => v.id === resource.vehicleID).year})` : ''}
 			  </ListGroup.Item>
 			  <ListGroup.Item>
 				Serviced at: {resource ? moment(resource.servicedAt).format('DD/MM/YYYY') : ''}

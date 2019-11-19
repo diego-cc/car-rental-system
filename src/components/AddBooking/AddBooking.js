@@ -3,7 +3,7 @@ import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
-import {ErrorModal} from "./ErrorModal";
+import {ErrorModal} from "../Modals/ErrorModal";
 import Moment from 'moment';
 import {extendMoment} from 'moment-range';
 import {Booking} from "../../Model/Booking";
