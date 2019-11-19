@@ -39,13 +39,13 @@ export const AddJourneyForm = () => {
 	  .required('This field is required'),
 	journeyStartedAt: yup
 	  .date()
-	  .min(associatedBooking ? moment(associatedBooking.startDate, 'YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'), 'Cannot be before booking start date')
+	  .min(associatedBooking ? moment(associatedBooking.startDate, 'YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'), 'Cannot be earlier than booking start date')
 	  .required('This field is required'),
 	journeyEndedAt: yup
 	  .date()
-	  .min(associatedBooking ? moment(associatedBooking.startDate, 'YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'), 'Cannot be before booking start date')
-	  .min(yup.ref('journeyStartedAt'), 'Cannot be before journey start date')
-	  .max(associatedBooking ? moment(associatedBooking.endDate, 'YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'), 'Cannot be after booking end date')
+	  .min(associatedBooking ? moment(associatedBooking.startDate, 'YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'), 'Cannot be earlier than booking start date')
+	  .min(yup.ref('journeyStartedAt'), 'Cannot be earlier than journey start date')
+	  .max(associatedBooking ? moment(associatedBooking.endDate, 'YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'), 'Cannot be later than booking end date')
 	  .required('This field is required'),
 	journeyFrom: yup
 	  .string(),

@@ -29,13 +29,13 @@ export const AddBooking = () => {
 	bookingType: yup.string().required('This field is required'),
 	startDate: yup
 	  .date()
-	  .min(moment().subtract(1, 'day'), 'Invalid date')
+	  .min(moment().subtract(1, 'day'), 'Start date cannot be earlier than today')
 	  .max(moment(moment(), 'YYYY-MM-DD').add(1, 'year'), 'Invalid date')
 	  .required('This field is required'),
 	endDate: yup
 	  .date()
 	  .min(moment().subtract(1, 'day'), 'Invalid date')
-	  .min(yup.ref('startDate'), 'End date cannot be before start date')
+	  .min(yup.ref('startDate'), 'End date cannot be earlier start date')
 	  .max(moment(moment(), 'YYYY-MM-DD').add(1, 'year'), 'Invalid date')
 	  .required('This field is required'),
 	startOdometer: yup
