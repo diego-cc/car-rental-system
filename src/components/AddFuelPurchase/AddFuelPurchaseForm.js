@@ -1,10 +1,13 @@
+/**
+ * AddFuelPurchaseForm.js
+ */
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
-import {FuelPurchase} from "../../Model/FuelPurchase";
+import {FuelPurchase} from "../../Models/FuelPurchase";
 import Moment from 'moment';
 import * as yup from "yup";
 import {Formik} from "formik";
@@ -12,6 +15,11 @@ import {Formik} from "formik";
 const moment = require('moment-range').extendMoment(Moment);
 const cloneDeep = require('lodash.clonedeep');
 
+/**
+ * AddFuelPurchaseForm component
+ * @returns {*}
+ * @constructor
+ */
 export const AddFuelPurchaseForm = () => {
   const {loading, notification, vehicles, addResource} = useContext(AppContext);
   const [fuelPurchaseToBeAdded, setFuelPurchaseToBeAdded] = useState(null);
@@ -23,6 +31,7 @@ export const AddFuelPurchaseForm = () => {
   const booking = vehicle ? vehicle.bookings.find(b => b.id === bookingID) : null;
   const associatedBooking = cloneDeep(booking);
 
+  // Defines a schema for the form to add a new fuel purchase
   const schema = yup.object().shape({
 	fuelQuantity: yup
 	  .number()
@@ -39,6 +48,8 @@ export const AddFuelPurchaseForm = () => {
 	  .required('This field  is required')
   });
 
+  // Detects changes on addFuelPurchase
+  // Adds a new fuel purchase if form is valid
   useEffect(() => {
 	if (addFuelPurchase && fuelPurchaseToBeAdded) {
 	  addResource('fuel purchase', fuelPurchaseToBeAdded);

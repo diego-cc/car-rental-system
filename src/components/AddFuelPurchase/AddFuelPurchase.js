@@ -1,3 +1,6 @@
+/**
+ * AddFuelPurchase.js
+ */
 import React from 'react';
 import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
@@ -7,6 +10,9 @@ import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 
+/**
+ * AddFuelPurchase component - navigates to AddFuelPurchaseForm once a booking is selected
+ */
 export class AddFuelPurchase extends React.Component {
   constructor(props) {
     super(props);

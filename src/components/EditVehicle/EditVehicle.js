@@ -1,12 +1,20 @@
+/**
+ * EditVehicle.js
+ */
 import React, {useContext} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {AppContext} from "../../AppContext/AppContext";
-import {Vehicle} from "../../Model/Vehicle";
+import {Vehicle} from "../../Models/Vehicle";
 import moment from "moment";
 import {VehicleForm} from "../VehicleForm/VehicleForm";
 
 const cloneDeep = require('lodash.clonedeep');
 
+/**
+ * EditVehicle component - renders a form to edit a vehicle
+ * @returns {*}
+ * @constructor
+ */
 export const EditVehicle = () => {
   const {vehicles, editVehicle} = useContext(AppContext);
   const history = useHistory();

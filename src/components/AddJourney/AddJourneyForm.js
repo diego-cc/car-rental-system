@@ -1,10 +1,13 @@
+/**
+ * AddJourneyForm component
+ */
 import React, {useContext, useEffect, useState} from 'react';
 import {AppContext} from "../../AppContext/AppContext";
 import {useHistory, useParams} from 'react-router-dom';
 import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
-import {Journey} from "../../Model/Journey";
+import {Journey} from "../../Models/Journey";
 import {extendMoment} from "moment-range";
 import Moment from "moment";
 import * as yup from "yup";
@@ -13,6 +16,11 @@ import {Formik} from "formik";
 const moment = extendMoment(Moment);
 const cloneDeep = require('lodash.clonedeep');
 
+/**
+ * AddJourneyForm component
+ * @returns {*}
+ * @constructor
+ */
 export const AddJourneyForm = () => {
   const {loading, notification, vehicles, addResource} = useContext(AppContext);
   const [journeyToBeAdded, setJourneyToBeAdded] = useState(null);
@@ -24,6 +32,7 @@ export const AddJourneyForm = () => {
   const booking = vehicle ? vehicle.bookings.find(b => b.id === bookingID) : null;
   const associatedBooking = cloneDeep(booking);
 
+  // Defines a schema for the form to add a new journey
   const schema = yup.object().shape({
 	journeyStartOdometerReading: yup
 	  .number()
@@ -53,6 +62,8 @@ export const AddJourneyForm = () => {
 	  .string()
   });
 
+  // Detects changes on addJourney
+  // Adds a new journey if form is valid
   useEffect(() => {
 	if (addJourney && journeyToBeAdded) {
 	  addResource('journey', journeyToBeAdded);

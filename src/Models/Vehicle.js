@@ -1,7 +1,14 @@
+/**
+ * Vehicle.js
+ */
 import moment from "moment";
 import {Service} from "./Service";
 import {firebase} from "../Firebase/Firebase";
 
+/**
+ * Vehicle model class
+ * @class
+ */
 export class Vehicle {
   _id;
   _manufacturer;
@@ -16,6 +23,18 @@ export class Vehicle {
   _updatedAt;
 
 
+  /**
+   * Creates a new Vehicle
+   * @param {string} manufacturer - manufacturer brand of this vehicle
+   * @param {string} model - model of this vehicle
+   * @param {number} year - year of this vehicle
+   * @param {number} odometerReading - odometer reading of this vehicle
+   * @param {string} registrationNumber - registration number of this vehicle
+   * @param {number} tankCapacity - tank capacity of this vehicle
+   * @param {string} id - ID of this vehicle
+   * @param {string} createdAt - timestamp generated when this vehicle is created
+   * @param {string|null} updatedAt - timestamp generated when this vehicle is updated
+   */
   constructor(manufacturer, model, year, odometerReading, registrationNumber, tankCapacity, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
 	this._id = id;
 	this._manufacturer = manufacturer;
@@ -28,10 +47,18 @@ export class Vehicle {
 	this._updatedAt = updatedAt;
   }
 
+  /**
+   * Adds a new booking to {@link bookings}
+   * @param {Booking} newBooking - new booking to be added to {@link bookings}
+   */
   addBooking(newBooking) {
 	this.bookings.push(newBooking);
   }
 
+  /**
+   * Removes a booking from {@link bookings} by its ID
+   * @param {string} bookingID - the ID of the booking to be removed
+   */
   removeBookingByID(bookingID) {
 	if (bookingID) {
 	  const bookingsCopy = [...this.bookings];
@@ -43,14 +70,27 @@ export class Vehicle {
 	}
   }
 
+  /**
+   * Removes a journey from {@link journeys} by its associated bookingID
+   * @param {Journey} journey - the journey to be removed
+   * @param {string} bookingID - the ID of the booking that contains the journey to be removed
+   */
   removeJourneyByBookingID(journey, bookingID) {
 	this.bookings.find(b => b.id === bookingID).removeJourney(journey);
   }
 
+  /**
+   * Adds a new journey to {@link journeys}
+   * @param {Journey} newJourney - the new journey to be added
+   */
   addJourney(newJourney) {
 	this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
   }
 
+  /**
+   * Adds a new service to {@link services}
+   * @param {Service} newService - new service to be added
+   */
   addService(newService) {
 	this.services.push(newService);
   }
@@ -179,6 +219,10 @@ export class Vehicle {
 	this._updatedAt = value;
   }
 
+  /**
+   * Returns an object that contains all details of this vehicle in a readable format
+   * @returns {{Vehicle: string, "Revenue recorded": string, "Kilometers since the last service": (string|*), "Requires service": (string), "Total services done": *, "Total Kilometers Travelled": string, "Registration Number": *}}
+   */
   printDetails() {
 	return ({
 	  'Vehicle': `${this.manufacturer} ${this.model} (${this.year})`,
@@ -191,6 +235,10 @@ export class Vehicle {
 	})
   }
 
+  /**
+   * Calculates total revenue associated with this vehicle based on its bookings
+   * @returns {number} totalRevenue - total revenue recorded for this vehicle
+   */
   calculateRevenueRecorded() {
 	return this.bookings.reduce((total, b) => {
 	  if (Number.parseFloat(b.bookingCost)) {
@@ -200,6 +248,10 @@ export class Vehicle {
 	}, 0);
   }
 
+  /**
+   * Updates this vehicle's odometer based on its journeys
+   * @param {Function} callback - runs after the vehicle has been updated on firebase
+   */
   updateVehicleOdometer(callback) {
 	// get all journeys
 	if (this.bookings.length) {

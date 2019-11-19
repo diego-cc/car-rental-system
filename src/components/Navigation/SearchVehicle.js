@@ -1,10 +1,19 @@
+/**
+ * SearchVehicle.js
+ */
 import React, {useRef, useState} from 'react';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {AppConsumer} from "../../AppContext/AppContext";
 import {Button, Form, FormGroup} from "react-bootstrap";
 import { useHistory } from 'react-router-dom';
 
-export const SearchVehicle = props => {
+/**
+ * SearchVehicle component - allows the user to search for a vehicle (with typeahead) by
+ * manufacturer, model or year
+ * @returns {*}
+ * @constructor
+ */
+export const SearchVehicle = () => {
   const [selected, setSelected] = useState([]);
   const typeaheadRef = useRef(null);
   const history = useHistory();
@@ -41,8 +50,7 @@ export const SearchVehicle = props => {
 				onClick={() => {
 				  typeaheadRef.current.clear();
 				  typeaheadRef.current.focus();
-				}
-				}
+				}}
 				variant="outline-danger"
 				className="ml-sm-3">
 				Clear

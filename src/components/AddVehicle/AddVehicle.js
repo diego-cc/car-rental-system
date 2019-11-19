@@ -1,10 +1,17 @@
+/**
+ * AddVehicle.js
+ */
 import React, {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {AppContext} from "../../AppContext/AppContext";
-import {Vehicle} from "../../Model/Vehicle";
+import {Vehicle} from "../../Models/Vehicle";
 import {VehicleForm} from "../VehicleForm/VehicleForm";
 
-
+/**
+ *
+ * @returns {*}
+ * @constructor
+ */
 export const AddVehicle = () => {
   const {addResource} = useContext(AppContext);
   const history = useHistory();

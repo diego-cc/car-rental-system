@@ -1,5 +1,12 @@
+/**
+ * Booking.js
+ */
 import moment from "moment";
 
+/**
+ * Booking model class
+ * @class
+ */
 export class Booking {
   _id;
   _vehicleID;
@@ -13,6 +20,17 @@ export class Booking {
   _createdAt;
   _updatedAt;
 
+  /**
+   * Creates a new Booking
+   * @param {string} vehicleID - ID of the vehicle associated with this booking
+   * @param {string} bookingType - one of: "D" (per day) or "K" (per kilometre)
+   * @param {Date} startDate - booking start date in the format YYYY-MM-DD
+   * @param {Date} endDate - booking end date in the format YYYY-MM-DD
+   * @param {number} startOdometer - initial odometer reading of the vehicle
+   * @param {number} id - ID of this booking
+   * @param {string} createdAt - timestamp generated when this booking is created
+   * @param {string|null} updatedAt - timestamp generated when this booking is updated
+   */
   constructor(vehicleID, bookingType, startDate, endDate, startOdometer, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
 	this._id = id;
 	this._vehicleID = vehicleID;
@@ -111,27 +129,47 @@ export class Booking {
   }
 
   set fuelPurchases(newFuelPurchases) {
-    this._fuelPurchases = newFuelPurchases;
+	this._fuelPurchases = newFuelPurchases;
   }
 
+  /**
+   * Adds a new fuel purchase to this booking
+   * @param {FuelPurchase} newFuelPurchase - new fuel purchase to be added to this.fuelPurchases
+   */
   addFuelPurchase(newFuelPurchase) {
-    this.fuelPurchases.push(newFuelPurchase);
+	this.fuelPurchases.push(newFuelPurchase);
   }
 
+  /**
+   * Adds a new journey to this booking and updates booking cost
+   * @param {Journey} newJourney - new journey to be added to this.journeys
+   */
   addJourney(newJourney) {
 	this.journeys.push(newJourney);
 	this.bookingCost = this.calculateBookingCost();
   }
 
+  /**
+   * Removes a journey from this.journeys and updated booking cost
+   * @param {Journey} journey - the journey to be removed
+   */
   removeJourney(journey) {
-    this.journeys = this.journeys.filter(j => j.id !== journey.id);
-    this.bookingCost = this.calculateBookingCost();
+	this.journeys = this.journeys.filter(j => j.id !== journey.id);
+	this.bookingCost = this.calculateBookingCost();
   }
 
+  /**
+   * Removes a fuel purchase from this.fuelPurchases
+   * @param {FuelPurchase} fuelPurchase - the fuel purchase to be removed
+   */
   removeFuelPurchase(fuelPurchase) {
-    this.fuelPurchases = this.fuelPurchases.filter(f => f.id !== fuelPurchase.id);
+	this.fuelPurchases = this.fuelPurchases.filter(f => f.id !== fuelPurchase.id);
   }
 
+  /**
+   * Calculates the cost of this booking based on its type and journeys
+   * @returns {number} bookingCost - the cost of this booking
+   */
   calculateBookingCost() {
 	let bookingCost = 0;
 	if (this.bookingType === 'D') {

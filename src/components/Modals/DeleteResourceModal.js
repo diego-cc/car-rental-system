@@ -1,12 +1,28 @@
+/**
+ * DeleteResourceModal.js
+ */
 import React, {useContext} from 'react';
 import {Button, ListGroup, Modal} from "react-bootstrap";
 import {AppConsumer, AppContext} from "../../AppContext/AppContext";
 import moment from "moment";
 
-export const DeleteResource = props => {
+/**
+ * DeleteResourceModal component - displays a modal to confirm whether a resource (i.e. vehicle, booking,
+ * journey, service or fuel purchase) should be deleted
+ * @returns {*}
+ * @constructor
+ */
+export const DeleteResourceModal = () => {
   const {vehicles, deleteResource} = useContext(AppContext);
   const {resource, resourceType} = deleteResource;
 
+  /**
+   * Renders all the information about a resource in a list
+   * @param {string} resourceType - one of: "vehicle", "booking", "journey", "service",
+   * "fuelPurchase" or "fuel purchase"
+   * @param {(Vehicle|Booking|Journey|Service|FuelPurchase)} resource - the resource object
+   * @returns {*}
+   */
   const renderResourceInfo = (resourceType, resource) => {
 	if (resourceType && resource) {
 	  switch (resourceType.trim().toLowerCase()) {

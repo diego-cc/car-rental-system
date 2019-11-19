@@ -1,3 +1,6 @@
+/**
+ * VehicleDetail.js
+ */
 import React, {useContext} from 'react';
 import {Accordion, Button, ButtonGroup, Card, ListGroup} from "react-bootstrap";
 import {Link} from "react-router-dom";
@@ -5,9 +8,19 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCog, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Dropdown from "react-bootstrap/Dropdown";
 import moment from "moment";
-import {DeleteResource} from "../DeleteResource/DeleteResource";
+import {DeleteResourceModal} from "../Modals/DeleteResourceModal";
 import {AppContext} from "../../AppContext/AppContext";
 
+/**
+ * @typedef {Object} VehicleDetailsProps
+ * @property {Vehicle} vehicle - the selected vehicle
+ */
+/**
+ * VehicleDetails component - renders all the information about a single vehicle
+ * @param {VehicleDetailsProps} props
+ * @returns {*}
+ * @constructor
+ */
 export const VehicleDetails = props => {
   const {vehicle} = props;
 
@@ -422,7 +435,7 @@ export const VehicleDetails = props => {
           </Accordion.Collapse>
         </Card>
       </Accordion>
-      <DeleteResource/>
+      <DeleteResourceModal/>
     </>
   )
 }

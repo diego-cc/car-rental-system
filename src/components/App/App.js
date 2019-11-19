@@ -1,3 +1,6 @@
+/**
+ * App.js
+ */
 import React from 'react';
 import {Navigation} from "../Navigation/Navigation";
 import {BrowseVehicles} from "../BrowseVehicles/BrowseVehicles";
@@ -13,18 +16,24 @@ import {AddJourneyForm} from "../AddJourney/AddJourneyForm";
 import {AddFuelPurchase} from "../AddFuelPurchase/AddFuelPurchase";
 import {AddFuelPurchaseForm} from "../AddFuelPurchase/AddFuelPurchaseForm";
 import {ShowVehicle} from "../ShowVehicle/ShowVehicle";
-import {Vehicle} from "../../Model/Vehicle";
-import {Booking} from "../../Model/Booking";
-import {Journey} from "../../Model/Journey";
-import {Service} from "../../Model/Service";
-import {FuelPurchase} from "../../Model/FuelPurchase";
+import {Vehicle} from "../../Models/Vehicle";
+import {Booking} from "../../Models/Booking";
+import {Journey} from "../../Models/Journey";
+import {Service} from "../../Models/Service";
+import {FuelPurchase} from "../../Models/FuelPurchase";
 import {Dashboard} from "../Dashboard/Dashboard";
 import moment from "moment";
 
+/**
+ * App component - entry point of this application
+ */
 export class App extends React.Component {
   constructor(props) {
 	super(props);
 
+	/**
+	 * Automatically dismisses notifications after 3.5 secs
+	 */
 	this.dismissNotification = () => {
 	  setTimeout(() => {
 		this.setState({
@@ -36,6 +45,11 @@ export class App extends React.Component {
 	  }, 3500)
 	};
 
+	/**
+	 * Edits a vehicle and updates both the state and firebase
+	 * @param {Vehicle} vehicle - a vehicle object that has the same ID as the vehicle to be
+	 * edited (for immutability), containing updated data
+	 */
 	this.editVehicle = vehicle => {
 	  this.setState({
 		loading: true
@@ -83,6 +97,12 @@ export class App extends React.Component {
 	  })
 	};
 
+	/**
+	 * Adds a new resource and updates both the state and firebase
+	 * @param {string} resourceType - one of: "vehicle", "booking", "journey", "service", "fuel
+	 * purchase" or "fuelPurchase"
+	 * @param {Vehicle|Booking|Journey|Service|FuelPurchase} resource
+	 */
 	this.addResource = (resourceType, resource) => {
 	  if (!resourceType || !resource) {
 		return this.setState({
@@ -209,6 +229,12 @@ export class App extends React.Component {
 	  })
 	};
 
+	/**
+	 * Deletes a resource (after confirmation by the user) from both the state and firebase
+	 * @param {string} resourceType - one of: "vehicle", "booking", "journey", "service", "fuel
+	 * purchase" or "fuelPurchase"
+	 * @param {Vehicle|Booking|Journey|Service|FuelPurchase} resource
+	 */
 	this.confirmDeleteResource = (resourceType, resource) => {
 	  if (resourceType && resource) {
 		this.setDeleteResourceModalShow(null, null, () => {
@@ -357,7 +383,7 @@ export class App extends React.Component {
 					.doc(resource.id)
 					.delete()
 					.then(() => {
-					  this.setState(prevState =>({
+					  this.setState(prevState => ({
 						loading: false,
 						revenue: this.calculateTotalRevenue(prevState.vehicles),
 						notification: {
@@ -441,6 +467,12 @@ export class App extends React.Component {
 	  }
 	};
 
+	/**
+	 *
+	 * @param resourceType
+	 * @param resource
+	 * @param callback
+	 */
 	this.setDeleteResourceModalShow = (resourceType, resource, callback) => {
 	  this.setState(prevState => ({
 		deleteResource: {
@@ -481,6 +513,10 @@ export class App extends React.Component {
 	};
   }
 
+  /**
+   * Fetches all collections from firebase, organises the data in the state and updates
+   * odometers, if need be
+   */
   componentDidMount() {
 	this
 	  .fetchCollections('vehicles', 'bookings', 'journeys', 'services', 'fuelPurchases')
@@ -549,6 +585,12 @@ export class App extends React.Component {
 	  })
   }
 
+  /**
+   * Fetches a collection from firebase and adds it to the state
+   * @param {string} collection - one of: "vehicles", "bookings", "journeys, "services" or
+   * "fuelPurchases"
+   * @returns {Promise<firebase.firestore.QuerySnapshot>}
+   */
   fetchCollection = (collection) => {
 	const formattedCollection = collection.trim().toLowerCase();
 	const db = firebase.firestore();
@@ -605,10 +647,26 @@ export class App extends React.Component {
 	  })
   };
 
+  /**
+   * Fetches multiple collections from firebase
+   * @param {Array<string>|string} collections - array of collection names to be fetched
+   * @returns {Promise<firebase.firestore.QuerySnapshot[]>}
+   */
   async fetchCollections(...collections) {
 	return Promise.all(collections.map(collection => this.fetchCollection(collection)))
   }
 
+  /**
+   * @typedef {Object} Revenue
+   * @property {string} monthAndYear - month / year of the revenue recorded
+   * @property {number} revenue - revenue recorded for this month and year
+   */
+  /**
+   * Calculates and maps total revenue generated (by month and year, for the last 6 months) by all
+   * vehicles in the system
+   * @param {Array<Vehicle>} vehicles - vehicles registered in the system
+   * @returns {Array<Revenue>} data - mapped revenue data
+   */
   calculateTotalRevenue = vehicles => {
 	let data = [];
 	vehicles = vehicles || this.state.vehicles;
@@ -659,9 +717,9 @@ export class App extends React.Component {
 	}
 	return data
 	  .sort((revenue1, revenue2) => {
-	  return moment(revenue1.monthAndYear, 'MMMM YYYY').diff(moment(revenue2.monthAndYear, 'MMMM' +
-		' YYYY'))
-	})
+		return moment(revenue1.monthAndYear, 'MMMM YYYY').diff(moment(revenue2.monthAndYear, 'MMMM' +
+		  ' YYYY'))
+	  })
 	  .filter(revenue => moment(revenue.monthAndYear, 'MMMM YYYY').isSameOrBefore(moment(moment(), 'MMMM YYYY')))
 	  .filter(revenue => moment(revenue.monthAndYear, 'MMMM YYYY').isSameOrAfter(moment(moment(), 'MMMM YYYY').subtract(6, 'months')));
   };

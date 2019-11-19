@@ -1,3 +1,6 @@
+/**
+ * AddBooking.js
+ */
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
@@ -6,7 +9,7 @@ import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import Moment from 'moment';
 import {extendMoment} from 'moment-range';
-import {Booking} from "../../Model/Booking";
+import {Booking} from "../../Models/Booking";
 import * as yup from "yup";
 import {WarningModal} from "../Modals/WarningModal";
 import {Formik} from "formik";
@@ -14,6 +17,11 @@ import {Formik} from "formik";
 const moment = extendMoment(Moment);
 const cloneDeep = require('lodash.clonedeep');
 
+/**
+ * AddBooking component
+ * @returns {*}
+ * @constructor
+ */
 export const AddBooking = () => {
   const {loading, notification, vehicles, addResource, deleteResource} = useContext(AppContext);
   const [bookingConflict, setBookingConflict] = useState({status: false, booking: null});
@@ -25,6 +33,7 @@ export const AddBooking = () => {
   const vehicleToBeModified = vehicles.find(v => v.id === vehicleID);
   const vehicle = cloneDeep(vehicleToBeModified);
 
+  // Defines a schema for the AddBooking form
   const schema = yup.object().shape({
 	bookingType: yup.string().required('This field is required'),
 	startDate: yup
@@ -44,6 +53,8 @@ export const AddBooking = () => {
 	  .required('This field is required')
   });
 
+  // Deletes a resource from both the context and firebase,
+  // then adds a new resource
   const confirmDeleteConflictedResource = (conflictedResourceType, conflictedResource, newResourceType, newResource) => {
 	deleteResource.confirmDeleteResource(conflictedResourceType, conflictedResource);
 	deleteResource.setDeleteResourceModalShow(null, null, () => {
@@ -52,6 +63,8 @@ export const AddBooking = () => {
 	});
   };
 
+  // Detects changes on addBooking
+  // Adds a new booking if form is valid and there are no conflicts
   useEffect(() => {
 	if (addBooking && bookingToBeAdded) {
 	  addResource('booking', bookingToBeAdded);
@@ -82,10 +95,10 @@ export const AddBooking = () => {
 		body={`New booking could not be added to the system, because there is another booking scheduled between ${bookingConflict.booking ? moment(bookingConflict.booking.startDate, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''} and ${bookingConflict.booking ? moment(bookingConflict.booking.endDate, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel the other booking and add this one now?`}
 		accept="Yes, cancel the other booking"
 		cancel="No, keep it as it is"
-		accepthandler={() => {
+		acceptHandler={() => {
 		  confirmDeleteConflictedResource('booking', bookingConflict.booking, 'booking', bookingToBeAdded);
 		}}
-		cancelhandler={() => setBookingConflict({status: false})}
+		cancelHandler={() => setBookingConflict({status: false})}
 	  />
 	  <WarningModal
 		onHide={() => setServiceConflict({status: false})}
@@ -94,10 +107,10 @@ export const AddBooking = () => {
 		body={`New booking could not be added to the system, because there is a service scheduled for ${serviceConflict.service ? moment(serviceConflict.service.servicedAt, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel that service and add this booking?`}
 		accept="Yes, cancel the service"
 		cancel="No, keep it as it is"
-		accepthandler={() => {
+		acceptHandler={() => {
 		  confirmDeleteConflictedResource('service', serviceConflict.service, 'booking', bookingToBeAdded);
 		}}
-		cancelhandler={() => setServiceConflict({status: false})}
+		cancelHandler={() => setServiceConflict({status: false})}
 	  />
 	  {
 		loading ?
@@ -114,6 +127,7 @@ export const AddBooking = () => {
 				const {bookingType, startDate, endDate, startOdometer} = values;
 				const booking = new Booking(vehicle.id, bookingType, startDate, endDate, startOdometer);
 				setBookingToBeAdded(booking);
+
 				// check booking conflicts
 				if (vehicle.bookings.some(b => {
 				  return moment.range(moment(b.startDate, 'YYYY-MM-DD'), moment(b.endDate, 'YYYY-MM-DD')).overlaps(moment.range(moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')))
@@ -133,9 +147,8 @@ export const AddBooking = () => {
 					service: serviceConflict
 				  });
 				} else {
+				  // All good, add new booking
 				  setAddBooking(true);
-				  /*addResource('booking', bookingToBeAdded);
-				  history.push(`/show/${vehicle.id}`);*/
 				}
 			  }}
 			  initialValues={{

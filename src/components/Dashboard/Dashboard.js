@@ -1,3 +1,6 @@
+/**
+ * Dashboard.js
+ */
 import React, {useContext} from 'react';
 import {Button, Container, Row} from "react-bootstrap";
 import {Header} from "../Header/Header";
@@ -5,6 +8,12 @@ import {AppContext} from "../../AppContext/AppContext";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {RevenueChart} from "./RevenueChart";
 
+/**
+ * Dashboard component - the first component displayed when the app starts
+ * @param props
+ * @returns {*}
+ * @constructor
+ */
 export const Dashboard = props => {
   const {loading, revenue} = useContext(AppContext);
 

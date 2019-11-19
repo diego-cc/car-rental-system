@@ -1,10 +1,13 @@
+/**
+ * AddService.js
+ */
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {AppContext} from "../../AppContext/AppContext";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
-import {Service} from "../../Model/Service";
+import {Service} from "../../Models/Service";
 import {Formik} from "formik";
 import Moment from "moment";
 import {extendMoment} from 'moment-range';
@@ -14,7 +17,11 @@ import {WarningModal} from "../Modals/WarningModal";
 const cloneDeep = require('lodash.clonedeep');
 const moment = extendMoment(Moment);
 
-
+/**
+ * AddService component
+ * @returns {*}
+ * @constructor
+ */
 export const AddService = () => {
   const {loading, notification, vehicles, addResource, deleteResource} = useContext(AppContext);
   const [bookingConflict, setBookingConflict] = useState({status: false, booking: null});
@@ -26,6 +33,8 @@ export const AddService = () => {
   const vehicleToBeModified = vehicles.find(v => v.id === vehicleID);
   const vehicle = cloneDeep(vehicleToBeModified);
 
+  // Deletes a resource from both the context and firebase,
+  // then adds a new resource
   const confirmDeleteConflictedResource = (conflictedResourceType, conflictedResource, newResourceType, newResource) => {
 	deleteResource.confirmDeleteResource(conflictedResourceType, conflictedResource);
 	deleteResource.setDeleteResourceModalShow(null, null, () => {
@@ -34,6 +43,7 @@ export const AddService = () => {
 	});
   };
 
+  // Defines a schema for the form to add a service
   const schema = yup.object().shape({
 	servicedAt: yup
 	  .date()
@@ -46,10 +56,12 @@ export const AddService = () => {
 	  .required('This field is required')
   });
 
+  // Detects changes on addService
+  // Adds a service if form is valid and there are no conflicts
   useEffect(() => {
-    if (addService && serviceToBeAdded) {
-      addResource('service', serviceToBeAdded);
-      history.push(`/show/${vehicle.id}`);
+	if (addService && serviceToBeAdded) {
+	  addResource('service', serviceToBeAdded);
+	  history.push(`/show/${vehicle.id}`);
 	}
   }, [addService]);
 
@@ -76,10 +88,10 @@ export const AddService = () => {
 		body={`New service could not be added to the system, because there is a booking scheduled between ${bookingConflict.booking ? moment(bookingConflict.booking.startDate, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''} and ${bookingConflict.booking ? moment(bookingConflict.booking.endDate, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel the booking and add this service now?`}
 		accept="Yes, cancel this booking"
 		cancel="No, keep it as it is"
-		accepthandler={() => {
+		acceptHandler={() => {
 		  confirmDeleteConflictedResource('booking', bookingConflict.booking, 'service', serviceToBeAdded);
 		}}
-		cancelhandler={() => setBookingConflict({status: false})}
+		cancelHandler={() => setBookingConflict({status: false})}
 	  />
 	  <WarningModal
 		onHide={() => setServiceConflict({status: false})}
@@ -88,10 +100,10 @@ export const AddService = () => {
 		body={`New service could not be added to the system, because there is another service also scheduled for ${serviceConflict.service ? moment(serviceConflict.service.servicedAt, 'YYYY-MM-DD').format('DD/MM/YYYY') : ''}. Would you like to cancel that service and add this one instead?`}
 		accept="Yes, cancel the other service"
 		cancel="No, keep it as it is"
-		accepthandler={() => {
+		acceptHandler={() => {
 		  confirmDeleteConflictedResource('service', serviceConflict.service, 'service', serviceToBeAdded);
 		}}
-		cancelhandler={() => setServiceConflict({status: false})}
+		cancelHandler={() => setServiceConflict({status: false})}
 	  />
 	  {
 		loading ?
@@ -108,6 +120,7 @@ export const AddService = () => {
 				const {serviceOdometer, servicedAt} = values;
 				const service = new Service(vehicle.id, serviceOdometer, servicedAt);
 				setServiceToBeAdded(service);
+
 				// check booking conflicts
 				if (vehicle.bookings.some(b => moment(servicedAt, 'YYYY-MM-DD').within(moment.range(b.startDate, b.endDate)))) {
 				  const bookingConflict = vehicle.bookings.find(b => moment(servicedAt, 'YYYY-MM-DD').within(moment.range(b.startDate, b.endDate)));

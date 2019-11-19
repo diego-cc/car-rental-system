@@ -1,3 +1,6 @@
+/**
+ * ShowVehicle.js
+ */
 import React, {useContext} from 'react';
 import {AppContext} from "../../AppContext/AppContext";
 import {Button, Col, Container, Row} from "react-bootstrap";
@@ -6,6 +9,12 @@ import {useHistory} from 'react-router-dom';
 import {VehicleDetails} from "./VehicleDetails";
 import {Notification} from "../Notification/Notification";
 
+/**
+ * ShowVehicle component - rendered when the user navigates to /show/:vehicleID
+ * @param props
+ * @returns {*}
+ * @constructor
+ */
 export const ShowVehicle = props => {
   const history = useHistory();
   const {

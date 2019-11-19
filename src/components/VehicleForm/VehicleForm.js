@@ -1,3 +1,6 @@
+/**
+ * VehicleForm.js
+ */
 import React, {useContext, useRef} from 'react';
 import {useHistory} from 'react-router-dom';
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
@@ -8,6 +11,10 @@ import moment from "moment";
 import {AppContext} from "../../AppContext/AppContext";
 import * as yup from "yup";
 
+/**
+ * Schema to validate VehicleForm
+ * @type {Schema}
+ */
 const schema = yup.object().shape({
   manufacturer: yup.string().trim().required('This field is required'),
   model: yup.string().trim().required('This field is required'),
@@ -30,6 +37,18 @@ const schema = yup.object().shape({
   tankCapacity: yup.number().min(0, 'Invalid tank capacity')
 });
 
+/**
+ * @typedef {Object} VehicleFormProps
+ * @property {string} type - one of: "add" or "edit"
+ * @property {Vehicle} vehicle - the vehicle to be edited, if {@link type} === "edit"
+ * @property {Function} handleSubmit - fired on submission if all form fields are valid
+ */
+/**
+ * VehicleForm component - provides a form for the user to add or edit a vehicle
+ * @param {VehicleFormProps} props
+ * @returns {*}
+ * @constructor
+ */
 export const VehicleForm = props => {
   const {loading, notification} = useContext(AppContext);
   const history = useHistory();

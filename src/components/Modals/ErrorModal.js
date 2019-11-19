@@ -1,6 +1,22 @@
+/**
+ * ErrorModal.js
+ */
 import React from 'react';
 import {Button, Modal} from "react-bootstrap";
 
+/**
+ * @typedef {Object} ErrorModalProps
+ * @property {boolean} show - determines whether this modal should be rendered
+ * @property {Function} onHide - sets {@link show} to false
+ * @property {string} headerMessage - title of the error modal
+ * @property {string} bodyMessage - message of the error modal
+ */
+/**
+ * ErrorModal component - renders a modal with an error message
+ * @param props
+ * @returns {*}
+ * @constructor
+ */
 export const ErrorModal = props => {
   return (
 	<Modal
@@ -15,9 +31,9 @@ export const ErrorModal = props => {
 		</Modal.Title>
 	  </Modal.Header>
 	  <Modal.Body>
-		<h4>{props.headermessage}</h4>
+		<h4>{props.headerMessage}</h4>
 		<p>
-		  {props.bodymessage}
+		  {props.bodyMessage}
 		</p>
 	  </Modal.Body>
 	  <Modal.Footer>

@@ -1,12 +1,20 @@
+/**
+ * BrowseVehicle.js
+ */
 import React from 'react';
 import {Col, Container, Row} from 'react-bootstrap'
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {AppConsumer} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
-import {DeleteResource} from "../DeleteResource/DeleteResource";
+import {DeleteResourceModal} from "../Modals/DeleteResourceModal";
 import {VehicleDetails} from "../ShowVehicle/VehicleDetails";
 
-export const BrowseVehicles = props => {
+/**
+ * BrowseVehicle component - shows all vehicles
+ * @returns {*}
+ * @constructor
+ */
+export const BrowseVehicles = () => {
   return (
     <AppConsumer>
       {
@@ -25,7 +33,7 @@ export const BrowseVehicles = props => {
                 <h2 className="text-center my-5">All vehicles</h2>
               </Col>
             </Row>
-            <DeleteResource/>
+            <DeleteResourceModal/>
             {
               loading ?
                 (
