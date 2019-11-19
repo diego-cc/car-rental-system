@@ -1,17 +1,15 @@
-import React, {useContext, useState, useEffect} from 'react';
-import {useParams, useHistory} from 'react-router-dom';
+import React, {useContext, useEffect, useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
-import {AppConsumer, AppContext} from "../../AppContext/AppContext";
+import {AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
-import {ErrorModal} from "../Modals/ErrorModal";
 import Moment from 'moment';
 import {extendMoment} from 'moment-range';
 import {Booking} from "../../Model/Booking";
 import * as yup from "yup";
 import {WarningModal} from "../Modals/WarningModal";
 import {Formik} from "formik";
-import {Service} from "../../Model/Service";
 
 const moment = extendMoment(Moment);
 const cloneDeep = require('lodash.clonedeep');
