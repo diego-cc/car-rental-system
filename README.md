@@ -30,3 +30,6 @@ Some of the technical features of this app include:
 - Conflict resolution (e.g. when a booking is scheduled when a service is due)
 - Bar chart with [recharts](https://github.com/recharts/recharts "recharts")
 - Automatic odometer updates
+
+## License
+[MIT](https://github.com/diego-cc/car-rental-system/blob/master/LICENSE "MIT License")
