@@ -519,9 +519,16 @@ export class App extends React.Component {
 
 		  });
 
-		  // update odometers
+		  // update odometers and notify user
 		  vehicles.forEach(v => {
-			v.updateVehicleOdometer();
+			v.updateVehicleOdometer(() => {
+			  this.setState({
+				notification: {
+				  display: true,
+				  message: `Updated odometer for ${v.manufacturer} ${v.model} (${v.year})`
+				}
+			  }, this.dismissNotification)
+			});
 		  });
 
 		  const revenue = this.calculateTotalRevenue(vehicles);

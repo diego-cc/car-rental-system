@@ -1,192 +1,170 @@
-import React from 'react';
-import {AppConsumer, AppContext} from "../../AppContext/AppContext";
+import React, {useContext, useEffect, useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {AppContext} from "../../AppContext/AppContext";
 import {Notification} from "../Notification/Notification";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import {LoadingSpinner} from "../LoadingSpinner/LoadingSpinner";
 import {FuelPurchase} from "../../Model/FuelPurchase";
+import Moment from 'moment';
+import * as yup from "yup";
+import {Formik} from "formik";
 
-export class AddFuelPurchaseForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.initialState = {
-      vehicle: '',
-      booking: '',
-      fields: {
-        id: '',
-        bookingID: '',
-        fuelQuantity: '',
-        fuelPrice: '',
-        createdAt: '',
-        updatedAt: ''
-      }
-    };
-    this.state = {...this.initialState};
-    this.fuelQuantity = React.createRef();
-  }
+const moment = require('moment-range').extendMoment(Moment);
+const cloneDeep = require('lodash.clonedeep');
 
-  componentDidMount() {
-    const {bookingID} = this.props.match.params;
-    const {vehicles} = this.context;
+export const AddFuelPurchaseForm = () => {
+  const {loading, notification, vehicles, addResource} = useContext(AppContext);
+  const [fuelPurchaseToBeAdded, setFuelPurchaseToBeAdded] = useState(null);
+  const [addFuelPurchase, setAddFuelPurchase] = useState(false);
+  const {bookingID} = useParams();
+  const history = useHistory();
+  const vehicleToBeModified = vehicles.find(v => v.bookings.some(b => b.id === bookingID));
+  const vehicle = cloneDeep(vehicleToBeModified);
+  const booking = vehicle ? vehicle.bookings.find(b => b.id === bookingID) : null;
+  const associatedBooking = cloneDeep(booking);
 
-    const vehicle = vehicles.find(vehicle => vehicle.bookings.some(b => b.id === bookingID));
-    const booking = vehicle.bookings.find(b => b.id === bookingID);
+  const schema = yup.object().shape({
+	fuelQuantity: yup
+	  .number()
+	  .moreThan(0, 'Invalid fuel quantity')
+	  .max(
+		vehicle ?
+		  vehicle.tankCapacity : 0,
+		'Cannot be greater than the tank capacity of this vehicle'
+	  )
+	  .required('This field is required'),
+	fuelPrice: yup
+	  .number()
+	  .moreThan(0, 'Invalid price')
+	  .required('This field  is required')
+  });
 
-    this.initialState = {
-      ...this.initialState,
-      vehicle,
-      booking,
-      fields: {
-        ...this.initialState.fields,
-        bookingID
-      }
-    };
+  useEffect(() => {
+	if (addFuelPurchase && fuelPurchaseToBeAdded) {
+	  addResource('fuel purchase', fuelPurchaseToBeAdded);
+	  history.push(`/show/${vehicle.id}`);
+	}
+  }, [addFuelPurchase]);
 
-    this.setState({...this.initialState});
-  }
-
-  handleSubmit = (e) => {
-    e.preventDefault();
-
-    const {addResource} = this.context;
-
-    let fuelPurchaseToBeAdded;
-    this.setState(prevState => {
-      const {
-        bookingID,
-        fuelQuantity,
-        fuelPrice
-      } = prevState.fields;
-
-      fuelPurchaseToBeAdded = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
-      return ({...this.initialState})
-    }, () => {
-      addResource('fuel purchase', fuelPurchaseToBeAdded);
-      this.props.history.push(`/show/${this.state.vehicle.id}`);
-    });
-    /*this.setState({...this.initialState}, () => {
-      const {
-        bookingID,
-        fuelQuantity,
-        fuelPrice
-      } = this.state.fields;
-
-      const fuelPurchaseToBeAdded = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
-      addResource('fuel purchase', fuelPurchaseToBeAdded);
-      this.props.history.push(`/show/${this.state.vehicle.id}`);
-    })*/
-  };
-
-  handleChange = e => {
-    const {id, value} = e.target;
-
-    this.setState(prevState => ({
-      ...prevState,
-      fields: {
-        ...prevState.fields,
-        [id]: value
-      }
-    }))
-  };
-
-  handleClear = () => {
-    this.setState({...this.initialState}, () => {
-      this.fuelQuantity.current.focus();
-    })
-  };
-
-  handleCancel = () => {
-    this.props.history.push("/browse");
-  };
-
-  render() {
-    return (
-      <AppConsumer>
-        {
-          ({loading, notification}) => (
-            <Container>
-              {
-                notification.display ?
-                  (
-                    <Notification
-                      display={notification.display}
-                      message={notification.message}/>
-                  ) : ''
-              }
-              <Row>
-                <Col>
-                  <h2 className="text-center my-5">Register a new fuel purchase
-                    for {this.state.vehicle ? `${this.state.vehicle.manufacturer} ${this.state.vehicle.model} (${this.state.vehicle.year})` : ''},
-                    booked
-                    on {this.state.booking ? new Date(this.state.booking.startDate).toLocaleDateString('en-AU') : ''}
-                  </h2>
-                </Col>
-              </Row>
-              {
-                loading ?
-                  (
-                    <Row className="justify-content-center mt-5">
-                      <LoadingSpinner/>
-                    </Row>
-                  ) :
-                  (
-                    <Form
-                      onSubmit={e => this.handleSubmit(e, this.state.fields)}
-                    >
-                      <Form.Group as={Row} controlId="fuelQuantity">
-                        <Form.Label column="true" sm="2">Fuel quantity (litres):</Form.Label>
-                        <Col sm="10">
-                          <Form.Control
-                            ref={this.fuelQuantity}
-                            onChange={this.handleChange}
-                            value={this.state.fields.fuelQuantity}
-                            type="number"
-                            placeholder="Fuel quantity (litres)..."/>
-                        </Col>
-                      </Form.Group>
-                      <Form.Group as={Row} controlId="fuelPrice">
-                        <Form.Label column="true" sm="2">Fuel price (per L):</Form.Label>
-                        <Col sm="10">
-                          <Form.Control
-                            onChange={this.handleChange}
-                            value={this.state.fields.fuelPrice}
-                            type="number"
-                            placeholder="Fuel price ($ / L).."/>
-                        </Col>
-                      </Form.Group>
-                      <Row className="justify-content-center my-5">
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          type="submit"
-                          className="mr-5"
-                        >
-                          Add fuel purchase
-                        </Button>
-                        <Button
-                          variant="warning"
-                          size="lg"
-                          className="mr-5"
-                          onClick={this.handleClear}
-                        >
-                          Clear
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="lg"
-                          onClick={this.handleCancel}
-                        >
-                          Cancel
-                        </Button>
-                      </Row>
-                    </Form>
-                  )
-              }
-            </Container>
-          )
-        }
-      </AppConsumer>
-    );
-  }
-}
-
-AddFuelPurchaseForm.contextType = AppContext;
+  return (
+	<Container>
+	  {
+		notification && notification.display ?
+		  (
+			<Notification
+			  display={notification.display}
+			  message={notification.message}/>
+		  ) : ''
+	  }
+	  <Row>
+		<Col>
+		  <h2 className="text-center my-5">Register new fuel purchase
+			for {vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.year})` : ''},
+			booked
+			for: {associatedBooking ? `${moment(associatedBooking.startDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}` : ''} - {associatedBooking ? `${moment(associatedBooking.endDate, 'YYYY-MM-DD').format('DD/MM/YYYY')}` : ''}</h2>
+		</Col>
+	  </Row>
+	  {
+		loading ?
+		  (
+			<Row className="justify-content-center mt-5">
+			  <LoadingSpinner/>
+			</Row>
+		  )
+		  :
+		  (
+			<Formik
+			  validationSchema={schema}
+			  onSubmit={(values) => {
+				const {fuelQuantity, fuelPrice} = values;
+				const fuelPurchase = new FuelPurchase(bookingID, fuelQuantity, fuelPrice);
+				setFuelPurchaseToBeAdded(fuelPurchase);
+				setAddFuelPurchase(true);
+			  }}
+			  initialValues={{
+				fuelQuantity: vehicle ? vehicle.tankCapacity : '',
+				fuelPrice: ''
+			  }}
+			>
+			  {({
+				  handleSubmit,
+				  handleChange,
+				  resetForm,
+				  values,
+				  touched,
+				  errors,
+				  isSubmitting
+				}) => (
+				<Form
+				  onSubmit={handleSubmit}
+				>
+				  <Form.Group as={Row} controlId="fuelQuantity">
+					<Form.Label column="true" sm="2">Fuel quantity:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="fuelQuantity"
+						value={values.fuelQuantity}
+						type="number"
+						placeholder="Fuel quantity (L)..."
+						isValid={touched.fuelQuantity && !errors.fuelQuantity}
+						isInvalid={!!errors.fuelQuantity}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.fuelQuantity}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
+				  <Form.Group as={Row} controlId="fuelPrice">
+					<Form.Label column="true" sm="2">Fuel price per litre:<span
+					  className="text-danger">*</span></Form.Label>
+					<Col sm="10">
+					  <Form.Control
+						onChange={handleChange}
+						name="fuelPrice"
+						value={values.fuelPrice}
+						type="number"
+						placeholder="Fuel price ($ / L)..."
+						isValid={touched.fuelPrice && !errors.fuelPrice}
+						isInvalid={!!errors.fuelPrice}
+					  />
+					  <Form.Control.Feedback type="invalid">
+						{errors.fuelPrice}
+					  </Form.Control.Feedback>
+					</Col>
+				  </Form.Group>
+				  <Row className="justify-content-center my-5">
+					<Button
+					  variant="primary"
+					  size="lg"
+					  type="submit"
+					  className="mr-5"
+					  disabled={isSubmitting}
+					>
+					  Add fuel purchase
+					</Button>
+					<Button
+					  variant="warning"
+					  size="lg"
+					  className="mr-5"
+					  onClick={resetForm}
+					>
+					  Clear
+					</Button>
+					<Button
+					  variant="danger"
+					  size="lg"
+					  onClick={() => history.push(`/show/${vehicle.id}`)}
+					>
+					  Cancel
+					</Button>
+				  </Row>
+				</Form>
+			  )}
+			</Formik>
+		  )
+	  }
+	</Container>
+  )
+};
