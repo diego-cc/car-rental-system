@@ -40,7 +40,7 @@ export const AddBooking = () => {
 	  .required('This field is required'),
 	startOdometer: yup
 	  .number()
-	  .min(vehicle ? vehicle.odometerReading : 0, 'Invalid odometer reading')
+	  .min(vehicle ? vehicle.odometerReading : 0, 'Cannot be lower than current odometer reading')
 	  .required('This field is required')
   });
 
