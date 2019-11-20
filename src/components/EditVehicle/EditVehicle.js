@@ -35,7 +35,7 @@ export const EditVehicle = () => {
 		}
 		vehicle.updatedAt = moment().format('DD/MM/YYYY hh:mm:ss A');
 		editVehicle(vehicle);
-		history.push(`/browse/${vehicle.id}`);
+		history.push(`/show/${vehicle.id}`);
 	  }}
 	/>
   )
