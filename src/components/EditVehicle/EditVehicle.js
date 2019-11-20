@@ -28,9 +28,12 @@ export const EditVehicle = () => {
 	  type="edit"
 	  vehicle={vehicle}
 	  handleSubmit={values => {
-		const {manufacturer, model, year, odometerReading, registrationNumber, tankCapacity} = values;
-		vehicle = new Vehicle(manufacturer, model, year, odometerReading, registrationNumber, tankCapacity, vehicle.id, vehicle.createdAt, moment().format('DD/MM/YYYY hh:mm:ss A'));
-
+		for (let field in values) {
+		  if (vehicle.hasOwnProperty(`_${field}`)) {
+			vehicle[field] = values[field];
+		  }
+		}
+		vehicle.updatedAt = moment().format('DD/MM/YYYY hh:mm:ss A');
 		editVehicle(vehicle);
 		history.push(`/browse/${vehicle.id}`);
 	  }}

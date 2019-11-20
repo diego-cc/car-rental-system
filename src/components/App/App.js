@@ -51,12 +51,22 @@ export class App extends React.Component {
 	 * edited (for immutability), containing updated data
 	 */
 	this.editVehicle = vehicle => {
+	  let fieldsChanged = {};
 	  this.setState({
 		loading: true
 	  }, () => {
 		this.setState(prevState => {
 		  const {vehicles} = {...prevState};
 		  const oldVehicleIndex = vehicles.findIndex(v => v.id === vehicle.id);
+		  const oldVehicle = vehicles[oldVehicleIndex];
+		  fieldsChanged = Object
+			.keys(oldVehicle)
+			.reduce((fields, field) => {
+			  if ((oldVehicle[field] !== vehicle[field]) && !Array.isArray(vehicle[field])) {
+			    fields[field] = vehicle[field];
+			  }
+			  return fields;
+			}, {});
 		  vehicles[oldVehicleIndex] = vehicle;
 
 		  return ({
@@ -69,9 +79,7 @@ export class App extends React.Component {
 		  return db
 			.collection('vehicles')
 			.doc(vehicle.id)
-			.update({
-			  ...vehicle
-			})
+			.update(fieldsChanged)
 			.then(() => {
 			  this.setState({
 				loading: false,
