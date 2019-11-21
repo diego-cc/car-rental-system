@@ -11,7 +11,7 @@ import {BrowserRouter} from "react-router-dom";
 
 ReactDOM.render(
   <BrowserRouter basename="/car-rental-system">
-	<App/>
+    <App/>
   </BrowserRouter>
   ,
   document.getElementById('root'));

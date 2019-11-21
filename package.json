@@ -47,6 +47,10 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^2.1.1"
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "gh-pages": "^2.1.1",
+    "jest-enzyme": "^7.1.2",
+    "react-test-renderer": "^16.12.0"
   }
 }
