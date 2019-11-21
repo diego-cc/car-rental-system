@@ -17,6 +17,7 @@ export class Vehicle {
   _odometerReading;
   _registrationNumber;
   _tankCapacity;
+  _fuelEconomy;
   _bookings = [];
   _services = [];
   _createdAt;
@@ -36,15 +37,16 @@ export class Vehicle {
    * @param {string|null} updatedAt - timestamp generated when this vehicle is updated
    */
   constructor(manufacturer, model, year, odometerReading, registrationNumber, tankCapacity, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
-	this._id = id;
-	this._manufacturer = manufacturer;
-	this._model = model;
-	this._year = year;
-	this._odometerReading = odometerReading;
-	this._registrationNumber = registrationNumber;
-	this._tankCapacity = tankCapacity;
-	this._createdAt = createdAt;
-	this._updatedAt = updatedAt;
+    this._id = id;
+    this._manufacturer = manufacturer;
+    this._model = model;
+    this._year = year;
+    this._odometerReading = odometerReading;
+    this._registrationNumber = registrationNumber;
+    this._tankCapacity = tankCapacity;
+    this._fuelEconomy = this.calculateFuelEconomy();
+    this._createdAt = createdAt;
+    this._updatedAt = updatedAt;
   }
 
   /**
@@ -52,7 +54,7 @@ export class Vehicle {
    * @param {Booking} newBooking - new booking to be added to {@link bookings}
    */
   addBooking(newBooking) {
-	this.bookings.push(newBooking);
+    this.bookings.push(newBooking);
   }
 
   /**
@@ -60,14 +62,14 @@ export class Vehicle {
    * @param {string} bookingID - the ID of the booking to be removed
    */
   removeBookingByID(bookingID) {
-	if (bookingID) {
-	  const bookingsCopy = [...this.bookings];
-	  const bookingToBeDeleted = bookingsCopy.find(booking => booking.id === bookingID);
+    if (bookingID) {
+      const bookingsCopy = [...this.bookings];
+      const bookingToBeDeleted = bookingsCopy.find(booking => booking.id === bookingID);
 
-	  if (bookingToBeDeleted) {
-		this.bookings = bookingsCopy.filter(booking => booking.id !== bookingToBeDeleted.id);
-	  }
-	}
+      if (bookingToBeDeleted) {
+        this.bookings = bookingsCopy.filter(booking => booking.id !== bookingToBeDeleted.id);
+      }
+    }
   }
 
   /**
@@ -76,7 +78,7 @@ export class Vehicle {
    * @param {string} bookingID - the ID of the booking that contains the journey to be removed
    */
   removeJourneyByBookingID(journey, bookingID) {
-	this.bookings.find(b => b.id === bookingID).removeJourney(journey);
+    this.bookings.find(b => b.id === bookingID).removeJourney(journey);
   }
 
   /**
@@ -84,7 +86,7 @@ export class Vehicle {
    * @param {Journey} newJourney - the new journey to be added
    */
   addJourney(newJourney) {
-	this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
+    this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
   }
 
   /**
@@ -92,147 +94,148 @@ export class Vehicle {
    * @param {Service} newService - new service to be added
    */
   addService(newService) {
-	this.services.push(newService);
+    this.services.push(newService);
   }
 
   removeServiceByID(serviceID) {
-	if (serviceID) {
-	  const servicesCopy = [...this.services];
-	  const serviceToBeDeleted = servicesCopy.find(service => service.id === serviceID);
+    if (serviceID) {
+      const servicesCopy = [...this.services];
+      const serviceToBeDeleted = servicesCopy.find(service => service.id === serviceID);
 
-	  if (serviceToBeDeleted) {
-		this.services = servicesCopy.filter(service => service.id !== serviceToBeDeleted.id);
-	  }
-	}
+      if (serviceToBeDeleted) {
+        this.services = servicesCopy.filter(service => service.id !== serviceToBeDeleted.id);
+      }
+    }
   }
 
   addFuelPurchase(newFuelPurchase) {
-	this.bookings.find(b => b.id === newFuelPurchase.bookingID).addFuelPurchase(newFuelPurchase);
+    this.bookings.find(b => b.id === newFuelPurchase.bookingID).addFuelPurchase(newFuelPurchase);
   }
 
   removeFuelPurchaseByBookingID(fuelPurchase, bookingID) {
-	this.bookings.find(b => b.id === bookingID).removeFuelPurchase(fuelPurchase);
+    this.bookings.find(b => b.id === bookingID).removeFuelPurchase(fuelPurchase);
   }
 
   get bookings() {
-	return this._bookings;
+    return this._bookings;
   }
 
   set bookings(value) {
-	this._bookings = value;
+    this._bookings = value;
   }
 
   get journeys() {
-	return this._bookings.reduce((journeys, b) => {
-	  b.journeys.forEach(j => {
-		journeys.push(j);
-	  });
-	  return journeys;
-	}, []);
+    return this._bookings.reduce((journeys, b) => {
+      b.journeys.forEach(j => {
+        journeys.push(j);
+      });
+      return journeys;
+    }, []);
   }
 
   get services() {
-	return this._services;
+    return this._services;
   }
 
   set services(value) {
-	this._services = value;
+    this._services = value;
   }
 
   get fuelPurchases() {
-	return this._fuelPurchases;
+    return this._fuelPurchases;
   }
 
   set fuelPurchases(value) {
-	this._fuelPurchases = value;
+    this._fuelPurchases = value;
   }
 
   get id() {
-	return this._id;
+    return this._id;
   }
 
   set id(value) {
-	this._id = value;
+    this._id = value;
   }
 
   get manufacturer() {
-	return this._manufacturer;
+    return this._manufacturer;
   }
 
   set manufacturer(value) {
-	this._manufacturer = value;
+    this._manufacturer = value;
   }
 
   get model() {
-	return this._model;
+    return this._model;
   }
 
   set model(value) {
-	this._model = value;
+    this._model = value;
   }
 
   get year() {
-	return this._year;
+    return this._year;
   }
 
   set year(value) {
-	this._year = value;
+    this._year = value;
   }
 
   get odometerReading() {
-	return this._odometerReading;
+    return this._odometerReading;
   }
 
   set odometerReading(value) {
-	this._odometerReading = value;
+    this._odometerReading = value;
   }
 
   get registrationNumber() {
-	return this._registrationNumber;
+    return this._registrationNumber;
   }
 
   set registrationNumber(value) {
-	this._registrationNumber = value;
+    this._registrationNumber = value;
   }
 
   get tankCapacity() {
-	return this._tankCapacity;
+    return this._tankCapacity;
   }
 
   set tankCapacity(value) {
-	this._tankCapacity = value;
+    this._tankCapacity = value;
   }
 
   get createdAt() {
-	return this._createdAt;
+    return this._createdAt;
   }
 
   set createdAt(value) {
-	this._createdAt = value;
+    this._createdAt = value;
   }
 
   get updatedAt() {
-	return this._updatedAt;
+    return this._updatedAt;
   }
 
   set updatedAt(value) {
-	this._updatedAt = value;
+    this._updatedAt = value;
   }
 
   /**
    * Returns an object that contains all details of this vehicle in a readable format
-   * @returns {{Vehicle: string, "Revenue recorded": string, "Kilometers since the last service": (string|*), "Requires service": (string), "Total services done": *, "Total Kilometers Travelled": string, "Registration Number": *}}
+   * @returns {{Vehicle: string, "Revenue recorded": string|number, "Kilometers since the last service": (string|*), "Requires service": (string), "Total services done": *, "Total Kilometers Travelled": string, "Registration Number": *}}
    */
   printDetails() {
-	return ({
-	  'Vehicle': `${this.manufacturer} ${this.model} (${this.year})`,
-	  'Registration Number': this.registrationNumber,
-	  'Total Kilometers Travelled': `${this.odometerReading} km`,
-	  'Total services done': Service.getTotalServicesDone(this.services),
-	  'Revenue recorded': `$ ${Number.parseFloat(this.calculateRevenueRecorded()).toFixed(2)}`,
-	  'Kilometers since the last service': Number.parseFloat(Service.getLastServiceOdometerReading(this.services)) ? `${this.odometerReading - Service.getLastServiceOdometerReading(this.services)} km` : Service.getLastServiceOdometerReading(this.services),
-	  'Requires service': Service.requiresService(this.services) ? 'Yes' : 'No'
-	})
+    return ({
+      'Vehicle': `${this.manufacturer} ${this.model} (${this.year})`,
+      'Registration Number': this.registrationNumber,
+      'Total Kilometers Travelled': `${this.odometerReading} km`,
+      'Total services done': Service.getTotalServicesDone(this.services),
+      'Revenue recorded': `$ ${Number.parseFloat(this.calculateRevenueRecorded()).toFixed(2)}`,
+      'Kilometers since the last service': Number.parseFloat(Service.getLastServiceOdometerReading(this.services)) ? `${this.odometerReading - Service.getLastServiceOdometerReading(this.services)} km` : Service.getLastServiceOdometerReading(this.services),
+      'Fuel economy': `${this.calculateFuelEconomy()}`,
+      'Requires service': Service.requiresService(this.services) ? 'Yes' : 'No'
+    })
   }
 
   /**
@@ -240,12 +243,53 @@ export class Vehicle {
    * @returns {number} totalRevenue - total revenue recorded for this vehicle
    */
   calculateRevenueRecorded() {
-	return this.bookings.reduce((total, b) => {
-	  if (Number.parseFloat(b.bookingCost)) {
-		total += b.bookingCost;
-	  }
-	  return total;
-	}, 0);
+    return this.bookings.reduce((total, b) => {
+      if (Number.parseFloat(b.bookingCost)) {
+        total += b.bookingCost;
+      }
+      return total;
+    }, 0);
+  }
+
+  /**
+   * Calculates the fuel economy for this vehicle by dividing the total cost of all fuel purchases by
+   * the total distance travelled across all recorded journeys
+   * @returns {string} fuelEconomy - The fuel economy in a readable format
+   */
+  calculateFuelEconomy() {
+    const fuelPurchases =
+      this.bookings.reduce((fuelPurchases, booking) => {
+        fuelPurchases.push(...booking.fuelPurchases);
+        return fuelPurchases;
+      }, []);
+
+    const totalFuelPurchaseCost = fuelPurchases.reduce((totalCost, fuelPurchase) => {
+      totalCost += fuelPurchase.fuelPrice * fuelPurchase.fuelQuantity;
+      return totalCost;
+    }, 0);
+
+    const totalDistanceTravelled = this.calculateTotalDistanceTravelled();
+
+    if (Number.isNaN(totalFuelPurchaseCost) || Number.isNaN(totalDistanceTravelled) || !Number.isFinite((totalFuelPurchaseCost / totalDistanceTravelled))) {
+      return 'Not enough data recorded to calculate fuel economy';
+    }
+    const fuelEconomy = (totalFuelPurchaseCost / totalDistanceTravelled);
+    return `${(fuelEconomy * 100).toFixed(2)} L / 100 km `
+  }
+
+  /**
+   * Calculates the total distance travelled by this vehicle for all recorded journeys
+   * @returns {number} totalDistance - The total distance travelled
+   */
+  calculateTotalDistanceTravelled() {
+    return (
+      this.bookings.reduce((totalDistance, booking) => {
+        booking.journeys.forEach(j => {
+          totalDistance += j.journeyEndOdometerReading - j.journeyStartOdometerReading
+        }, 0);
+        return totalDistance;
+      }, 0)
+    )
   }
 
   /**
@@ -253,33 +297,33 @@ export class Vehicle {
    * @param {Function} callback - runs after the vehicle has been updated on firebase
    */
   updateVehicleOdometer(callback) {
-	// get all journeys
-	if (this.bookings.length) {
-	  const journeys = this.bookings.reduce((j, b) => {
-		if (b.journeys.length) {
-		  j.push(...b.journeys);
-		}
-		return j;
-	  }, []);
+    // get all journeys
+    if (this.bookings.length) {
+      const journeys = this.bookings.reduce((j, b) => {
+        if (b.journeys.length) {
+          j.push(...b.journeys);
+        }
+        return j;
+      }, []);
 
-	  // if a journey is scheduled for today, update vehicle odometer
-	  const todaysJourney = journeys.find(j => moment(j.journeyEndedAt).isSame(moment(), 'days'));
+      // if a journey is scheduled for today and the vehicle's odometer reading at the end is greater than the current vehicle's odometer reading, update vehicle odometer
+      const todaysJourney = journeys.find(j => moment(j.journeyEndedAt).isSame(moment(), 'days'));
 
-	  if (todaysJourney && todaysJourney.journeyEndOdometerReading > this.odometerReading) {
-		this.odometerReading = todaysJourney.journeyEndOdometerReading;
+      if (todaysJourney && todaysJourney.journeyEndOdometerReading > this.odometerReading) {
+        this.odometerReading = todaysJourney.journeyEndOdometerReading;
 
-		// update vehicle on firebase
-		const db = firebase.firestore();
-		db
-		  .collection('vehicles')
-		  .doc(this.id)
-		  .update({
-			'_odometerReading': this.odometerReading,
-			'_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
-		  })
-		  .then(callback)
-		  .catch(console.dir)
-	  }
-	}
+        // update vehicle on firebase
+        const db = firebase.firestore();
+        db
+          .collection('vehicles')
+          .doc(this.id)
+          .update({
+            '_odometerReading': this.odometerReading,
+            '_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
+          })
+          .then(callback)
+          .catch(console.dir)
+      }
+    }
   }
 }
