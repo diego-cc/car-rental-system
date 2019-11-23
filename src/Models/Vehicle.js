@@ -300,7 +300,7 @@ export class Vehicle {
    * Updates this vehicle's odometer based on its journeys
    * @param {Function|undefined} callback - runs after the vehicle has been updated on firebase
    */
-  updateVehicleOdometer(callback = (() => console.dir(this))) {
+  updateVehicleOdometer(callback = undefined) {
 	if (this.bookings.length) {
 	  // get all journeys that end today
 	  if (this.bookings.length) {

@@ -149,7 +149,7 @@ export class Booking {
    * @param {Function|undefined} callback - An optional callback that runs after this booking
    * has been updated on firebase
    */
-  updateEndOdometer(callback = (() => console.dir(this))) {
+  updateEndOdometer(callback = undefined) {
 	if (this.journeys.length) {
 	  let lastJourney = this.journeys[0];
 	  this.journeys.forEach((j, i) => {
@@ -158,19 +158,20 @@ export class Booking {
 		}
 	  });
 	  this.endOdometer = lastJourney.journeyEndOdometerReading;
-
-	  // update endOdometer on firebase
-	  const db = firebase.firestore();
-	  db
-		.collection('bookings')
-		.doc(this.id)
-		.update({
-		  '_endOdometer': this.endOdometer,
-		  '_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
-		})
-		.then(callback)
-		.catch(err => console.dir(err))
+	} else {
+	  this.endOdometer = null;
 	}
+	// update endOdometer on firebase
+	const db = firebase.firestore();
+	db
+	  .collection('bookings')
+	  .doc(this.id)
+	  .update({
+		'_endOdometer': this.endOdometer,
+		'_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
+	  })
+	  .then(callback)
+	  .catch(err => console.dir(err))
   }
 
   /**
@@ -187,8 +188,8 @@ export class Booking {
    */
   addJourney(newJourney) {
 	this.journeys.push(newJourney);
-	this.bookingCost = this.calculateBookingCost();
 	this.updateEndOdometer();
+	this.bookingCost = this.calculateBookingCost();
   }
 
   /**
@@ -197,8 +198,8 @@ export class Booking {
    */
   removeJourney(journey) {
 	this.journeys = this.journeys.filter(j => j.id !== journey.id);
-	this.bookingCost = this.calculateBookingCost();
 	this.updateEndOdometer();
+	this.bookingCost = this.calculateBookingCost();
   }
 
   /**
