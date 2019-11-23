@@ -173,7 +173,8 @@ export class Booking {
   calculateBookingCost() {
 	let bookingCost = 0;
 	if (this.bookingType === 'D') {
-	  const days = moment(this.endDate).diff(this.startDate, 'days');
+	  let days = moment(this.endDate).diff(this.startDate, 'days');
+	  if (days === 0) days = 1;
 	  bookingCost = days * 100;
 	} else {
 	  if (this.journeys.length) {
