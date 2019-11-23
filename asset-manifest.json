@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/car-rental-system/static/css/main.a0b1a750.chunk.css",
-    "main.js": "/car-rental-system/static/js/main.6ec2cecd.chunk.js",
-    "main.js.map": "/car-rental-system/static/js/main.6ec2cecd.chunk.js.map",
+    "main.js": "/car-rental-system/static/js/main.932fdde8.chunk.js",
+    "main.js.map": "/car-rental-system/static/js/main.932fdde8.chunk.js.map",
     "runtime-main.js": "/car-rental-system/static/js/runtime-main.7fee94cc.js",
     "runtime-main.js.map": "/car-rental-system/static/js/runtime-main.7fee94cc.js.map",
     "static/css/2.b0bb7f2c.chunk.css": "/car-rental-system/static/css/2.b0bb7f2c.chunk.css",
     "static/js/2.8f80d754.chunk.js": "/car-rental-system/static/js/2.8f80d754.chunk.js",
     "static/js/2.8f80d754.chunk.js.map": "/car-rental-system/static/js/2.8f80d754.chunk.js.map",
     "index.html": "/car-rental-system/index.html",
-    "precache-manifest.2059e6463781ef83bec5bf816d88539c.js": "/car-rental-system/precache-manifest.2059e6463781ef83bec5bf816d88539c.js",
+    "precache-manifest.4aff75699c3274537359d7750ca25720.js": "/car-rental-system/precache-manifest.4aff75699c3274537359d7750ca25720.js",
     "service-worker.js": "/car-rental-system/service-worker.js",
     "static/css/2.b0bb7f2c.chunk.css.map": "/car-rental-system/static/css/2.b0bb7f2c.chunk.css.map",
     "static/css/main.a0b1a750.chunk.css.map": "/car-rental-system/static/css/main.a0b1a750.chunk.css.map"
@@ -19,6 +19,6 @@
     "static/css/2.b0bb7f2c.chunk.css",
     "static/js/2.8f80d754.chunk.js",
     "static/css/main.a0b1a750.chunk.css",
-    "static/js/main.6ec2cecd.chunk.js"
+    "static/js/main.932fdde8.chunk.js"
   ]
 }
