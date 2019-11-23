@@ -2,6 +2,7 @@
  * Booking.js
  */
 import moment from "moment";
+import {firebase} from "../Firebase/Firebase";
 
 /**
  * Booking model class
@@ -17,6 +18,7 @@ export class Booking {
   _startDate;
   _endDate;
   _startOdometer;
+  _endOdometer;
   _createdAt;
   _updatedAt;
 
@@ -27,17 +29,19 @@ export class Booking {
    * @param {Date} startDate - booking start date in the format YYYY-MM-DD
    * @param {Date} endDate - booking end date in the format YYYY-MM-DD
    * @param {number} startOdometer - initial odometer reading of the vehicle
+   * @param {number|null} endOdometer - final odometer reading of the vehicle
    * @param {number} id - ID of this booking
    * @param {string} createdAt - timestamp generated when this booking is created
    * @param {string|null} updatedAt - timestamp generated when this booking is updated
    */
-  constructor(vehicleID, bookingType, startDate, endDate, startOdometer, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
+  constructor(vehicleID, bookingType, startDate, endDate, startOdometer, endOdometer = null, id = require('uuid/v4')(), createdAt = moment().format('DD/MM/YYYY hh:mm:ss A'), updatedAt = null) {
 	this._id = id;
 	this._vehicleID = vehicleID;
 	this._bookingType = bookingType;
 	this._startDate = startDate;
 	this._endDate = endDate;
 	this._startOdometer = startOdometer;
+	this._endOdometer = endOdometer;
 	this._createdAt = createdAt;
 	this._updatedAt = updatedAt;
 	this._bookingCost = this.calculateBookingCost();
@@ -91,6 +95,14 @@ export class Booking {
 	this._startOdometer = value;
   }
 
+  get endOdometer() {
+	return this._endOdometer;
+  }
+
+  set endOdometer(value) {
+	this._endOdometer = value;
+  }
+
   get createdAt() {
 	return this._createdAt;
   }
@@ -133,6 +145,35 @@ export class Booking {
   }
 
   /**
+   * Update endOdometer for this booking if at least one journey has been added
+   * @param {Function|undefined} callback - An optional callback that runs after this booking
+   * has been updated on firebase
+   */
+  updateEndOdometer(callback = (() => console.dir(this))) {
+	if (this.journeys.length) {
+	  let lastJourney = this.journeys[0];
+	  this.journeys.forEach((j, i) => {
+		if (j.journeyEndOdometerReading > lastJourney.journeyEndOdometerReading) {
+		  lastJourney = this.journeys[i];
+		}
+	  });
+	  this.endOdometer = lastJourney.journeyEndOdometerReading;
+
+	  // update endOdometer on firebase
+	  const db = firebase.firestore();
+	  db
+		.collection('bookings')
+		.doc(this.id)
+		.update({
+		  '_endOdometer': this.endOdometer,
+		  '_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
+		})
+		.then(callback)
+		.catch(err => console.dir(err))
+	}
+  }
+
+  /**
    * Adds a new fuel purchase to this booking
    * @param {FuelPurchase} newFuelPurchase - new fuel purchase to be added to this.fuelPurchases
    */
@@ -147,6 +188,7 @@ export class Booking {
   addJourney(newJourney) {
 	this.journeys.push(newJourney);
 	this.bookingCost = this.calculateBookingCost();
+	this.updateEndOdometer();
   }
 
   /**
@@ -156,6 +198,7 @@ export class Booking {
   removeJourney(journey) {
 	this.journeys = this.journeys.filter(j => j.id !== journey.id);
 	this.bookingCost = this.calculateBookingCost();
+	this.updateEndOdometer();
   }
 
   /**
@@ -177,11 +220,8 @@ export class Booking {
 	  if (days === 0) days = 1;
 	  bookingCost = days * 100;
 	} else {
-	  if (this.journeys.length) {
-		bookingCost = this.journeys.reduce((dist, j) => {
-		  dist += j.journeyEndOdometerReading - j.journeyStartOdometerReading;
-		  return dist;
-		}, 0);
+	  if (this.endOdometer) {
+		bookingCost = (this.endOdometer - this.startOdometer);
 	  }
 	}
 	return bookingCost;

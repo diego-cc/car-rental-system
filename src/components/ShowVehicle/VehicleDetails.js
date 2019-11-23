@@ -162,19 +162,17 @@ export const VehicleDetails = props => {
                                             Start
                                             Odometer: {booking.startOdometer} km
                                           </ListGroup.Item>
+										  <ListGroup.Item>
+											End
+											Odometer: {booking.endOdometer ? `${booking.endOdometer} km` : `Pending`}
+										  </ListGroup.Item>
                                           <ListGroup.Item>
                                             Booking
                                             Type: {booking.bookingType === 'D' ? 'Per day' : 'Per kilometer'}
                                           </ListGroup.Item>
                                           <ListGroup.Item>
                                             Booking cost: {
-                                            `$ ${Number.parseFloat(booking.bookingCost).toFixed(2)}`
-                                            /*Number.isNaN(calculateBookingCost(booking, booking.journeys))
-                                              ?
-                                              'Pending (no journeys have' +
-                                              ' been made for this booking' +
-                                              ' yet)' :
-                                              `$ ${Number.parseFloat(calculateBookingCost(booking, booking.journeys)).toFixed(2)}`*/
+                                            booking.bookingCost ? `$ ${Number.parseFloat(booking.bookingCost).toFixed(2)}` : 'Pending'
                                           }
                                           </ListGroup.Item>
                                         </ListGroup>
