@@ -112,10 +112,19 @@ export class Vehicle {
 	}
   }
 
+  /**
+   * Adds a fuelPurchase to {@link fuelPurchases}
+   * @param {FuelPurchase} newFuelPurchase - The new fuel purchase to be added
+   */
   addFuelPurchase(newFuelPurchase) {
 	this.bookings.find(b => b.id === newFuelPurchase.bookingID).addFuelPurchase(newFuelPurchase);
   }
 
+  /**
+   * Removes a fuel purchase based on its bookingID
+   * @param {FuelPurchase} fuelPurchase - The fuel purchase to be removed
+   * @param {string} bookingID - The ID of the booking associated with this fuel purchase
+   */
   removeFuelPurchaseByBookingID(fuelPurchase, bookingID) {
 	this.bookings.find(b => b.id === bookingID).removeFuelPurchase(fuelPurchase);
   }
