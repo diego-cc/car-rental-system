@@ -616,7 +616,7 @@ export class App extends React.Component {
 				break;
 
 			  case 'bookings':
-				resource = new Booking(resource._vehicleID, resource._bookingType, resource._startDate, resource._endDate, resource._startOdometer, resource._id, resource._createdAt, resource._updatedAt);
+				resource = new Booking(resource._vehicleID, resource._bookingType, resource._startDate, resource._endDate, resource._startOdometer, resource._endOdometer, resource._id, resource._createdAt, resource._updatedAt);
 				break;
 
 			  case 'journeys':
