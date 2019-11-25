@@ -48,30 +48,34 @@ export const fakeAPI = {
   ]
 };
 
-/**
- * An object that mocks the initial state of the app after the data has been fetched from an API
- * @type {{vehicles: Array<Vehicle>}}
- */
-/*export const initialContextValue = {
-  vehicles: fakeAPI.vehicles.map(v => {
-	// find all bookings associated with "v"
-	const associatedBookings = fakeAPI.bookings.filter(b => b.vehicleID === v.id);
+export const setUpVehicles = initialData => ({
+  vehicles: initialData.vehicles.reduce((updatedVehicles, v) => {
+	// get all bookings for this vehicle
+	const bookings = initialData.bookings.filter(b => b.vehicleID === v.id);
 
-	// for each associated booking, add all journeys and fuel purchases to it
-	associatedBookings.forEach(b => {
-	  const associatedJourneys = fakeAPI.journeys.filter(j => j.bookingID === b.id);
-	  b.journeys.push(...associatedJourneys);
-
-	  const associatedFuelPurchases = fakeAPI.fuelPurchases.filter(f => f.bookingID === b.id);
-	  b.fuelPurchases.push(...associatedFuelPurchases);
+	// get all journeys for this vehicle
+	const journeys = initialData.journeys.filter(j => bookings.some(b => b.id === j.bookingID));
+	// add journeys to each booking
+	journeys.forEach(j => {
+	  bookings.find(b => b.id === j.bookingID).journeys.push(j);
 	});
 
-	// add associatedBookings to "v"
-	v.bookings.push(...associatedBookings);
+	// get all fuel purchases for this vehicle;
+	const fuelPurchases = initialData.fuelPurchases.filter(f => bookings.some(b => b.id === f.bookingID));
+	// add fuel purchases to each booking
+	fuelPurchases.forEach(f => {
+	  bookings.find(b => b.id === f.bookingID).fuelPurchases.push(f);
+	});
 
-	// add all associated services to "v"
-	v.services.push(...fakeAPI.services.filter(s => s.vehicleID === v.id));
+	// add bookings to this vehicle
+	v.bookings.push(...bookings);
 
-	return v;
-  })
-};*/
+	// get all services for this vehicle
+	const services = initialData.services.filter(s => s.vehicleID === v.id);
+	// add services to this vehicle
+	v.services.push(...services);
+
+	updatedVehicles.push(v);
+	return updatedVehicles;
+  }, [])
+});
