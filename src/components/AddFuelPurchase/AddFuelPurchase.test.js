@@ -8,7 +8,6 @@ import '@testing-library/jest-dom/extend-expect'
 import {AppProvider} from "../../AppContext/AppContext";
 import {AddFuelPurchase} from "./AddFuelPurchase";
 import {fakeAPI} from "../../setupTests";
-const cloneDeep = require('lodash.clonedeep');
 
 let tree, contextValue;
 
