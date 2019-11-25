@@ -69,7 +69,11 @@ export const AddJourney = () => {
 							  return 0;
 							})
 							.map((booking, index) => (
-							  <Card key={index} style={{overflow: 'visible'}}>
+							  <Card
+								data-testid={`booking-${booking.id}`}
+								key={index}
+								style={{overflow: 'visible'}}
+							  >
 								<Card.Header>
 								  <Accordion.Toggle
 									className="mr-auto"
