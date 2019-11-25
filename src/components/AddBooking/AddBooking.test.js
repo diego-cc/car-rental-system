@@ -2,57 +2,52 @@
  * AddBooking.test.js
  */
 import React from 'react';
-import {fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render, wait} from '@testing-library/react';
 import {MemoryRouter, Route} from 'react-router-dom';
 import {fakeAPI} from "../../setupTests";
 import {AddBooking} from "./AddBooking";
 import '@testing-library/jest-dom/extend-expect'
 import {AppProvider} from "../../AppContext/AppContext";
 import moment from "moment";
-import {act} from "@testing-library/react";
 
-let contextValue;
-beforeEach(() => {
-  contextValue = {
-	vehicles: fakeAPI.vehicles.map(v => {
-	  fakeAPI.bookings.forEach(b => {
-		fakeAPI.journeys.forEach(j => {
-		  if (j.bookingID === b.id) {
-			b.journeys.push(j);
-		  }
-		});
-		if (b.vehicleID === v.id) {
-		  v.bookings.push(b);
-		}
-	  });
-	  fakeAPI.services.forEach(s => {
-		if (s.vehicleID === v.id) {
-		  v.services.push(s);
-		}
-	  });
-	  return v;
-	}),
-	addResource: (resourceType, resource) => {
-	  if (resourceType.trim().toLowerCase() === 'booking') {
-		contextValue.vehicles.find(v => v.id === resource.vehicleID).bookings.push(resource);
+const initialContextValue = {
+  vehicles: fakeAPI.vehicles.map(v => {
+	const vehicleBookings = fakeAPI.bookings.reduce((vBookings, b) => {
+	  if (b.vehicleID === v.id) {
+		vBookings.push(b);
 	  }
+	  return vBookings;
+	}, []);
+	v.bookings.push(...vehicleBookings);
+	return v;
+  }),
+  addResource: (resourceType, resource) => {
+	if (resourceType.trim().toLowerCase() === 'booking') {
+	  contextValue.vehicles.find(v => v.id === resource.vehicleID).bookings.push(resource);
 	}
   }
+};
+
+let tree, contextValue;
+
+beforeEach(() => {
+  contextValue = {...initialContextValue};
+  tree = (
+	<AppProvider value={contextValue}>
+	  <MemoryRouter initialEntries={[`/addBooking/tesla-123`]}>
+		<Route path={`/addBooking/:vehicleID`} render={props => <AddBooking {...props} />}/>
+	  </MemoryRouter>
+	</AppProvider>
+  );
 });
 
 describe('AddBooking component', () => {
   it('loads AddBooking form with correct default values', () => {
 	let component;
 	act(() => {
-	  const tree = (
-		<AppProvider value={contextValue}>
-		  <MemoryRouter initialEntries={[`/addBooking/tesla-123`]}>
-			<Route path={`/addBooking/:vehicleID`} render={props => <AddBooking {...props} />}/>
-		  </MemoryRouter>
-		</AppProvider>
-	  );
 	  component = render(tree);
 	  const {getByLabelText} = component;
+
 	  expect(getByLabelText(/^Booking Type:/)).toHaveValue('D');
 	  expect(getByLabelText(/^Start Date:/)).toHaveValue(moment().format('YYYY-MM-DD'));
 	  expect(getByLabelText(/^End Date:/)).toHaveValue(moment().add(1, 'day').format('YYYY-MM-DD'));
@@ -60,22 +55,36 @@ describe('AddBooking component', () => {
 	});
   });
 
-  it('warns the user in case there are booking conflicts', async () => {
+  it('does not add a new booking right away if there are booking conflicts', async () => {
 	let component;
 
 	// we need to use async/await here
 	// see https://github.com/jaredpalmer/formik/issues/1543
 	await act(async () => {
-	  const tree = (
-		<AppProvider value={contextValue}>
-		  <MemoryRouter initialEntries={[`/addBooking/tesla-123`]}>
-			<Route path={`/addBooking/:vehicleID`} render={props => <AddBooking {...props} />}/>
-		  </MemoryRouter>
-		</AppProvider>
-	  );
 	  component = render(tree);
 	  const {getByText} = component;
 	  fireEvent.click(getByText('Add booking'));
+	  const vehicle = contextValue.vehicles.find(v => v.id === 'tesla-123');
+
+	  expect(vehicle.bookings.length).toBe(1);
+	});
+  });
+
+  it('adds a new booking if there are no conflicts', async () => {
+	let component;
+
+	component = render(tree);
+	const {getByLabelText, getByText} = component;
+	const startDateInput = getByLabelText(/^Start Date:/);
+	const endDateInput = getByLabelText(/^End Date:/);
+
+	fireEvent.change(startDateInput, {target: {value: moment(moment().add(10, 'days'), 'YYYY-MM-DD').format('YYYY-MM-DD')}});
+	fireEvent.change(endDateInput, {target: {value: moment(moment().add(20, 'days'), 'YYYY-MM-DD').format('YYYY-MM-DD')}});
+	fireEvent.click(getByText('Add booking'));
+
+	await wait(() => {
+	  const vehicle = contextValue.vehicles.find(v => v.id === 'tesla-123');
+	  expect(vehicle.bookings.length).toBe(2);
 	});
   })
 });

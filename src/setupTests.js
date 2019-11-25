@@ -14,7 +14,6 @@ export const fakeAPI = {
   ],
   bookings: [
 	new Booking('tesla-123', 'D', moment().subtract(1, 'day').toDate(), moment().add(2, 'days').toDate(), 500, 600, 'tesla-booking'),
-	new Booking('tesla-123', 'D', moment().subtract(2, 'days').toDate(), moment().add(1, 'days').toDate(), 500, 600, 'tesla-booking2'),
 	new Booking('ranger-123', 'K', moment().subtract(1, 'day').toDate(), moment().add(2, 'days').toDate(), 800, 1000, 'ranger-booking'),
 	new Booking('holden-123', 'K', moment().subtract(1, 'day').toDate(), moment().add(2, 'days').toDate(), 800, 1200, 'holden-booking')
   ],
