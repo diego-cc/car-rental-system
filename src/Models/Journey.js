@@ -24,8 +24,8 @@ export class Journey {
    * @param {string} bookingID - ID of the booking associated with this journey
    * @param {number} journeyStartOdometerReading - odometer reading at the start of this journey
    * @param {number} journeyEndOdometerReading - odometer reading at the end of this journey
-   * @param {Date} journeyStartedAt - start date of this journey
-   * @param {Date} journeyEndedAt - end date of this journey
+   * @param {Date|string} journeyStartedAt - start date of this journey
+   * @param {Date|string} journeyEndedAt - end date of this journey
    * @param {string} journeyFrom - location where the journey started
    * @param {string} journeyTo - location where the journey ended
    * @param {string} id - ID of this journey

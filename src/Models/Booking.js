@@ -26,8 +26,8 @@ export class Booking {
    * Creates a new Booking
    * @param {string} vehicleID - ID of the vehicle associated with this booking
    * @param {string} bookingType - one of: "D" (per day) or "K" (per kilometre)
-   * @param {Date} startDate - booking start date in the format YYYY-MM-DD
-   * @param {Date} endDate - booking end date in the format YYYY-MM-DD
+   * @param {Date|string} startDate - booking start date in the format YYYY-MM-DD
+   * @param {Date|string} endDate - booking end date in the format YYYY-MM-DD
    * @param {number} startOdometer - initial odometer reading of the vehicle
    * @param {number|null} endOdometer - final odometer reading of the vehicle
    * @param {number} id - ID of this booking

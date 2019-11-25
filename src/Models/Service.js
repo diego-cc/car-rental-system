@@ -19,7 +19,7 @@ export class Service {
    * Creates a new Service
    * @param {string} vehicleID - ID of the vehicle associated with this service
    * @param {number} serviceOdometer - odometer reading for this service
-   * @param {Date} servicedAt - when this service is due
+   * @param {Date|string} servicedAt - when this service is due
    * @param {string} id - ID of this service
    * @param {string} createdAt - timestamp generated when this service is created
    * @param {string|null} updatedAt - timestamp generated when this service is updated
