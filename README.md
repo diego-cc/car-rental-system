@@ -13,6 +13,9 @@ A basic car rental system developed for an assignment at North Metropolitan TAFE
 ## Run
 `yarn start`
 
+## Test
+`yarn test`
+
 ## Build
 `yarn build`
 
