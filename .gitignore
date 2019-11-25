@@ -210,3 +210,5 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/node,windows,jetbrains+all
 
 build/
+
+__snapshots__/
