@@ -60,7 +60,7 @@ describe('AddService component', () => {
 	const servicedAtInput = getByLabelText(/^Serviced at:/);
 
 	act(() => {
-	  fireEvent.change(servicedAtInput, {target: {value: moment(moment().add(10, 'days'), 'YYYY-MM-DD').format('YYYY-MM-DD')}});
+	  fireEvent.change(servicedAtInput, {target: {value: '2019-12-10'}});
 	  fireEvent.click(getByText('Add service'));
 	});
 
@@ -74,9 +74,10 @@ describe('AddService component', () => {
 	let component;
 
 	component = render(tree);
-	const {getByText} = component;
+	const {getByText, getByLabelText} = component;
 
 	act(() => {
+	  fireEvent.change(getByLabelText(/^Serviced at:/), {target: {value: '2020-02-11'}});
 	  fireEvent.click(getByText('Add service'));
 	});
 

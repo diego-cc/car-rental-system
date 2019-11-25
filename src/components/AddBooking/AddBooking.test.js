@@ -62,7 +62,9 @@ describe('AddBooking component', () => {
 	// see https://github.com/jaredpalmer/formik/issues/1543
 	await act(async () => {
 	  component = render(tree);
-	  const {getByText} = component;
+	  const {getByText, getByLabelText} = component;
+	  fireEvent.change(getByLabelText(/^Start Date:/), {target: {value: '2019-11-26'}});
+	  fireEvent.change(getByLabelText(/^End Date:/), {target: {value: '2019-11-26'}});
 	  fireEvent.click(getByText('Add booking'));
 	  const vehicle = contextValue.vehicles.find(v => v.id === 'tesla-123');
 
@@ -78,8 +80,8 @@ describe('AddBooking component', () => {
 	const startDateInput = getByLabelText(/^Start Date:/);
 	const endDateInput = getByLabelText(/^End Date:/);
 
-	fireEvent.change(startDateInput, {target: {value: moment(moment().add(10, 'days'), 'YYYY-MM-DD').format('YYYY-MM-DD')}});
-	fireEvent.change(endDateInput, {target: {value: moment(moment().add(20, 'days'), 'YYYY-MM-DD').format('YYYY-MM-DD')}});
+	fireEvent.change(startDateInput, {target: {value: '2020-01-10'}});
+	fireEvent.change(endDateInput, {target: {value: '2020-01-20'}});
 	fireEvent.click(getByText('Add booking'));
 
 	await wait(() => {

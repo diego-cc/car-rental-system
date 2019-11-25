@@ -70,7 +70,9 @@ describe('AddJourneyForm component', () => {
   });
 
   it('adds a new journey', async () => {
-	const {getByText} = render(tree);
+	const {getByText, getByLabelText} = render(tree);
+	fireEvent.change(getByLabelText(/^Journey started at:/), {target: {value: '2019-11-26'}});
+	fireEvent.change(getByLabelText(/^Journey ended at:/), {target: {value: '2019-11-26'}});
 	fireEvent.click(getByText(/^Add journey/));
 
 	await wait(() => {
