@@ -1,3 +1,6 @@
+/**
+ * setupTests.js
+ */
 import React from 'react';
 import {Vehicle} from "./Models/Vehicle";
 import {Booking} from "./Models/Booking";
@@ -6,6 +9,10 @@ import {Journey} from "./Models/Journey";
 import {Service} from "./Models/Service";
 import {FuelPurchase} from "./Models/FuelPurchase";
 
+/**
+ * An object containing fake seed data to be used in the unit tests
+ * @type {{journeys: Array<Journey>, vehicles: Array<Vehicle>, fuelPurchases: Array<FuelPurchase>, services: Array<Service>, bookings: Array<Booking>}}
+ */
 export const fakeAPI = {
   vehicles: [
 	new Vehicle('Tesla', 'Roadster', 2008, 500, '1TES999', 0, 'tesla-123'),
@@ -33,3 +40,31 @@ export const fakeAPI = {
 	new FuelPurchase('holden-booking', 30, 1.2, 'ranger-fuel')
   ]
 };
+
+/**
+ * An object that mocks the initial state of the app after the data has been fetched from an API
+ * @type {{vehicles: Array<Vehicle>}}
+ */
+/*export const initialContextValue = {
+  vehicles: fakeAPI.vehicles.map(v => {
+	// find all bookings associated with "v"
+	const associatedBookings = fakeAPI.bookings.filter(b => b.vehicleID === v.id);
+
+	// for each associated booking, add all journeys and fuel purchases to it
+	associatedBookings.forEach(b => {
+	  const associatedJourneys = fakeAPI.journeys.filter(j => j.bookingID === b.id);
+	  b.journeys.push(...associatedJourneys);
+
+	  const associatedFuelPurchases = fakeAPI.fuelPurchases.filter(f => f.bookingID === b.id);
+	  b.fuelPurchases.push(...associatedFuelPurchases);
+	});
+
+	// add associatedBookings to "v"
+	v.bookings.push(...associatedBookings);
+
+	// add all associated services to "v"
+	v.services.push(...fakeAPI.services.filter(s => s.vehicleID === v.id));
+
+	return v;
+  })
+};*/
