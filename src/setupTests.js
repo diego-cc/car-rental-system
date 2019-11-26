@@ -32,7 +32,7 @@ export const fakeAPI = {
 	new Booking('holden-123', 'K', '2019-11-25', '2019-11-27', 800, 1200, 'holden-booking')
   ],
   journeys: [
-	new Journey('tesla-booking', 500, 550, '2019-11-25', '2019-11-25', "", "", 'tesla-journey'),
+	new Journey('tesla-booking', 500, 550, '2019-11-25', '2019-11-25', "Perth", "Rockingham", 'tesla-journey'),
 	new Journey('ranger-booking', 800, 950, '2019-11-25', '2019-11-25', "", "", 'ranger-journey'),
 	new Journey('holden-booking', 800, 950, '2019-11-25', '2019-11-25', "", "", 'holden-journey')
   ],
