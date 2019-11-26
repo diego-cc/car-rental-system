@@ -1,3 +1,6 @@
+/**
+ * SearchVehicle.test.js
+ */
 import {fakeAPI, setUpVehicles} from "../../setupTests";
 import {AppProvider} from "../../AppContext/AppContext";
 import {MemoryRouter} from "react-router-dom";
