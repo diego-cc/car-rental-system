@@ -107,8 +107,4 @@ describe('VehicleForm component', () => {
 		.toEqual(moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'));
 	});
   });
-
-  /*it('restores form to original vehicle data', () => {
-
-  });*/
 });
