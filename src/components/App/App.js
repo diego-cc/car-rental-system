@@ -22,7 +22,6 @@ import {Journey} from "../../Models/Journey";
 import {Service} from "../../Models/Service";
 import {FuelPurchase} from "../../Models/FuelPurchase";
 import {Dashboard} from "../Dashboard/Dashboard";
-import moment from "moment";
 import {calculateTotalRevenue} from "./calculateTotalRevenue";
 
 /**
