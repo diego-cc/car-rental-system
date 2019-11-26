@@ -79,7 +79,7 @@ describe('AddJourneyForm component', () => {
 	  const vehicle = contextValue.vehicles.find(v => v.bookings.some(b => b.id === 'ranger-booking'));
 	  expect(vehicle.bookings.find(b => b.id === 'ranger-booking')
 		.journeys.length)
-		.toBe(2);
+		.toBe(3);
 	});
   });
 });

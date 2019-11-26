@@ -287,7 +287,7 @@ export class Vehicle {
 	  return 'Not enough data recorded to calculate fuel economy';
 	}
 	const fuelEconomy = (totalFuelPurchaseCost / totalDistanceTravelled);
-	return `${(fuelEconomy * 100).toFixed(2)} L / 100 km `
+	return `${(fuelEconomy * 100).toFixed(2)} L / 100 km`;
   }
 
   /**
@@ -308,8 +308,9 @@ export class Vehicle {
   /**
    * Updates this vehicle's odometer based on its journeys
    * @param {Function|undefined} callback - runs after the vehicle has been updated on firebase
+   * @param {Boolean} updateRemote - if true, also updates the remote database (defaults to true)
    */
-  updateVehicleOdometer(callback = undefined) {
+  updateVehicleOdometer(callback = undefined, updateRemote = true) {
 	if (this.bookings.length) {
 	  // get all journeys that end today
 	  if (this.bookings.length) {
@@ -329,17 +330,19 @@ export class Vehicle {
 		// update odometer reading for this vehicle
 		this.odometerReading = greatestEndOdometer ? greatestEndOdometer : this.odometerReading;
 
-		// update vehicle on firebase
-		const db = firebase.firestore();
-		db
-		  .collection('vehicles')
-		  .doc(this.id)
-		  .update({
-			'_odometerReading': this.odometerReading,
-			'_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
-		  })
-		  .then(callback)
-		  .catch(console.dir)
+		if (updateRemote) {
+		  // update vehicle on firebase
+		  const db = firebase.firestore();
+		  db
+			.collection('vehicles')
+			.doc(this.id)
+			.update({
+			  '_odometerReading': this.odometerReading,
+			  '_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
+			})
+			.then(callback)
+			.catch(console.dir)
+		}
 	  }
 	}
   }

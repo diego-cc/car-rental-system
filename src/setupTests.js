@@ -33,8 +33,10 @@ export const fakeAPI = {
   ],
   journeys: [
 	new Journey('tesla-booking', 500, 550, '2019-11-25', '2019-11-25', "Perth", "Rockingham", 'tesla-journey'),
-	new Journey('ranger-booking', 800, 950, '2019-11-25', '2019-11-25', "", "", 'ranger-journey'),
-	new Journey('holden-booking', 800, 950, '2019-11-25', '2019-11-25', "", "", 'holden-journey')
+	new Journey('ranger-booking', 800, 950, '2019-11-25', '2019-11-25', "", "", 'ranger-journey1'),
+	new Journey('ranger-booking', 950, 1000, '2019-11-25', '2019-11-25', "", "", 'ranger-journey2'),
+	new Journey('holden-booking', 800, 950, '2019-11-25', '2019-11-25', "", "", 'holden-journey1'),
+	new Journey('holden-booking', 950, 1200, '2019-11-25', '2019-11-25', "", "", 'holden-journey2')
   ],
   services: [
 	new Service('tesla-123', 1000, '2019-12-10', 'tesla-service'),
@@ -44,7 +46,7 @@ export const fakeAPI = {
   fuelPurchases: [
 	new FuelPurchase('tesla-booking', 20, 1.5, 'tesla-fuel'),
 	new FuelPurchase('ranger-booking', 15, 1.3, 'ranger-fuel'),
-	new FuelPurchase('holden-booking', 30, 1.2, 'ranger-fuel')
+	new FuelPurchase('holden-booking', 30, 1.2, 'holden-fuel')
   ]
 };
 
