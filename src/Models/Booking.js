@@ -146,10 +146,12 @@ export class Booking {
 
   /**
    * Update endOdometer for this booking if at least one journey has been added
+   * @param {Boolean} updateRemote - Provides the option to also update endOdometer in the
+   * remote database. Defaults to true.
    * @param {Function|undefined} callback - An optional callback that runs after this booking
    * has been updated on firebase
    */
-  updateEndOdometer(callback = undefined) {
+  updateEndOdometer(callback = undefined, updateRemote = true) {
 	if (this.journeys.length) {
 	  let lastJourney = this.journeys[0];
 	  this.journeys.forEach((j, i) => {
@@ -161,17 +163,19 @@ export class Booking {
 	} else {
 	  this.endOdometer = null;
 	}
-	// update endOdometer on firebase
-	const db = firebase.firestore();
-	db
-	  .collection('bookings')
-	  .doc(this.id)
-	  .update({
-		'_endOdometer': this.endOdometer,
-		'_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
-	  })
-	  .then(callback)
-	  .catch(err => console.dir(err))
+	if (updateRemote) {
+	  // update endOdometer on firebase
+	  const db = firebase.firestore();
+	  db
+		.collection('bookings')
+		.doc(this.id)
+		.update({
+		  '_endOdometer': this.endOdometer,
+		  '_updatedAt': moment().format('DD/MM/YYYY hh:mm:ss a')
+		})
+		.then(callback)
+		.catch(err => console.dir(err))
+	}
   }
 
   /**
