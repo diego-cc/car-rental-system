@@ -57,11 +57,13 @@ beforeEach(() => {
 
 describe('AddJourneyForm component', () => {
   it('loads AddJourneyForm with correct default values', () => {
+    const associatedBooking = contextValue.vehicles.find(v => v.id === 'ranger-123').bookings.find(b => b.id === 'ranger-booking');
+
 	const {getByLabelText} = render(tree);
 
 	act(() => {
-	  expect(getByLabelText(/^Journey started at:/)).toHaveValue(moment(moment().subtract(1, 'day'), 'YYYY-MM-DD').format('YYYY-MM-DD'));
-	  expect(getByLabelText(/^Journey ended at:/)).toHaveValue(moment(moment().subtract(1, 'day'), 'YYYY-MM-DD').format('YYYY-MM-DD'));
+	  expect(getByLabelText(/^Journey started at:/)).toHaveValue(associatedBooking.startDate);
+	  expect(getByLabelText(/^Journey ended at:/)).toHaveValue(associatedBooking.startDate);
 	  expect(getByLabelText(/^Journey start odometer reading:/)).toHaveValue(800);
 	  expect(getByLabelText(/^Journey end odometer reading:/)).toHaveValue(800);
 	  expect(getByLabelText(/^Journey from:/)).toHaveValue('');
