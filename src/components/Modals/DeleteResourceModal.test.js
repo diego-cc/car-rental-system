@@ -1,3 +1,6 @@
+/**
+ * DeleteResourceModal.test.js
+ */
 import React from 'react';
 import {fakeAPI, setUpVehicles} from "../../setupTests";
 import {AppProvider} from "../../AppContext/AppContext";

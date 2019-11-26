@@ -236,7 +236,7 @@ export class Vehicle {
 
   /**
    * Returns an object that contains all details of this vehicle in a readable format
-   * @returns {{Vehicle: string, "Revenue recorded": string|number, "Kilometers since the last service": (string|*), "Requires service": (string), "Total services done": *, "Total Kilometers Travelled": string, "Registration Number": *}}
+   * @returns {{Vehicle: string, "Revenue recorded": string, "Kilometers since the last service": (string), "Requires service": (string), "Total services done": (number|string), "Total Kilometers Travelled": string, "Fuel economy": string, "Registration Number": (string)}}
    */
   printDetails() {
 	return ({

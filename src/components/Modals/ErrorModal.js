@@ -20,7 +20,7 @@ import {Button, Modal} from "react-bootstrap";
 export const ErrorModal = props => {
   return (
 	<Modal
-	  {...props}
+	  show={props.show}
 	  size="xl"
 	  aria-labelledby="contained-modal-title-vcenter"
 	  centered
