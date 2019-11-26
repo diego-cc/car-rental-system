@@ -32,25 +32,4 @@ describe('SearchVehicle component', () => {
     const component = render(tree);
     expect(component).toMatchSnapshot();
   });
-
-  /**
-   * TODO: Figure out how to correctly trigger change events for this component, since it's
-   * currently not working with Typeahead
-   */
-  /*it('filters the correct results by manufacturer', async () => {
-	const {debug, getByPlaceholderText, getByText} = render(tree, {container: document.body});
-	fireEvent.change(getByPlaceholderText("Search for a vehicle..."), {target: {value: 'test'}});
-
-	await wait(() => {
-	  debug();
-	});
-  }, 9999);
-
-  it('filters the correct results by model', () => {
-
-  });
-
-  it('filters the correct results by year', () => {
-
-  });*/
 });
