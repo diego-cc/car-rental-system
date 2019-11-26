@@ -4,9 +4,8 @@ import {MemoryRouter, Route} from "react-router-dom";
 import {VehicleForm} from "./VehicleForm";
 import {Vehicle} from "../../Models/Vehicle";
 import {fakeAPI, setUpVehicles} from "../../setupTests";
-import {act, fireEvent, wait, render} from '@testing-library/react';
+import {fireEvent, render, wait} from '@testing-library/react';
 import moment from "moment";
-const util = require('util');
 const cloneDeep = require('lodash.clonedeep');
 
 const initialContextValue = {
