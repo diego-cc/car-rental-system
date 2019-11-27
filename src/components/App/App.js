@@ -209,7 +209,34 @@ export class App extends React.Component {
 	  }, () => {
 		if (collectionName && collection) {
 		  if (updateRemote) {
-			const db = firebase.firestore();
+			fetch(`/api/vehicles`, {
+			  method: 'POST',
+			  body: JSON.stringify(resource),
+			  headers: {
+				'Content-Type': 'application/json; charset=utf-8'
+			  }
+			})
+			  .then(() => {
+				this.setState(prevState => ({
+				  loading: false,
+				  revenue: calculateTotalRevenue(prevState.vehicles),
+				  notification: {
+					display: true,
+					message: `The new ${resourceType} has been successfully added to the system`
+				  }
+				}), this.dismissNotification)
+			  })
+			  .catch(err => {
+				this.setState({
+				  loading: false,
+				  notification: {
+					display: true,
+					message: `Could not add new ${resourceType}. Error: ${err.message}`
+				  }
+				}, this.dismissNotification)
+			  });
+
+			/*const db = firebase.firestore();
 			db
 			  .collection(collectionName)
 			  .doc(resource.id)
@@ -232,7 +259,7 @@ export class App extends React.Component {
 					message: `Could not add new ${resourceType}. Error: ${err.message}`
 				  }
 				}, this.dismissNotification)
-			  })
+			  })*/
 		  }
 		} else {
 		  this.setState({
@@ -371,15 +398,15 @@ export class App extends React.Component {
 					  message: `The ${resourceType} has been successfully removed from the system`
 					}
 				  }), this.dismissNotification)
-/*					.catch(err => {
-					  this.state({
-						loading: false,
-						notification: {
-						  display: true,
-						  message: `Error: ${err.message}`
-						}
-					  })
-					})*/
+				  /*					.catch(err => {
+										this.state({
+										  loading: false,
+										  notification: {
+											display: true,
+											message: `Error: ${err.message}`
+										  }
+										})
+									  })*/
 				})
 			  } else if (collection === 'journeys') {
 				// delete journey from state
@@ -541,6 +568,9 @@ export class App extends React.Component {
    * odometers, if need be
    */
   componentDidMount() {
+	/*fetch(`/api/vehicles`)
+	  .then(res => res.json())
+	  .then(res => console.dir(res));*/
 	this
 	  .fetchCollections('vehicles', 'bookings', 'journeys', 'services', 'fuelPurchases')
 	  .then(values => {
