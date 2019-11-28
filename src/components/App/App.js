@@ -210,7 +210,7 @@ export class App extends React.Component {
         if (collectionName && collection) {
           if (updateRemote) {
             // add resource to the mysql database
-            fetch(`/api/vehicles`, {
+            fetch(`/api/${collectionName}`, {
               method: 'POST',
               body: JSON.stringify(resource),
               headers: {
@@ -236,6 +236,32 @@ export class App extends React.Component {
                   }
                 }, this.dismissNotification)
               });
+            /*fetch(`/api/vehicles`, {
+              method: 'POST',
+              body: JSON.stringify(resource),
+              headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+              }
+            })
+              .then(() => {
+                this.setState(prevState => ({
+                  loading: false,
+                  revenue: calculateTotalRevenue(prevState.vehicles),
+                  notification: {
+                    display: true,
+                    message: `The new ${resourceType} has been successfully added to the system`
+                  }
+                }), this.dismissNotification)
+              })
+              .catch(err => {
+                this.setState({
+                  loading: false,
+                  notification: {
+                    display: true,
+                    message: `Could not add new ${resourceType}. Error: ${err.message}`
+                  }
+                }, this.dismissNotification)
+              });*/
 
             // Use the code below to add the resource to firebase instead
             /*const db = firebase.firestore();

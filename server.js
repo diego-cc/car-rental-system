@@ -178,25 +178,26 @@ router.get(`/services/:serviceID`, async (req, res) => {
  * @returns {{error: string}}
  */
 const addResource = async (resourceName, resource) => {
-  let results = [];
+  if (!resource || !resource['_id']) {
+    return {
+      error: 'invalid resource data'
+    }
+  }
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   let response;
   if (!resourceName) {
-    return ({
+    response = {
       error: 'invalid resource name'
-    })
+    };
+    return response;
   }
 
+  let queryString, valuesArray;
   switch (resourceName) {
     case 'vehicle':
       resourceName = 'vehicles';
-      if (!resource || !resource['_id']) {
-        return {
-          error: 'invalid vehicle data'
-        }
-      }
       const {
-        _id,
+        _id: vehicleUUID,
         _manufacturer,
         _model,
         _year,
@@ -205,15 +206,45 @@ const addResource = async (resourceName, resource) => {
         _tankCapacity
       } = resource;
 
-      const vehiclesQueryResults = await pool.query(`INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`, [_id, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity]);
-      results = vehiclesQueryResults[0][0];
-      return results;
+      queryString = `INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      valuesArray = [vehicleUUID, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity];
+      break;
+
+    case 'booking':
+      resourceName = 'bookings';
+      const {
+        _id: bookingUUID,
+        _vehicleID,
+        _bookingType,
+        _bookingCost,
+        _startDate,
+        _endDate,
+        _startOdometer,
+        _endOdometer
+      } = resource;
+
+      // get the vehicle associated with this booking from the database
+      const associatedVehicleQueryResults = await pool.query(`SELECT id FROM vehicles WHERE uuid = ?`, [_vehicleID]);
+      if (!associatedVehicleQueryResults[0][0] || !associatedVehicleQueryResults[0][0].id) {
+        response = {
+          error: 'No vehicle associated with this booking was found'
+        }
+      }
+      else {
+        queryString = `INSERT INTO nmt_fleet_manager.bookings(uuid, vehicle_id, vehicle_uuid, started_at, ended_at, start_odometer, type, cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        valuesArray = [bookingUUID, associatedVehicleQueryResults[0][0].id, _vehicleID, _startDate, _endDate, _startOdometer, _bookingType, _bookingCost]
+      }
+      break;
+
 
     default:
       response = {
         error: 'Invalid resource to be added'
       };
       break;
+  }
+  if (queryString && valuesArray.length && !response) {
+    response = await pool.query(queryString, valuesArray);
   }
   return response;
 };
@@ -239,7 +270,9 @@ router.post(`/vehicles`, (req, res) => {
 });
 
 // POST /api/bookings
-
+router.post(`/bookings`, (req, res) => {
+  handlePostResource(req, res, 'booking', req.body);
+});
 
 // 404
 router.all('*', (req, res) => {
