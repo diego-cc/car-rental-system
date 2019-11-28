@@ -551,7 +551,7 @@ export class App extends React.Component {
 
     /**
      * Changes the state of the delete modal
-     * @param {string} resourceType - one of: "vehicle", "booking", "journey", "fuelPurchase", "fuel purchase"
+     * @param {string|null} resourceType - one of: "vehicle", "booking", "journey", "fuelPurchase", "fuel purchase"
      * or "service"
      * @param {Vehicle|Booking|Journey|FuelPurchase|Service} resource - the resource to be deleted
      * @param {Function} callback - an optional callback
