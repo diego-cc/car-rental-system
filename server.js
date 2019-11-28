@@ -155,7 +155,9 @@ router.get(`/services/:serviceID`, async (req, res) => {
 });
 
 /**
- * TODO: implement async/await for POST requests
+ * TODO:
+ * Implement addResource for bookings, journeys, fuel purchases and services
+ * Handle errors
  * Functions to POST a resource to the database
  */
 /**
@@ -164,7 +166,8 @@ router.get(`/services/:serviceID`, async (req, res) => {
  * @param resource
  * @returns {{error: string}}
  */
-const addResource = (resourceName, resource) => {
+const addResource = async (resourceName, resource) => {
+	let results = [];
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   let response;
   if (!resourceName) {
@@ -190,11 +193,10 @@ const addResource = (resourceName, resource) => {
 		_registrationNumber,
 		_tankCapacity
 	  } = resource;
-	  pool.query(`INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`, [_id, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity], (err, results, fields) => {
-		if (err) throw err;
-		response = results;
-	  });
-	  break;
+
+	  const vehiclesQueryResults = await pool.query(`INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`, [_id, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity]);
+		results = vehiclesQueryResults[0][0];
+		return results;
 
 	default:
 	  response = {
