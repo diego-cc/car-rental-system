@@ -79,7 +79,7 @@ const getResource = async (resourceName, resourceID = null) => {
       if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
         resourceName = 'fuel_purchase';
       }
-      query = `SELECT * FROM \`${resourceName}s\` WHERE \`id\` = ?`;
+      query = `SELECT * FROM \`${resourceName}s\` WHERE \`uuid\` = ?`;
       const queryResult = await pool.execute(query, [resourceID]);
       results = queryResult[0][0];
       return results;
@@ -170,9 +170,10 @@ router.get(`/services/:serviceID`, async (req, res) => {
  * Functions to POST a resource to the database
  */
 /**
- *
- * @param resourceName
- * @param resource
+ * Adds a resource to the database
+ * @param {string} resourceName - one of: "vehicle", "booking", "journey", "fuelPurchase",
+ * "fuel purchase", "fuel_purchase" or "service"
+ * @param {Object} resource - raw data from the resource request
  * @returns {{error: string}}
  */
 const addResource = async (resourceName, resource) => {
