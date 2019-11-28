@@ -3,6 +3,15 @@
 # Name: Diego Craveiro Chaves
 # Student ID: 20026893
 
+# Default connection settings for the MySQL server:
+-- host: localhost
+-- port: 3306
+-- user: nmt_fleet_manager@localhost
+-- password: Fleet2019S2
+-- database: nmt_fleet_manager
+
+# See server.js to change the connection parameters
+
 # STEP 1: Create the Application
 # Already completed on part 1 of the related TDD assignment (using React and Firebase)
 

@@ -1,8 +1,7 @@
 # Car Rental System
 A basic car rental system developed for an assignment at North Metropolitan TAFE. The frontend
  uses [React](https://reactjs.org/ "React") and the
- backend is
- currently handled by [Firebase](https://firebase.google.com/ "Firebase").
+ backend in this branch consists of [Express](http://expressjs.com/ "ExpressJS") and [MySQL](https://www.mysql.com/ "MySQL") (using the [node-mysql2](https://github.com/sidorares/node-mysql2 "node-mysql2") package).
 
 ## Download
 `git clone https://github.com/diego-cc/car-rental-system.git`
@@ -11,6 +10,8 @@ A basic car rental system developed for an assignment at North Metropolitan TAFE
 `yarn` 
 
 ## Run
+__NOTE__: _**Make sure that your database has been set up and initialised first before proceeding any further (see [DCC-FleetManager.sql](https://github.com/diego-cc/car-rental-system/blob/mysql/DCC-FleetManager.sql "DCC-FleetManager.sql") for instructions).**_
+
 `yarn start`
 
 ## Test

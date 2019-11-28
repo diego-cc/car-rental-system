@@ -685,8 +685,7 @@ export class App extends React.Component {
         return resource;
       });
       return data;
-    }
-    catch (err) {
+    } catch (err) {
       throw err;
     }
     // If the remote database is firebase instead of MySQL, use the code below and comment out the one above
@@ -770,8 +769,7 @@ export class App extends React.Component {
         fuelPurchases,
         services
       });
-    }
-    catch (err) {
+    } catch (err) {
       throw err;
     }
   }

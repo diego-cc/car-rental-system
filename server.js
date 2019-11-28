@@ -11,6 +11,7 @@ app.use(express.urlencoded({extended: true}));
 /**
  * Opens a connection pool to the MySQL database, assuming that
  * you have already set it up locally
+ * You may need change the connection parameters to suit your local database
  * @type {Pool} pool
  */
 const pool = mysql.createPool({
