@@ -45,48 +45,48 @@ const getResource = async (resourceName, resourceID = null) => {
   let results = [];
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   if (!resourceName) {
-    return ({
-      error: 'invalid resource name'
-    })
+	return ({
+	  error: 'invalid resource name'
+	})
   }
 
   let query;
   switch (resourceName) {
-    case 'vehicles':
-    case 'bookings':
-    case 'journeys':
-    case 'fuel purchases':
-    case 'fuelpurchases':
-    case 'fuel_purchases':
-    case 'services':
-      if (resourceName === 'fuel purchases' || resourceName === 'fuelpurchases') {
-        resourceName = 'fuel_purchases';
-      }
-      query = `SELECT * FROM ${resourceName}`;
-      const [rows] = await pool.query(query);
-      results = rows;
-      return results;
+	case 'vehicles':
+	case 'bookings':
+	case 'journeys':
+	case 'fuel purchases':
+	case 'fuelpurchases':
+	case 'fuel_purchases':
+	case 'services':
+	  if (resourceName === 'fuel purchases' || resourceName === 'fuelpurchases') {
+		resourceName = 'fuel_purchases';
+	  }
+	  query = `SELECT * FROM ${resourceName}`;
+	  const [rows] = await pool.query(query);
+	  results = rows;
+	  return results;
 
-    case 'vehicle':
-    case 'booking':
-    case 'journey':
-    case 'fuel purchase':
-    case 'fuelpurchase':
-    case 'fuel_purchase':
-    case 'service':
-      if (!resourceID) {
-        throw new Error(`Invalid resourceID provided: ${resourceID}`);
-      }
-      if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
-        resourceName = 'fuel_purchase';
-      }
-      query = `SELECT * FROM \`${resourceName}s\` WHERE \`uuid\` = ?`;
-      const queryResult = await pool.execute(query, [resourceID]);
-      results = queryResult[0][0];
-      return results;
+	case 'vehicle':
+	case 'booking':
+	case 'journey':
+	case 'fuel purchase':
+	case 'fuelpurchase':
+	case 'fuel_purchase':
+	case 'service':
+	  if (!resourceID) {
+		throw new Error(`Invalid resourceID provided: ${resourceID}`);
+	  }
+	  if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
+		resourceName = 'fuel_purchase';
+	  }
+	  query = `SELECT * FROM \`${resourceName}s\` WHERE \`uuid\` = ?`;
+	  const queryResult = await pool.execute(query, [resourceID]);
+	  results = queryResult[0][0];
+	  return results;
 
-    default:
-      return results;
+	default:
+	  return results;
   }
 };
 
@@ -101,13 +101,13 @@ const getResource = async (resourceName, resourceID = null) => {
  */
 const handleFetchResource = async (req, res, resourceName, resourceID = null) => {
   res.set({
-    'Content-Type': 'application/json; charset=utf-8'
+	'Content-Type': 'application/json; charset=utf-8'
   });
   try {
-    const resource = await getResource(resourceName, resourceID);
-    res.json(resource);
+	const resource = await getResource(resourceName, resourceID);
+	res.json(resource);
   } catch (err) {
-    res.json(err);
+	res.json(err);
   }
 };
 
@@ -179,85 +179,181 @@ router.get(`/services/:serviceID`, async (req, res) => {
  */
 const addResource = async (resourceName, resource) => {
   if (!resource || !resource['_id']) {
-    return {
-      error: 'invalid resource data'
-    }
+	return {
+	  error: 'invalid resource data'
+	}
   }
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   let response;
   if (!resourceName) {
-    response = {
-      error: 'invalid resource name'
-    };
-    return response;
+	response = {
+	  error: 'invalid resource name'
+	};
+	return response;
   }
 
   let queryString, valuesArray;
   switch (resourceName) {
-    case 'vehicle':
-      resourceName = 'vehicles';
-      const {
-        _id: vehicleUUID,
-        _manufacturer,
-        _model,
-        _year,
-        _odometerReading,
-        _registrationNumber,
-        _tankCapacity
-      } = resource;
+	case 'vehicle':
+	  const {
+		_id: vehicleUUID,
+		_manufacturer,
+		_model,
+		_year,
+		_odometerReading,
+		_registrationNumber,
+		_tankCapacity
+	  } = resource;
 
-      queryString = `INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-      valuesArray = [vehicleUUID, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity];
-      break;
+	  queryString = `INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+	  valuesArray = [vehicleUUID, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity];
+	  break;
 
-    case 'booking':
-      resourceName = 'bookings';
-      const {
-        _id: bookingUUID,
-        _vehicleID,
-        _bookingType,
-        _bookingCost,
-        _startDate,
-        _endDate,
-        _startOdometer,
-        _endOdometer
-      } = resource;
+	case 'booking':
+	  const {
+		_id: vehicleBookingUUID,
+		_vehicleID,
+		_bookingType,
+		_bookingCost,
+		_startDate,
+		_endDate,
+		_startOdometer,
+		_endOdometer
+	  } = resource;
 
-      // get the vehicle associated with this booking from the database
-      const associatedVehicleQueryResults = await pool.query(`SELECT id FROM vehicles WHERE uuid = ?`, [_vehicleID]);
-      if (!associatedVehicleQueryResults[0][0] || !associatedVehicleQueryResults[0][0].id) {
-        response = {
-          error: 'No vehicle associated with this booking was found'
-        }
-      }
-      else {
-        queryString = `INSERT INTO nmt_fleet_manager.bookings(uuid, vehicle_id, vehicle_uuid, started_at, ended_at, start_odometer, type, cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        valuesArray = [bookingUUID, associatedVehicleQueryResults[0][0].id, _vehicleID, _startDate, _endDate, _startOdometer, _bookingType, _bookingCost]
-      }
-      break;
+	  // get the vehicle associated with this booking from the database
+	  const associatedVehicleQueryResults = await pool.query(`SELECT id FROM vehicles WHERE uuid = ?`, [_vehicleID]);
+	  if (!associatedVehicleQueryResults[0][0] || !associatedVehicleQueryResults[0][0].id) {
+		response = {
+		  error: 'No vehicle associated with this booking was found'
+		}
+	  } else {
+		queryString = `INSERT INTO nmt_fleet_manager.bookings(uuid, vehicle_id, vehicle_uuid, started_at, ended_at, start_odometer, type, cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+		valuesArray = [vehicleBookingUUID, associatedVehicleQueryResults[0][0].id, _vehicleID, _startDate, _endDate, _startOdometer, _bookingType, _bookingCost]
+	  }
+	  break;
 
+	case `journey`:
+	  const {
+		_id: journeyUUID,
+		_bookingID: journeyBookingUUID,
+		_journeyStartOdometerReading,
+		_journeyEndOdometerReading,
+		_journeyStartedAt,
+		_journeyEndedAt,
+		_journeyFrom,
+		_journeyTo
+	  } = resource;
 
-    default:
-      response = {
-        error: 'Invalid resource to be added'
-      };
-      break;
+	  // get the booking associated with this journey
+	  const associatedJourneyBookingQueryResults = await pool.query(`SELECT id, uuid, vehicle_id, vehicle_uuid FROM bookings WHERE uuid = ?`, [journeyBookingUUID]);
+
+	  if (!associatedJourneyBookingQueryResults[0] ||
+		!associatedJourneyBookingQueryResults[0][0]) {
+		response = {
+		  error: 'No booking associated with this journey was found'
+		}
+	  } else {
+		queryString = `INSERT INTO nmt_fleet_manager.journeys(uuid, booking_id, booking_uuid, vehicle_id, vehicle_uuid, started_at, ended_at, journey_from, journey_to, start_odometer, end_odometer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+		valuesArray =
+		  [
+			journeyUUID,
+			associatedJourneyBookingQueryResults[0][0].id,
+			associatedJourneyBookingQueryResults[0][0].uuid,
+			associatedJourneyBookingQueryResults[0][0].vehicle_id,
+			associatedJourneyBookingQueryResults[0][0].vehicle_uuid,
+			_journeyStartedAt,
+			_journeyEndedAt,
+			_journeyFrom,
+			_journeyTo,
+			_journeyStartOdometerReading,
+			_journeyEndOdometerReading
+		  ];
+	  }
+	  break;
+
+	case `fuel purchase`:
+	case `fuel_purchase`:
+	case `fuelpurchase`:
+	  const {
+		_id: fuelPurchaseUUID,
+		_bookingID: fuelPurchaseBookingUUID,
+		_fuelPrice,
+		_fuelQuantity
+	  } = resource;
+
+	  // get the booking associated with this fuel purchase
+	  const associatedFuelPurchaseBookingQueryResults = await pool.query(`SELECT id, uuid, vehicle_id, vehicle_uuid FROM bookings WHERE uuid = ?`, [fuelPurchaseBookingUUID]);
+
+	  if (!associatedFuelPurchaseBookingQueryResults[0] ||
+		!associatedFuelPurchaseBookingQueryResults[0][0]) {
+		response = {
+		  error: 'No booking associated with this fuel purchase was found'
+		}
+	  } else {
+		queryString = `INSERT INTO nmt_fleet_manager.fuel_purchases(uuid, booking_id, booking_uuid, vehicle_id, vehicle_uuid, fuel_quantity, fuel_price) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+		valuesArray =
+		  [
+			fuelPurchaseUUID,
+			associatedFuelPurchaseBookingQueryResults[0][0].id,
+			associatedFuelPurchaseBookingQueryResults[0][0].uuid,
+			associatedFuelPurchaseBookingQueryResults[0][0].vehicle_id,
+			associatedFuelPurchaseBookingQueryResults[0][0].vehicle_uuid,
+			_fuelQuantity,
+			_fuelPrice
+		  ];
+	  }
+	  break;
+
+	case `service`:
+	  const {
+		_id: serviceUUID,
+		_vehicleID: serviceVehicleUUID,
+		_serviceOdometer,
+		_servicedAt
+	  } = resource;
+
+	  // get the vehicle associated with this service
+	  const associatedVehicleServiceQueryResults = await pool.query(`SELECT id, uuid FROM vehicles WHERE uuid = ?`, [serviceVehicleUUID]);
+
+	  if (!associatedVehicleServiceQueryResults[0]
+		|| !associatedVehicleServiceQueryResults[0][0]) {
+		response = {
+		  error: 'No vehicle associated with this service was found'
+		}
+	  } else {
+		queryString = `INSERT INTO nmt_fleet_manager.services(uuid, vehicle_id, vehicle_uuid, odometer, serviced_at) VALUES (?, ?, ?, ?, ?)`;
+		valuesArray = [
+		  serviceUUID,
+		  associatedVehicleServiceQueryResults[0][0].id,
+		  associatedVehicleServiceQueryResults[0][0].uuid,
+		  _serviceOdometer,
+		  _servicedAt
+		];
+	  }
+	  break;
+
+	default:
+	  response = {
+		error: 'Invalid resource to be added'
+	  };
+	  break;
   }
   if (queryString && valuesArray.length && !response) {
-    response = await pool.query(queryString, valuesArray);
+	response = await pool.query(queryString, valuesArray);
   }
   return response;
 };
 
 const handlePostResource = (req, res, resourceName, resource) => {
   res.set({
-    'Content-Type': 'application/json; charset=utf-8'
+	'Content-Type': 'application/json; charset=utf-8'
   });
   try {
-    const response = addResource(resourceName, resource);
-    res.json(response);
+	const response = addResource(resourceName, resource);
+	res.json(response);
   } catch (err) {
-    res.json(err);
+	res.json(err);
   }
 };
 
@@ -274,14 +370,104 @@ router.post(`/bookings`, (req, res) => {
   handlePostResource(req, res, 'booking', req.body);
 });
 
+router.post(`/journeys`, (req, res) => {
+  handlePostResource(req, res, 'journey', req.body);
+});
+
+router.post(`/fuel_purchases`, (req, res) => {
+  handlePostResource(req, res, 'fuel_purchase', req.body);
+});
+
+router.post(`/services`, (req, res) => {
+  handlePostResource(req, res, 'service', req.body);
+});
+
+/**
+ * DELETE a resource from the database
+ */
+/**
+ * Deletes a resource from the database
+ * @param {string} resourceName - one of: "vehicle", "journey", "fuel purchase",
+ * "fuel_purchase", "fuelpurchase", "booking" or "service"
+ * @param {string} resourceUUID - The resource to be removed from the database
+ */
+const deleteResource = async (resourceName, resourceUUID) => {
+  if (!resourceUUID) {
+	return {
+	  error: 'invalid resource data'
+	}
+  }
+  resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
+  let response;
+  if (!resourceName) {
+	response = {
+	  error: 'invalid resource name'
+	};
+	return response;
+  }
+  if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
+    resourceName = `fuel_purchase`;
+  }
+  // make sure that the resource exists in the database
+  const resourceQueryResults = await pool.query(`SELECT id, uuid FROM ${resourceName}s WHERE uuid = ?`, [resourceUUID]);
+
+  if (!resourceQueryResults[0] || !resourceQueryResults[0][0]) {
+    response = {
+      error: 'resource not found in DB'
+	};
+	return response;
+  }
+
+  // delete resource
+  response = await pool.query(`DELETE FROM nmt_fleet_manager.${resourceName}s WHERE id = ? AND uuid = ?`, [resourceQueryResults[0][0].id, resourceUUID]);
+  return response;
+};
+
+const handleDeleteResource = async (req, res, resourceName, resourceUUID) => {
+  res.set('json');
+  const response = await deleteResource(resourceName, resourceUUID);
+  res.json({
+	response
+  })
+};
+
+/**
+ * DELETE ROUTES
+ */
+// DELETE /vehicles/:vehicleUUID
+router.delete(`/vehicles/:vehicleUUID`, async (req, res) => {
+  await handleDeleteResource(req, res, 'vehicle', req.params.vehicleUUID);
+});
+
+// DELETE /bookings/:bookingUUID
+router.delete(`/bookings/:bookingUUID`, async (req, res) => {
+  await handleDeleteResource(req, res, 'booking', req.params.bookingUUID);
+});
+
+// DELETE /journeys/:journeyUUID
+router.delete(`/journeys/:journeyUUID`, async (req, res) => {
+  await handleDeleteResource(req, res, 'journey', req.params.journeyUUID);
+});
+
+// DELETE /fuel_purchases/:fuelPurchaseUUID
+router.delete(`/fuel_purchases/:fuelPurchaseUUID`, async (req, res) => {
+  await handleDeleteResource(req, res, 'fuel_purchase', req.params.fuelPurchaseUUID);
+});
+
+// DELETE /services/:serviceUUID
+router.delete(`/services/:serviceUUID`, async (req, res) => {
+  await handleDeleteResource(req, res, 'service', req.params.serviceUUID);
+});
+
+
 // 404
 router.all('*', (req, res) => {
   res.set({
-    'Content-Type': 'application/json; charset=utf-8'
+	'Content-Type': 'application/json; charset=utf-8'
   });
 
-  res.json({
-    error: `Endpoint not found`
+  res.status(404).json({
+	error: `Endpoint not found`
   });
 });
 

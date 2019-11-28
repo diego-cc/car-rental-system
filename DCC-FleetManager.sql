@@ -47,10 +47,13 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.vehicles
     `fuel_type`    VARCHAR(8)               NOT NULL DEFAULT 'Unknown',
     `tank_size`    DECIMAL(5, 2) UNSIGNED   NOT NULL,
     `created_at`   DATETIME                 NOT NULL DEFAULT NOW(),
-    `updated_at`   DATETIME                          DEFAULT NULL ON UPDATE NOW()
+    `updated_at`   DATETIME                          DEFAULT NULL ON UPDATE NOW(),
+
+    INDEX (`id`, `uuid`)
 )
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_general_ci;
+    COLLATE utf8mb4_general_ci
+    ENGINE = INNODB;
 
 # Bookings table
 CREATE TABLE IF NOT EXISTS nmt_fleet_manager.bookings
@@ -67,13 +70,14 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.bookings
     `created_at`     DATETIME                NOT NULL DEFAULT NOW(),
     `updated_at`     DATETIME                         DEFAULT NULL ON UPDATE NOW(),
 
-    INDEX (vehicle_id, vehicle_uuid),
-    FOREIGN KEY (vehicle_id, vehicle_uuid)
-        REFERENCES vehicles (id, uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE
+    INDEX (`id`, `uuid`),
+    FOREIGN KEY (`vehicle_id`, `vehicle_uuid`)
+        REFERENCES vehicles (`id`, `uuid`)
+        ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_general_ci;
+    COLLATE utf8mb4_general_ci
+    ENGINE = INNODB;
 
 # Journeys table
 CREATE TABLE IF NOT EXISTS nmt_fleet_manager.journeys
@@ -93,19 +97,19 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.journeys
     `created_at`     DATETIME                NOT NULL DEFAULT NOW(),
     `updated_at`     DATETIME                         DEFAULT NOW() ON UPDATE NOW(),
 
-    INDEX (vehicle_id, vehicle_uuid),
-    INDEX (booking_id, booking_uuid),
+    INDEX (`id`, `uuid`),
 
-    FOREIGN KEY (vehicle_id, vehicle_uuid)
-        REFERENCES vehicles (id, uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (`vehicle_id`, `vehicle_uuid`)
+        REFERENCES vehicles (`id`, `uuid`)
+        ON DELETE CASCADE,
 
-    FOREIGN KEY (booking_id, booking_uuid)
-        REFERENCES bookings (id, uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (`booking_id`, `booking_uuid`)
+        REFERENCES bookings (`id`, `uuid`)
+        ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_general_ci;
+    COLLATE utf8mb4_general_ci
+    ENGINE = INNODB;
 
 # Services table
 CREATE TABLE IF NOT EXISTS nmt_fleet_manager.services
@@ -119,14 +123,15 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.services
     `created_at`   DATETIME                NOT NULL DEFAULT NOW(),
     `updated_at`   DATETIME                         DEFAULT NULL ON UPDATE NOW(),
 
-    INDEX (vehicle_id, vehicle_uuid),
+    INDEX (`id`, `uuid`),
 
-    FOREIGN KEY (vehicle_id, vehicle_uuid)
-        REFERENCES vehicles (id, uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (`vehicle_id`, `vehicle_uuid`)
+        REFERENCES vehicles (`id`, `uuid`)
+        ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_general_ci;
+    COLLATE utf8mb4_general_ci
+    ENGINE = INNODB;
 
 # Fuel purchases table
 CREATE TABLE IF NOT EXISTS nmt_fleet_manager.fuel_purchases
@@ -142,19 +147,19 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.fuel_purchases
     `created_at`    DATETIME               NOT NULL DEFAULT NOW(),
     `updated_at`    DATETIME                        DEFAULT NULL ON UPDATE NOW(),
 
-    INDEX (vehicle_id, vehicle_uuid),
-    INDEX (booking_id, booking_uuid),
+    INDEX (`id`, `uuid`),
 
-    FOREIGN KEY (vehicle_id, vehicle_uuid)
-        REFERENCES vehicles (id, uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (`vehicle_id`, `vehicle_uuid`)
+        REFERENCES vehicles (`id`, `uuid`)
+        ON DELETE CASCADE,
 
-    FOREIGN KEY (booking_id, booking_uuid)
-        REFERENCES bookings (id, uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (`booking_id`, `booking_uuid`)
+        REFERENCES bookings (`id`, `uuid`)
+        ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_general_ci;
+    COLLATE utf8mb4_general_ci
+    ENGINE = INNODB;
 
 # STEP 3.5: Seed Data
 # Vehicles:
@@ -244,7 +249,7 @@ INSERT INTO nmt_fleet_manager.journeys(uuid, booking_id, booking_uuid, vehicle_i
                                        journey_from, journey_to, start_odometer, end_odometer)
 VALUES ('83d2722f-baf5-4632-85a1-4cb1c02185ee',
         '1',
-        'cd302c56-b15a-4e0f-8055-f9dc41907063',
+        '3e933953-5b14-40b9-b04c-00c968d49d39',
         '1',
         '23c07876-a967-4cf0-bf22-0fdeaf7beb06',
         '2019-11-28',
@@ -257,7 +262,7 @@ VALUES ('83d2722f-baf5-4632-85a1-4cb1c02185ee',
         '2',
         'a6bd0071-77cd-46a1-a338-8c897e4108b0',
         '2',
-        '3fc41603-8b8a-4207-bba4-a49095f36692',
+        '37b80138-56e3-4834-9870-5c618e648d0c',
         '2019-11-29',
         '2019-11-30',
         'Perth',
@@ -268,7 +273,7 @@ VALUES ('83d2722f-baf5-4632-85a1-4cb1c02185ee',
         '3',
         '963bc486-cc1a-4463-8cfb-98b0782f115a',
         '3',
-        '37b80138-56e3-4834-9870-5c618e648d0c',
+        '3fc41603-8b8a-4207-bba4-a49095f36692',
         '2019-11-28',
         '2019-11-29',
         'Perth',
