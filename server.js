@@ -20,7 +20,16 @@ const pool = mysql.createPool({
   user: 'nmt_fleet_manager',
   password: 'Fleet2019S2',
   database: 'nmt_fleet_manager'
-}).promise();
+})
+  .promise();
+
+/**
+ * Basic connection error handling
+ * (To be properly implemented, perhaps write a middleware and pass it to the router)
+ */
+pool.on('error', err => {
+  console.dir(err);
+});
 
 /**
  * Functions to get a resource from the database
@@ -35,48 +44,48 @@ const getResource = async (resourceName, resourceID = null) => {
   let results = [];
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   if (!resourceName) {
-	return ({
-	  error: 'invalid resource name'
-	})
+    return ({
+      error: 'invalid resource name'
+    })
   }
 
   let query;
   switch (resourceName) {
-	case 'vehicles':
-	case 'bookings':
-	case 'journeys':
-	case 'fuel purchases':
-	case 'fuelpurchases':
-	case 'fuel_purchases':
-	case 'services':
-	  if (resourceName === 'fuel purchases' || resourceName === 'fuelpurchases') {
-		resourceName = 'fuel_purchases';
-	  }
-	  query = `SELECT * FROM ${resourceName}`;
-	  const [rows] = await pool.query(query);
-	  results = rows;
-	  return results;
+    case 'vehicles':
+    case 'bookings':
+    case 'journeys':
+    case 'fuel purchases':
+    case 'fuelpurchases':
+    case 'fuel_purchases':
+    case 'services':
+      if (resourceName === 'fuel purchases' || resourceName === 'fuelpurchases') {
+        resourceName = 'fuel_purchases';
+      }
+      query = `SELECT * FROM ${resourceName}`;
+      const [rows] = await pool.query(query);
+      results = rows;
+      return results;
 
-	case 'vehicle':
-	case 'booking':
-	case 'journey':
-	case 'fuel purchase':
-	case 'fuelpurchase':
-	case 'fuel_purchase':
-	case 'service':
-	  if (!resourceID) {
-		throw new Error(`Invalid resourceID provided: ${resourceID}`);
-	  }
-	  if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
-		resourceName = 'fuel_purchase';
-	  }
-	  query = `SELECT * FROM \`${resourceName}s\` WHERE \`id\` = ?`;
-	  const queryResult = await pool.execute(query, [resourceID]);
-	  results = queryResult[0][0];
-	  return results;
+    case 'vehicle':
+    case 'booking':
+    case 'journey':
+    case 'fuel purchase':
+    case 'fuelpurchase':
+    case 'fuel_purchase':
+    case 'service':
+      if (!resourceID) {
+        throw new Error(`Invalid resourceID provided: ${resourceID}`);
+      }
+      if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
+        resourceName = 'fuel_purchase';
+      }
+      query = `SELECT * FROM \`${resourceName}s\` WHERE \`id\` = ?`;
+      const queryResult = await pool.execute(query, [resourceID]);
+      results = queryResult[0][0];
+      return results;
 
-	default:
-	  return results;
+    default:
+      return results;
   }
 };
 
@@ -91,13 +100,13 @@ const getResource = async (resourceName, resourceID = null) => {
  */
 const handleFetchResource = async (req, res, resourceName, resourceID = null) => {
   res.set({
-	'Content-Type': 'application/json; charset=utf-8'
+    'Content-Type': 'application/json; charset=utf-8'
   });
   try {
-	const resource = await getResource(resourceName, resourceID);
-	res.json(resource);
+    const resource = await getResource(resourceName, resourceID);
+    res.json(resource);
   } catch (err) {
-	res.json(err);
+    res.json(err);
   }
 };
 
@@ -110,7 +119,7 @@ router.get(`/vehicles`, async (req, res) => {
 });
 
 // GET /api/bookings
-router.get(`/bookings`, async(req, res) => {
+router.get(`/bookings`, async (req, res) => {
   await handleFetchResource(req, res, 'bookings');
 });
 
@@ -167,55 +176,55 @@ router.get(`/services/:serviceID`, async (req, res) => {
  * @returns {{error: string}}
  */
 const addResource = async (resourceName, resource) => {
-	let results = [];
+  let results = [];
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   let response;
   if (!resourceName) {
-	return ({
-	  error: 'invalid resource name'
-	})
+    return ({
+      error: 'invalid resource name'
+    })
   }
 
   switch (resourceName) {
-	case 'vehicle':
-	  resourceName = 'vehicles';
-	  if (!resource || !resource['_id']) {
-		return {
-		  error: 'invalid vehicle data'
-		}
-	  }
-	  const {
-		_id,
-		_manufacturer,
-		_model,
-		_year,
-		_odometerReading,
-		_registrationNumber,
-		_tankCapacity
-	  } = resource;
+    case 'vehicle':
+      resourceName = 'vehicles';
+      if (!resource || !resource['_id']) {
+        return {
+          error: 'invalid vehicle data'
+        }
+      }
+      const {
+        _id,
+        _manufacturer,
+        _model,
+        _year,
+        _odometerReading,
+        _registrationNumber,
+        _tankCapacity
+      } = resource;
 
-	  const vehiclesQueryResults = await pool.query(`INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`, [_id, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity]);
-		results = vehiclesQueryResults[0][0];
-		return results;
+      const vehiclesQueryResults = await pool.query(`INSERT INTO nmt_fleet_manager.vehicles(uuid, manufacturer, model, year, odometer, registration, tank_size) VALUES (?, ?, ?, ?, ?, ?, ?)`, [_id, _manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity]);
+      results = vehiclesQueryResults[0][0];
+      return results;
 
-	default:
-	  response = {
-		error: 'Invalid resource to be added'
-	  };
-	  break;
+    default:
+      response = {
+        error: 'Invalid resource to be added'
+      };
+      break;
   }
   return response;
 };
 
 const handlePostResource = (req, res, resourceName, resource) => {
   res.set({
-	'Content-Type': 'application/json; charset=utf-8'
+    'Content-Type': 'application/json; charset=utf-8'
   });
   try {
-	const response = addResource(resourceName, resource);
-	res.json(response);
+    const response = addResource(resourceName, resource);
+    res.json(response);
   } catch (err) {
-	res.json(err);
+    res.json(err);
   }
 };
 
@@ -233,11 +242,11 @@ router.post(`/vehicles`, (req, res) => {
 // 404
 router.all('*', (req, res) => {
   res.set({
-	'Content-Type': 'application/json; charset=utf-8'
+    'Content-Type': 'application/json; charset=utf-8'
   });
 
   res.json({
-	error: `Endpoint not found`
+    error: `Endpoint not found`
   });
 });
 

@@ -236,7 +236,7 @@ export class App extends React.Component {
               }, this.dismissNotification)
               });*/
 
-            const db = firebase.firestore();
+            /*const db = firebase.firestore();
             if (collectionName === 'journeys') {
               const associatedBooking = this.state.vehicles.find(v => v.bookings.some(b => b.id === resource.bookingID)).bookings.find(b => b.id === resource.bookingID);
               if (associatedBooking.bookingType === 'K') {
@@ -272,7 +272,7 @@ export class App extends React.Component {
                     message: `Could not add new ${resourceType}. Error: ${err.message}`
                   }
                 }, this.dismissNotification)
-              })
+              })*/
           }
         } else {
           this.setState({
@@ -580,7 +580,7 @@ export class App extends React.Component {
       .then(values => {
         // move services, bookings, journeys and fuel purchases to the respective vehicle
         this.setState(prevState => {
-          const {services, bookings, journeys, fuelPurchases, vehicles} = prevState;
+          const {services, bookings, journeys, fuelPurchases, vehicles} = values;
 
           let vehicleJourneys, vehicleServices, vehicleFuelPurchases;
 
@@ -621,11 +621,12 @@ export class App extends React.Component {
                   message: `Updated odometer for ${v.manufacturer} ${v.model} (${v.year})`
                 }
               }, this.dismissNotification)
-            });
+            }, false);
           });
 
           const revenue = calculateTotalRevenue(vehicles);
           return ({
+            loading: false,
             vehicles,
             revenue
           })
@@ -648,9 +649,56 @@ export class App extends React.Component {
    * "fuelPurchases"
    * @returns {Promise<firebase.firestore.QuerySnapshot>}
    */
-  fetchCollection = (collection) => {
-    const formattedCollection = collection.trim().toLowerCase();
-    const db = firebase.firestore();
+  fetchCollection = async (collection) => {
+    let formattedCollection = collection.trim().toLowerCase();
+    if (formattedCollection === 'fuelpurchases' || formattedCollection === 'fuel purchases') {
+      formattedCollection = 'fuel_purchases';
+    }
+    const fetchResult = await fetch(`/api/${formattedCollection}`);
+    const collectionResources = await fetchResult.json();
+
+    const data = collectionResources.map(resource => {
+      switch (formattedCollection) {
+        case 'vehicles':
+          resource = new Vehicle(resource.manufacturer, resource.model, resource.year, resource.odometer, resource.registration, resource[`tank_size`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+          break;
+
+        case 'bookings':
+          resource = new Booking(resource[`vehicle_uuid`], resource.type, resource[`started_at`], resource[`ended_at`], resource[`start_odometer`], resource[`end_odometer`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+          break;
+
+        case 'journeys':
+          resource = new Journey(resource[`booking_uuid`], resource[`start_odometer`], resource[`end_odometer`], resource[`started_at`], resource[`ended_at`], resource[`journey_from`], resource[`journey_to`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+          break;
+
+        case 'fuel_purchases':
+          resource = new FuelPurchase(resource[`booking_uuid`], resource[`fuel_quantity`], resource[`fuel_price`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+          break;
+
+        case 'services':
+          resource = new Service(resource[`vehicle_uuid`], resource.odometer, resource[`serviced_at`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+          break;
+
+        default:
+          break;
+      }
+      return resource;
+    });
+    return Promise.resolve(data);
+
+
+     /* .catch(err => {
+        this.setState({
+          loading: false,
+          notification: {
+            display: true,
+            message: `Could not fetch ${collection}: ${err.message}`
+          }
+        }, this.dismissNotification)
+      });*/
+
+    // If the remote database is firebase instead of MySQL, use the code below and comment out the one above
+    /*const db = firebase.firestore();
     return db
       .collection(collection)
       .get()
@@ -701,7 +749,7 @@ export class App extends React.Component {
         }, () => {
           console.dir(e);
         })
-      })
+      })*/
   };
 
   /**
@@ -710,7 +758,19 @@ export class App extends React.Component {
    * @returns {Promise<firebase.firestore.QuerySnapshot[]>}
    */
   async fetchCollections(...collections) {
-    return Promise.all(collections.map(collection => this.fetchCollection(collection)))
+    const vehicles = await this.fetchCollection('vehicles');
+    const bookings = await this.fetchCollection('bookings');
+    const journeys = await this.fetchCollection('journeys');
+    const fuelPurchases = await this.fetchCollection('fuelPurchases');
+    const services = await this.fetchCollection('services');
+
+    return ({
+      vehicles,
+      bookings,
+      journeys,
+      fuelPurchases,
+      services
+    });
   }
 
   render() {

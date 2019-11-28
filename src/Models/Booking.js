@@ -192,7 +192,7 @@ export class Booking {
    */
   addJourney(newJourney) {
 	this.journeys.push(newJourney);
-	this.updateEndOdometer();
+	this.updateEndOdometer(null, false);
 	this.bookingCost = this.calculateBookingCost();
   }
 
@@ -202,7 +202,7 @@ export class Booking {
    */
   removeJourney(journey) {
 	this.journeys = this.journeys.filter(j => j.id !== journey.id);
-	this.updateEndOdometer();
+	this.updateEndOdometer(null, false);
 	this.bookingCost = this.calculateBookingCost();
   }
 

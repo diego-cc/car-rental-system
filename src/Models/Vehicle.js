@@ -55,7 +55,7 @@ export class Vehicle {
    */
   addBooking(newBooking) {
 	this.bookings.push(newBooking);
-	this.updateVehicleOdometer();
+	this.updateVehicleOdometer(null, false);
   }
 
   /**
@@ -69,7 +69,7 @@ export class Vehicle {
 
 	  if (bookingToBeDeleted) {
 		this.bookings = bookingsCopy.filter(booking => booking.id !== bookingToBeDeleted.id);
-		this.updateVehicleOdometer();
+		this.updateVehicleOdometer(null, false);
 	  }
 	}
   }
@@ -81,7 +81,7 @@ export class Vehicle {
    */
   removeJourneyByBookingID(journey, bookingID) {
 	this.bookings.find(b => b.id === bookingID).removeJourney(journey);
-	this.updateVehicleOdometer();
+	this.updateVehicleOdometer(null, false);
   }
 
   /**
@@ -90,7 +90,7 @@ export class Vehicle {
    */
   addJourney(newJourney) {
 	this.bookings.find(b => b.id === newJourney.bookingID).addJourney(newJourney);
-	this.updateVehicleOdometer();
+	this.updateVehicleOdometer(null, false);
   }
 
   /**
