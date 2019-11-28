@@ -522,10 +522,11 @@ export class App extends React.Component {
     };
 
     /**
-     *
-     * @param resourceType
-     * @param resource
-     * @param callback
+     * Changes the state of the delete modal
+     * @param {string} resourceType - one of: "vehicle", "booking", "journey", "fuelPurchase", "fuel purchase"
+     * or "service"
+     * @param {Vehicle|Booking|Journey|FuelPurchase|Service} resource - the resource to be deleted
+     * @param {Function} callback - an optional callback
      */
     this.setDeleteResourceModalShow = (resourceType, resource, callback) => {
       this.setState(prevState => ({
@@ -568,13 +569,10 @@ export class App extends React.Component {
   }
 
   /**
-   * Fetches all collections from firebase, organises the data in the state and updates
+   * Fetches all collections from the database, organises the data in the state and updates
    * odometers, if need be
    */
   componentDidMount() {
-    /*fetch(`/api/vehicles`)
-      .then(res => res.json())
-      .then(res => console.dir(res));*/
     this
       .fetchCollections('vehicles', 'bookings', 'journeys', 'services', 'fuelPurchases')
       .then(values => {
@@ -609,9 +607,7 @@ export class App extends React.Component {
             vehicleServices.forEach(s => {
               v.addService(s);
             });
-
           });
-
           // update odometers and notify user
           vehicles.forEach(v => {
             v.updateVehicleOdometer(() => {
@@ -654,49 +650,43 @@ export class App extends React.Component {
     if (formattedCollection === 'fuelpurchases' || formattedCollection === 'fuel purchases') {
       formattedCollection = 'fuel_purchases';
     }
-    const fetchResult = await fetch(`/api/${formattedCollection}`);
-    const collectionResources = await fetchResult.json();
 
-    const data = collectionResources.map(resource => {
-      switch (formattedCollection) {
-        case 'vehicles':
-          resource = new Vehicle(resource.manufacturer, resource.model, resource.year, resource.odometer, resource.registration, resource[`tank_size`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
-          break;
+    let fetchResult, collectionResources, data;
+    try {
+      fetchResult = await fetch(`/api/${formattedCollection}`);
+      collectionResources = await fetchResult.json();
+      data = collectionResources.map(resource => {
+        switch (formattedCollection) {
+          case 'vehicles':
+            resource = new Vehicle(resource.manufacturer, resource.model, resource.year, resource.odometer, resource.registration, resource[`tank_size`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+            break;
 
-        case 'bookings':
-          resource = new Booking(resource[`vehicle_uuid`], resource.type, resource[`started_at`], resource[`ended_at`], resource[`start_odometer`], resource[`end_odometer`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
-          break;
+          case 'bookings':
+            resource = new Booking(resource[`vehicle_uuid`], resource.type, resource[`started_at`], resource[`ended_at`], resource[`start_odometer`], resource[`end_odometer`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+            break;
 
-        case 'journeys':
-          resource = new Journey(resource[`booking_uuid`], resource[`start_odometer`], resource[`end_odometer`], resource[`started_at`], resource[`ended_at`], resource[`journey_from`], resource[`journey_to`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
-          break;
+          case 'journeys':
+            resource = new Journey(resource[`booking_uuid`], resource[`start_odometer`], resource[`end_odometer`], resource[`started_at`], resource[`ended_at`], resource[`journey_from`], resource[`journey_to`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+            break;
 
-        case 'fuel_purchases':
-          resource = new FuelPurchase(resource[`booking_uuid`], resource[`fuel_quantity`], resource[`fuel_price`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
-          break;
+          case 'fuel_purchases':
+            resource = new FuelPurchase(resource[`booking_uuid`], resource[`fuel_quantity`], resource[`fuel_price`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+            break;
 
-        case 'services':
-          resource = new Service(resource[`vehicle_uuid`], resource.odometer, resource[`serviced_at`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
-          break;
+          case 'services':
+            resource = new Service(resource[`vehicle_uuid`], resource.odometer, resource[`serviced_at`], resource.uuid, resource[`created_at`], resource[`updated_at`]);
+            break;
 
-        default:
-          break;
-      }
-      return resource;
-    });
-    return Promise.resolve(data);
-
-
-     /* .catch(err => {
-        this.setState({
-          loading: false,
-          notification: {
-            display: true,
-            message: `Could not fetch ${collection}: ${err.message}`
-          }
-        }, this.dismissNotification)
-      });*/
-
+          default:
+            break;
+        }
+        return resource;
+      });
+      return data;
+    }
+    catch (err) {
+      throw err;
+    }
     // If the remote database is firebase instead of MySQL, use the code below and comment out the one above
     /*const db = firebase.firestore();
     return db
@@ -755,22 +745,33 @@ export class App extends React.Component {
   /**
    * Fetches multiple collections from firebase
    * @param {Array<string>|string} collections - array of collection names to be fetched
-   * @returns {Promise<firebase.firestore.QuerySnapshot[]>}
+   * @returns {Object} data
    */
   async fetchCollections(...collections) {
-    const vehicles = await this.fetchCollection('vehicles');
-    const bookings = await this.fetchCollection('bookings');
-    const journeys = await this.fetchCollection('journeys');
-    const fuelPurchases = await this.fetchCollection('fuelPurchases');
-    const services = await this.fetchCollection('services');
+    let vehicles, bookings, journeys, fuelPurchases, services;
+    try {
+      /**
+       * The callback that is passed to Array.forEach, Array.map, etc. is synchronous
+       * So I have to fetch one by one
+       * Too bad :(
+       */
+      vehicles = await this.fetchCollection('vehicles');
+      bookings = await this.fetchCollection('bookings');
+      journeys = await this.fetchCollection('journeys');
+      fuelPurchases = await this.fetchCollection('fuelPurchases');
+      services = await this.fetchCollection('services');
 
-    return ({
-      vehicles,
-      bookings,
-      journeys,
-      fuelPurchases,
-      services
-    });
+      return ({
+        vehicles,
+        bookings,
+        journeys,
+        fuelPurchases,
+        services
+      });
+    }
+    catch (err) {
+      throw err;
+    }
   }
 
   render() {
