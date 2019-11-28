@@ -296,6 +296,12 @@ export class App extends React.Component {
 			  })
 				.then(() => {
 				  this.componentDidMount();
+				  this.setState({
+					notification: {
+					  display: true,
+					  message: `The ${resourceType} and has been successfully deleted`
+					}
+				  }, this.dismissNotification)
 				})
 				.catch(err => {
 				  this.setState({
