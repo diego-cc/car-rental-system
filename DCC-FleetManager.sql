@@ -3,15 +3,6 @@
 # Name: Diego Craveiro Chaves
 # Student ID: 20026893
 
-# Default connection settings for the MySQL server:
--- host: localhost
--- port: 3306
--- user: nmt_fleet_manager@localhost
--- password: Fleet2019S2
--- database: nmt_fleet_manager
-
-# See server.js to change the connection parameters
-
 # STEP 1: Create the Application
 # Already completed on part 1 of the related TDD assignment (using React and Firebase)
 
@@ -74,7 +65,12 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.bookings
     `type`           ENUM ('D', 'K')         NOT NULL DEFAULT 'D',
     `cost`           DECIMAL(10, 2) UNSIGNED          DEFAULT 0.0,
     `created_at`     DATETIME                NOT NULL DEFAULT NOW(),
-    `updated_at`     DATETIME                         DEFAULT NULL ON UPDATE NOW()
+    `updated_at`     DATETIME                         DEFAULT NULL ON UPDATE NOW(),
+
+    INDEX (vehicle_id, vehicle_uuid),
+    FOREIGN KEY (vehicle_id, vehicle_uuid)
+        REFERENCES vehicles (id, uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_general_ci;
@@ -95,7 +91,18 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.journeys
     `start_odometer` DECIMAL(10, 2) UNSIGNED NOT NULL DEFAULT 0.0,
     `end_odometer`   DECIMAL(10, 2) UNSIGNED NOT NULL DEFAULT 0.0,
     `created_at`     DATETIME                NOT NULL DEFAULT NOW(),
-    `updated_at`     DATETIME                         DEFAULT NOW() ON UPDATE NOW()
+    `updated_at`     DATETIME                         DEFAULT NOW() ON UPDATE NOW(),
+
+    INDEX (vehicle_id, vehicle_uuid),
+    INDEX (booking_id, booking_uuid),
+
+    FOREIGN KEY (vehicle_id, vehicle_uuid)
+        REFERENCES vehicles (id, uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+
+    FOREIGN KEY (booking_id, booking_uuid)
+        REFERENCES bookings (id, uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_general_ci;
@@ -110,7 +117,13 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.services
     `odometer`     DECIMAL(10, 2) UNSIGNED NOT NULL DEFAULT 0.0,
     `serviced_at`  DATETIME                NOT NULL DEFAULT NOW(),
     `created_at`   DATETIME                NOT NULL DEFAULT NOW(),
-    `updated_at`   DATETIME                         DEFAULT NULL ON UPDATE NOW()
+    `updated_at`   DATETIME                         DEFAULT NULL ON UPDATE NOW(),
+
+    INDEX (vehicle_id, vehicle_uuid),
+
+    FOREIGN KEY (vehicle_id, vehicle_uuid)
+        REFERENCES vehicles (id, uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_general_ci;
@@ -127,7 +140,18 @@ CREATE TABLE IF NOT EXISTS nmt_fleet_manager.fuel_purchases
     `fuel_quantity` DECIMAL(5, 2) UNSIGNED NOT NULL DEFAULT 0.0,
     `fuel_price`    DECIMAL(5, 2) UNSIGNED NOT NULL,
     `created_at`    DATETIME               NOT NULL DEFAULT NOW(),
-    `updated_at`    DATETIME                        DEFAULT NULL ON UPDATE NOW()
+    `updated_at`    DATETIME                        DEFAULT NULL ON UPDATE NOW(),
+
+    INDEX (vehicle_id, vehicle_uuid),
+    INDEX (booking_id, booking_uuid),
+
+    FOREIGN KEY (vehicle_id, vehicle_uuid)
+        REFERENCES vehicles (id, uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+
+    FOREIGN KEY (booking_id, booking_uuid)
+        REFERENCES bookings (id, uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE
 )
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_general_ci;
