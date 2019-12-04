@@ -109,8 +109,8 @@ export const AddJourneyForm = () => {
 			  initialValues={{
 				journeyStartOdometerReading: associatedBooking ? associatedBooking.startOdometer : 0,
 				journeyEndOdometerReading: associatedBooking ? associatedBooking.startOdometer : 0,
-				journeyStartedAt: associatedBooking ? associatedBooking.startDate : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
-				journeyEndedAt: associatedBooking ? associatedBooking.startDate : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+				journeyStartedAt: associatedBooking ? moment(associatedBooking.startDate).format('YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+				journeyEndedAt: associatedBooking ? moment(associatedBooking.startDate).format('YYYY-MM-DD') : moment(moment(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
 				journeyFrom: '',
 				journeyTo: ''
 			  }}

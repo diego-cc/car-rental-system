@@ -72,36 +72,47 @@ export class App extends React.Component {
 
 		  return ({
 			...prevState,
-			vehicles
+			vehicles,
+			loading: updateRemote
 		  })
 		}, () => {
 		  if (updateRemote) {
-			const db = firebase.firestore();
-
-			return db
-			  .collection('vehicles')
-			  .doc(vehicle.id)
-			  .update(fieldsChanged)
-			  .then(() => {
-				this.setState({
-				  loading: false,
-				  notification: {
-					display: true,
-					message: `The vehicle has been successfully updated`
-				  }
-				}, this.dismissNotification)
+			fetch(`/api/vehicles/${vehicle.id}`, {
+			  method: 'PUT',
+			  headers: {
+				'Content-Type': 'application/json'
+			  },
+			  body: JSON.stringify({...vehicle})
+			})
+			  .then(res => res.json())
+			  .then(res => {
+				if (!res.error && !res.message) {
+				  this.setState({
+					loading: false,
+					notification: {
+					  display: true,
+					  message: 'The vehicle has been successfully updated'
+					}
+				  }, this.dismissNotification)
+				} else {
+				  this.setState({
+					loading: false,
+					notification: {
+					  display: true,
+					  message: res.error
+					}
+				  }, this.dismissNotification)
+				}
 			  })
 			  .catch(err => {
+				console.log(err);
 				this.setState({
 				  loading: false,
 				  notification: {
 					display: true,
-					message: `Could not edit vehicle: ${err}`
+					message: err.message
 				  }
-				}, () => {
-				  this.dismissNotification();
-				  console.dir(err);
-				})
+				}, this.dismissNotification)
 			  })
 		  }
 		});
@@ -290,28 +301,29 @@ export class App extends React.Component {
 				break;
 			}
 			if (collection) {
-			  // update vehicle on mysql database
-			  fetch(`/api/${collection}/${resource.id}`, {
-				method: 'DELETE'
-			  })
-				.then(() => {
-				  this.componentDidMount();
-				  this.setState({
-					notification: {
-					  display: true,
-					  message: `The ${resourceType} and has been successfully deleted`
-					}
-				  }, this.dismissNotification)
+			  if (updateRemote) {
+				fetch(`/api/${collection}/${resource.id}`, {
+				  method: 'DELETE'
 				})
-				.catch(err => {
-				  this.setState({
-					loading: false,
-					notification: {
-					  display: true,
-					  message: `Could not delete ${resourceType}: ${err.message}`
-					}
-				  }, this.dismissNotification)
-				});
+				  .then(() => {
+					this.componentDidMount();
+					this.setState({
+					  notification: {
+						display: true,
+						message: `The ${resourceType} has been successfully deleted`
+					  }
+					}, this.dismissNotification)
+				  })
+				  .catch(err => {
+					this.setState({
+					  loading: false,
+					  notification: {
+						display: true,
+						message: `Could not delete ${resourceType}: ${err.message}`
+					  }
+					}, this.dismissNotification)
+				  });
+			  }
 			} else {
 			  this.setState({
 				loading: false,
