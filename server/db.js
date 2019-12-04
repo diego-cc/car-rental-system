@@ -1,5 +1,14 @@
+/**
+ * db.js
+ */
 const mysql = require('mysql2/promise');
 
+/**
+ * Opens a new connection to the database
+ * If the connection fails, the error is thrown - to be handled by the many routes of the
+ * application
+ * @returns {Promise<Pool>}
+ */
 const getPoolConnection = async () => {
   let pool;
   try {
