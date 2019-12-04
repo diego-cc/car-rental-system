@@ -14,17 +14,17 @@ bookingsRouter
   .get(`/`, async (req, res) => {
 	await handleFetchResource(req, res, 'bookings');
   })
-  .get(`/:bookingID`, async (req, res) => {
-	await handleFetchResource(req, res, 'booking', req.params.bookingID);
+  .get(`/:bookingUUID`, async (req, res) => {
+	await handleFetchResource(req, res, 'booking', req.params.bookingUUID);
   })
   .post(`/`, async (req, res) => {
 	await handlePostResource(req, res, 'booking', req.body);
   })
-  .put(`/:bookingID`, async (req, res) => {
-	await handlePutResource(req, res, 'booking', req.body);
+  .put(`/:bookingUUID`, async (req, res) => {
+	await handlePutResource(req, res, 'booking', req.params.bookingUUID, req.body);
   })
-  .delete(`/:bookingID`, async (req, res) => {
-	await handleDeleteResource(req, res, 'booking', req.params.bookingID);
+  .delete(`/:bookingUUID`, async (req, res) => {
+	await handleDeleteResource(req, res, 'booking', req.params.bookingUUID);
   });
 
 module.exports = {bookingsRouter};

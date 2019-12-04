@@ -14,17 +14,17 @@ fuelPurchasesRouter
   .get(`/`, async (req, res) => {
 	await handleFetchResource(req, res, 'fuel_purchases');
   })
-  .get(`/:fuelPurchaseID`, async (req, res) => {
-	await handleFetchResource(req, res, 'fuel_purchase', req.params.fuelPurchaseID);
+  .get(`/:fuelPurchaseUUID`, async (req, res) => {
+	await handleFetchResource(req, res, 'fuel_purchase', req.params.fuelPurchaseUUID);
   })
   .post(`/`, async (req, res) => {
 	await handlePostResource(req, res, 'fuel_purchase', req.body);
   })
-  .put(`/:fuelPurchaseID`, async (req, res) => {
-	await handlePutResource(req, res, 'fuel_purchase', req.body);
+  .put(`/:fuelPurchaseUUID`, async (req, res) => {
+	await handlePutResource(req, res, 'fuel_purchase', req.params.fuelPurchaseUUID, req.body);
   })
-  .delete(`/:fuelPurchaseID`, async (req, res) => {
-	await handleDeleteResource(req, res, 'fuel_purchase', req.params.fuelPurchaseID);
+  .delete(`/:fuelPurchaseUUID`, async (req, res) => {
+	await handleDeleteResource(req, res, 'fuel_purchase', req.params.fuelPurchaseUUID);
   });
 
 module.exports = {fuelPurchasesRouter};

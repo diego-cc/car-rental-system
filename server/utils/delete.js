@@ -12,13 +12,13 @@ const deleteResource = async (resourceName, resourceUUID) => {
 
 	if (!resourceUUID) {
 	  return {
-		error: 'invalid resource data'
+		error: 'Invalid resource data'
 	  }
 	}
 	resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
 	if (!resourceName) {
 	  response = {
-		error: 'invalid resource name'
+		error: 'Invalid resource name'
 	  };
 	  return response;
 	}
@@ -30,7 +30,7 @@ const deleteResource = async (resourceName, resourceUUID) => {
 
 	if (!resourceQueryResults[0] || !resourceQueryResults[0][0]) {
 	  response = {
-		error: 'resource not found in DB'
+		error: 'Resource not found in DB'
 	  };
 	  return response;
 	}

@@ -14,17 +14,17 @@ servicesRouter
   .get(`/`, async (req, res) => {
 	await handleFetchResource(req, res, 'services');
   })
-  .get(`/:serviceID`, async (req, res) => {
-	await handleFetchResource(req, res, 'service', req.params.serviceID);
+  .get(`/:serviceUUID`, async (req, res) => {
+	await handleFetchResource(req, res, 'service', req.params.serviceUUID);
   })
   .post(`/`, async (req, res) => {
 	await handlePostResource(req, res, 'service', req.body);
   })
-  .put(`/:serviceID`, async (req, res) => {
-	await handlePutResource(req, res, 'service', req.body);
+  .put(`/:serviceUUID`, async (req, res) => {
+	await handlePutResource(req, res, 'service', req.params.serviceUUID, req.body);
   })
-  .delete(`/:serviceID`, async (req, res) => {
-	await handleDeleteResource(req, res, 'service', req.params.serviceID);
+  .delete(`/:serviceUUID`, async (req, res) => {
+	await handleDeleteResource(req, res, 'service', req.params.serviceUUID);
   });
 
 module.exports = {servicesRouter};

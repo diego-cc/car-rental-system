@@ -26,8 +26,6 @@ const updateResource = async (resourceName, resourceUUID, resource) => {
 		  _tankCapacity
 		} = resource;
 
-		console.log(resource);
-
 		queryString = `UPDATE vehicles SET manufacturer = ?, model = ?, year = ?, odometer = ?, registration = ?, tank_size = ? WHERE uuid = ?`;
 		valuesArray = [_manufacturer, _model, _year, _odometerReading, _registrationNumber, _tankCapacity, vehicleUUID];
 		break;
@@ -39,10 +37,47 @@ const updateResource = async (resourceName, resourceUUID, resource) => {
 		  _bookingCost,
 		  _startDate,
 		  _endDate,
-		  _startOdometer,
-		  _endOdometer
+		  _startOdometer
 		} = resource;
-		
+		queryString = `UPDATE bookings SET type = ?, cost = ?, started_at = ?, ended_at = ?, start_odometer = ? WHERE uuid = ?`;
+		valuesArray = [_bookingType, _bookingCost, _startDate, _endDate, _startOdometer, bookingUUID];
+		break;
+
+	  case 'journey':
+		const {
+		  _id: journeyUUID,
+		  _journeyStartOdometerReading,
+		  _journeyEndOdometerReading,
+		  _journeyStartedAt,
+		  _journeyEndedAt,
+		  _journeyFrom,
+		  _journeyTo
+		} = resource;
+		queryString = `UPDATE journeys SET start_odometer = ?, end_odometer = ?, started_at = ?, ended_at = ?, journey_from = ?, journey_to = ? WHERE uuid = ?`;
+		valuesArray = [_journeyStartOdometerReading, _journeyEndOdometerReading, _journeyStartedAt, _journeyEndedAt, _journeyFrom, _journeyTo, journeyUUID];
+		break;
+
+	  case 'fuelpurchase':
+	  case 'fuel purchase':
+	  case 'fuel_purchase':
+		const {
+		  _id: fuelPurchaseUUID,
+		  _fuelPrice,
+		  _fuelQuantity,
+		} = resource;
+		queryString = `UPDATE fuel_purchases SET fuel_price = ?, fuel_quantity = ? WHERE uuid = ?`;
+		valuesArray = [_fuelPrice, _fuelQuantity, fuelPurchaseUUID];
+		break;
+
+	  case 'service':
+		const {
+		  _id: serviceUUID,
+		  _serviceOdometer,
+		  _servicedAt
+		} = resource;
+	    queryString = `UPDATE services SET odometer = ?, serviced_at = ? WHERE uuid = ?`;
+	    valuesArray = [_serviceOdometer, _servicedAt, serviceUUID];
+	    break;
 
 	  default:
 		response = {

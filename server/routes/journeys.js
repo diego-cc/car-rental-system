@@ -14,17 +14,17 @@ journeysRouter
   .get(`/`, async (req, res) => {
 	await handleFetchResource(req, res, 'journeys');
   })
-  .get(`/:journeyID`, async (req, res) => {
-	await handleFetchResource(req, res, 'journey', req.params.journeyID);
+  .get(`/:journeyUUID`, async (req, res) => {
+	await handleFetchResource(req, res, 'journey', req.params.journeyUUID);
   })
   .post(`/`, async (req, res) => {
 	await handlePostResource(req, res, 'journey', req.body);
   })
-  .put(`/:journeyID`, async (req, res) => {
-	await handlePutResource(req, res, 'journey', req.body);
+  .put(`/:journeyUUID`, async (req, res) => {
+	await handlePutResource(req, res, 'journey', req.params.journeyUUID, req.body);
   })
-  .delete(`/:journeyID`, async (req, res) => {
-	await handleDeleteResource(req, res, 'journey', req.params.journeyID);
+  .delete(`/:journeyUUID`, async (req, res) => {
+	await handleDeleteResource(req, res, 'journey', req.params.journeyUUID);
   });
 
 module.exports = {journeysRouter};
