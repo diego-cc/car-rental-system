@@ -9,53 +9,61 @@ const {getPoolConnection} = require('../db');
  * @param {string|null} resourceUUID - an optional ID string to get a specific resource instead
  */
 const getResource = async (resourceName, resourceUUID = null) => {
-  const pool = await getPoolConnection();
+  let pool;
+  try {
+	pool = await getPoolConnection();
 
-  let results = [];
-  resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
-  if (!resourceName) {
-	return ({
-	  error: 'invalid resource name'
-	})
-  }
+	let results = [];
+	resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
+	if (!resourceName) {
+	  return ({
+		error: 'invalid resource name'
+	  })
+	}
 
-  let query;
-  switch (resourceName) {
-	case 'vehicles':
-	case 'bookings':
-	case 'journeys':
-	case 'fuel purchases':
-	case 'fuelpurchases':
-	case 'fuel_purchases':
-	case 'services':
-	  if (resourceName === 'fuel purchases' || resourceName === 'fuelpurchases') {
-		resourceName = 'fuel_purchases';
-	  }
-	  query = `SELECT * FROM ${resourceName}`;
-	  const [rows] = await pool.query(query);
-	  results = rows;
-	  return results;
+	let query;
+	switch (resourceName) {
+	  case 'vehicles':
+	  case 'bookings':
+	  case 'journeys':
+	  case 'fuel purchases':
+	  case 'fuelpurchases':
+	  case 'fuel_purchases':
+	  case 'services':
+		if (resourceName === 'fuel purchases' || resourceName === 'fuelpurchases') {
+		  resourceName = 'fuel_purchases';
+		}
+		query = `SELECT * FROM ${resourceName}`;
+		const [rows] = await pool.query(query);
+		results = rows;
+		return results;
 
-	case 'vehicle':
-	case 'booking':
-	case 'journey':
-	case 'fuel purchase':
-	case 'fuelpurchase':
-	case 'fuel_purchase':
-	case 'service':
-	  if (!resourceUUID) {
-		throw new Error(`Invalid resourceID provided: ${resourceUUID}`);
-	  }
-	  if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
-		resourceName = 'fuel_purchase';
-	  }
-	  query = `SELECT * FROM \`${resourceName}s\` WHERE \`uuid\` = ?`;
-	  const queryResult = await pool.execute(query, [resourceUUID]);
-	  results = queryResult[0][0];
-	  return results;
+	  case 'vehicle':
+	  case 'booking':
+	  case 'journey':
+	  case 'fuel purchase':
+	  case 'fuelpurchase':
+	  case 'fuel_purchase':
+	  case 'service':
+		if (!resourceUUID) {
+		  throw new Error(`Invalid resourceID provided: ${resourceUUID}`);
+		}
+		if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
+		  resourceName = 'fuel_purchase';
+		}
+		query = `SELECT * FROM \`${resourceName}s\` WHERE \`uuid\` = ?`;
+		const queryResult = await pool.execute(query, [resourceUUID]);
+		results = queryResult[0][0];
+		return results;
 
-	default:
-	  return results;
+	  default:
+		return results;
+	}
+  } catch (err) {
+	return {
+	  error: 'Could not connect to the database',
+	  message: err
+	}
   }
 };
 
