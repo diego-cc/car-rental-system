@@ -14,14 +14,14 @@ vehiclesRouter
   .get(`/`, async (req, res) => {
 	await handleFetchResource(req, res, 'vehicles');
   })
-  .get(`/:vehicleID`, async (req, res) => {
-	await handleFetchResource(req, res, 'vehicle', req.params.vehicleID);
+  .get(`/:vehicleUUID`, async (req, res) => {
+	await handleFetchResource(req, res, 'vehicle', req.params.vehicleUUID);
   })
   .post(`/`, async (req, res) => {
 	await handlePostResource(req, res, 'vehicle', req.body);
   })
-  .put(`/:vehicleID`, async (req, res) => {
-	await handlePutResource(req, res, 'vehicle', req.body);
+  .put(`/:vehicleUUID`, async (req, res) => {
+	await handlePutResource(req, res, 'vehicle', req.params.vehicleUUID, req.body);
   })
   .delete(`/:vehicleID`, async (req, res) => {
 	await handleDeleteResource(req, res, 'vehicle', req.params.vehicleID);

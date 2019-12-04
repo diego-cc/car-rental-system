@@ -6,9 +6,9 @@ const {getPoolConnection} = require('../db');
  * Gets a resource from the database (e.g. vehicles, bookings, journeys, etc.)
  * @param {string} resourceName - one of: "vehicle(s)", "booking(s)", "journey(s)",
  * "service(s)", "fuel purchase(s)", "fuelPurchase(s)"
- * @param {string|null} resourceID - an optional ID string to get a specific resource instead
+ * @param {string|null} resourceUUID - an optional ID string to get a specific resource instead
  */
-const getResource = async (resourceName, resourceID = null) => {
+const getResource = async (resourceName, resourceUUID = null) => {
   const pool = await getPoolConnection();
 
   let results = [];
@@ -43,14 +43,14 @@ const getResource = async (resourceName, resourceID = null) => {
 	case 'fuelpurchase':
 	case 'fuel_purchase':
 	case 'service':
-	  if (!resourceID) {
-		throw new Error(`Invalid resourceID provided: ${resourceID}`);
+	  if (!resourceUUID) {
+		throw new Error(`Invalid resourceID provided: ${resourceUUID}`);
 	  }
 	  if (resourceName === 'fuel purchase' || resourceName === 'fuelpurchase') {
 		resourceName = 'fuel_purchase';
 	  }
 	  query = `SELECT * FROM \`${resourceName}s\` WHERE \`uuid\` = ?`;
-	  const queryResult = await pool.execute(query, [resourceID]);
+	  const queryResult = await pool.execute(query, [resourceUUID]);
 	  results = queryResult[0][0];
 	  return results;
 
@@ -65,15 +65,15 @@ const getResource = async (resourceName, resourceID = null) => {
  * @param {Response} res - Response object
  * @param {string} resourceName - one of: "vehicle(s)", "booking(s)", "journey(s)",
  * "service(s)", "fuel purchase(s)", "fuelPurchase(s)"
- * @param {string|null} resourceID - an optional ID string to get a specific resource
+ * @param {string|null} resourceUUID - an optional ID string to get a specific resource
  * instead
  */
-const handleFetchResource = async (req, res, resourceName, resourceID = null) => {
+const handleFetchResource = async (req, res, resourceName, resourceUUID = null) => {
   res.set({
 	'Content-Type': 'application/json; charset=utf-8'
   });
   try {
-	const resource = await getResource(resourceName, resourceID);
+	const resource = await getResource(resourceName, resourceUUID);
 	res.json(resource);
   } catch (err) {
 	res.json(err);

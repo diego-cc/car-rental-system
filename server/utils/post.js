@@ -1,4 +1,5 @@
 const {getPoolConnection} = require('../db');
+const util = require('util');
 /**
  * Adds a resource to the database
  * @param {string} resourceName - one of: "vehicle", "booking", "journey", "fuelPurchase",
@@ -11,14 +12,14 @@ const addResource = async (resourceName, resource) => {
 
   if (!resource || !resource['_id']) {
 	return {
-	  error: 'invalid resource data'
+	  error: 'Invalid resource data'
 	}
   }
   resourceName = resourceName ? resourceName.trim().toLowerCase() : resourceName;
   let response;
   if (!resourceName) {
 	response = {
-	  error: 'invalid resource name'
+	  error: 'Invalid resource name'
 	};
 	return response;
   }
@@ -170,18 +171,25 @@ const addResource = async (resourceName, resource) => {
 	  };
 	  break;
   }
-  if (queryString && valuesArray.length && !response) {
-	response = await pool.query(queryString, valuesArray);
+  if (queryString) {
+    try {
+	  response = await pool.query(queryString, valuesArray);
+	}
+	catch (err) {
+      response = {
+        error: err.message
+	  }
+	}
   }
   return response;
 };
 
-const handlePostResource = (req, res, resourceName, resource) => {
+const handlePostResource = async (req, res, resourceName, resource) => {
   res.set({
 	'Content-Type': 'application/json; charset=utf-8'
   });
   try {
-	const response = addResource(resourceName, resource);
+	const response = await addResource(resourceName, resource);
 	res.json(response);
   } catch (err) {
 	res.json(err);
