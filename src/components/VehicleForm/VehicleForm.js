@@ -231,9 +231,7 @@ export const VehicleForm = props => {
 					  className="mr-5"
 					  disabled={isSubmitting}
 					>
-					  {
-						type === 'add' ? `Add vehicle` : `Edit vehicle`
-					  }
+						Save changes
 					</Button>
 					<Button
 					  variant="warning"
