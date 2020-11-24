@@ -14,7 +14,7 @@ const config = {
   projectId: process.env.PROJECT_ID || 'car-rental-system-725f7',
   storageBucket: process.env.STORAGE_BUCKET || 'car-rental-system-725f7.appspot.com',
   messagingSenderId: process.env.MESSAGING_SENDER_ID || '533494537845',
-  appId: process.env.APP_ID || '533494537845:web:8886eede71aaf00dde623c'
+  appId: process.env.APP_ID || '1:533494537845:web:8886eede71aaf00dde623c'
 };
 
 firebase.initializeApp(config);
